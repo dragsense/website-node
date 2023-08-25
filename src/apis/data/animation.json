@@ -1,0 +1,17 @@
+{
+    "bLKFdSs4": {
+        "_uid": "bLKFdSs4",
+        "name": "newaniamtion",
+        "style": {
+            "20%": {
+                "selectorText": "20%",
+                "type": "newaniamtion",
+                "properties": {
+                    "background-color": {
+                        "value": "rgba(243.49949999999998, 241.42975425, 241.42975425, 1)"
+                    }
+                }
+            }
+        }
+    }
+}

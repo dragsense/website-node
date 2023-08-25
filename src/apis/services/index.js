@@ -1,0 +1,18 @@
+module.exports.authService = require('./auth.service')
+module.exports.settingService = require('./setting.service')
+module.exports.themeService = require('./theme.service')
+module.exports.ecommerceService = require('./ecommerce.service')
+module.exports.tokenService = require('./token.service')
+module.exports.userService = require('./user.service')
+module.exports.formService = require('./form.service')
+module.exports.layoutService = require('./layout.service')
+module.exports.templateService = require('./template.service')
+module.exports.componentService = require('./component.service')
+module.exports.documentService = require('./document.service')
+module.exports.themesService = require('./themes.service')
+module.exports.backupService = require('./backup.service')
+
+module.exports.collectionService = require('./collection.service')
+
+module.exports.mediaService = require('./media.service')
+module.exports.pageService = require('./page.service')

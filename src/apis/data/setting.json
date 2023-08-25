@@ -1,0 +1,51 @@
+{
+    "webtitle": "Autocode Website",
+    "tagLine": "Contrary to popular belief, Lorem Ipsum is not simply ",
+    "desc": "Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 4",
+    "lang": "en",
+    "author": "Rana Awais",
+    "keywords": "Easy, Effortless, Rapid",
+    "images": {
+        "favicon": {
+            "_id": "64b7897e0e62eb66579605d9",
+            "src": "http://localhost:3001/static/uploads/images/file-1689749886301.png",
+            "alt": "logo.png",
+            "mimetype": "image/png",
+            "name": "logo.png"
+        },
+        "logo": {
+            "_id": "64b7897e0e62eb66579605d9",
+            "src": "http://localhost:3001/static/uploads/images/file-1689749886301.png",
+            "alt": "logo.png",
+            "mimetype": "image/png",
+            "name": "logo.png"
+        },
+        "mobileLogo": {},
+        "placeholder": {}
+    },
+    "email": {
+        "host": "localhost",
+        "port": "1025",
+        "ignoreTLS": true,
+        "secure": false,
+        "auth": {
+            "user": "admin",
+            "pass": "fb6whNW1E^82sv$!kj"
+        },
+        "subject": "Message from autocode",
+        "from": "info@autocode.com",
+        "to": "info@autocode.com",
+        "cc": "info@autocode.com",
+        "bcc": "info@autocode.com",
+        "replyTo": "info@autocode.com"
+    },
+    "scripts": {
+        "head": "",
+        "footer": ""
+    },
+    "_id": "64b0dad4d4a66ebb9289d462",
+    "homePage": {
+        "_id": "64e0e08cdc46f596d65d7222",
+        "name": "Home Page"
+    }
+}
