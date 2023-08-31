@@ -1,0 +1,8 @@
+module.exports.Page = require('./page.model')
+module.exports.Collection = require('./collection.model')
+module.exports.Form = require('./form.model')
+module.exports.Document = require('./document.model')
+module.exports.Component = require('./component.model')
+module.exports.Layout = require('./layout.model')
+module.exports.Media = require('./media.model')
+module.exports.Template = require('./template.model')

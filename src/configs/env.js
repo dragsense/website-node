@@ -53,12 +53,7 @@ const env = {
         jwtAccessExpired: toNumber(getOsEnv('PASSPORT_JWT_ACCESS_EXPIRED')),
         jwtRefreshExpired: toNumber(getOsEnv('PASSPORT_JWT_REFRESH_EXPIRED')),
     },
-    swagger: {
-        enabled: toBool(getOsEnv('SWAGGER_ENABLED')),
-        route: getOsEnv('SWAGGER_ROUTE'),
-        username: getOsEnv('SWAGGER_USERNAME'),
-        password: getOsEnv('SWAGGER_PASSWORD'),
-    },
+ 
 }
 
 module.exports = env

@@ -12,9 +12,6 @@ module.exports = (log) => {
         log.info(`Version      : ${env.app.version}`)
         log.info(``)
         log.info(`API Info     : ${route()}${env.app.routePrefix}`)
-        if (env.swagger.enabled) {
-            log.info(`Swagger      : ${route()}${env.swagger.route}`)
-        }
         if (env.monitor.enabled) {
             log.info(`Monitor      : ${route()}${env.monitor.route}`)
         }

@@ -1,14 +1,19 @@
+const React = require('react');
+const ReactDOMServer = require('react-dom/server');
 const Logger = require('./libs/logger')
+const env = require('./configs/env')
 
 const bannerLogger = require('./libs/banner')
 
 const expressLoader = require('./loaders/expressLoader')
-const clientLoader = require('./loaders/clientLoader')
+const { autocodeRoutes, autocodeClient } = require('../autocode/app');
+import AppClient from './client/components';
+import AutocodePage  from '../autocodeClient/server';
+
 const mongooseLoader = require('./loaders/mongooseLoader')
 const monitorLoader = require('./loaders/monitorLoader')
 const passportLoader = require('./loaders/passportLoader')
 const publicLoader = require('./loaders/publicLoader')
-const swaggerLoader = require('./loaders/swaggerLoader')
 const winstonLoader = require('./loaders/winstonLoader')
 
 
@@ -25,15 +30,13 @@ async function initApp() {
     await mongooseLoader()
 
     // express
-    const app = expressLoader()
+    const app = expressLoader(autocodeRoutes)
 
-  
+
 
     // monitor
     monitorLoader(app)
 
-    // swagger
-    swaggerLoader(app)
 
     // passport init
     passportLoader(app)
@@ -41,9 +44,14 @@ async function initApp() {
     // public Url
     publicLoader(app)
 
-    clientLoader(app)
-
     
+    autocodeClient(app,
+        AutocodePage,
+        AppClient,
+        `app-client`
+    )
+
+
 }
 
 initApp()

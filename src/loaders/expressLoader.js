@@ -10,68 +10,69 @@ const bodyParser = require('body-parser');
 const env = require('../configs/env')
 const { errorConverter, errorHandler } = require('../middlewares/error')
 const { customizeLimiter } = require('../middlewares/rate-limit')
-const routeConfig = require('../apis/routes')
-
-module.exports = () => {
-    const app = express()
-
-    // set log request
-    app.use(morgan('dev'))
-
-    // set security HTTP headers
-    app.use(helmet());
-
-    const cspConfig = {
-        directives: {
-          defaultSrc: ["'self'"],
-          fontSrc: ["'self'", "https://cdnjs.cloudflare.com"],
-          scriptSrc: ["'self'", "'unsafe-eval'", "'unsafe-inline'"],
-          styleSrc: ["'self'", "'unsafe-inline'", "https://cdnjs.cloudflare.com"], // Allow styles from the same origin, unsafe-inline, and the specified CDN
-          // Add other directives as needed
-        },
-      };
-      
-      // Override CSP directive settings if needed
-      app.use(helmet.contentSecurityPolicy(cspConfig));
+//const routeConfig = require('../apis/routes')
 
 
-    // parse json request body
-    app.use(express.json())
+module.exports = (autocodeRoutes) => {
+  const app = express()
 
-    // parse urlencoded request body
-    app.use(express.urlencoded({ extended: true }))
+  // set log request
+  app.use(morgan('dev'))
 
-    // sanitize request data
-    //app.use(xss())
-    //app.use(mongoSanitize())
+  // set security HTTP headers
+  app.use(helmet());
 
-    // gzip compression
-    //app.use(compression())
+  const cspConfig = {
+    directives: {
+      defaultSrc: ["'self'"],
+      fontSrc: ["'self'", "https://cdnjs.cloudflare.com"],
+      scriptSrc: ["'self'", "'unsafe-eval'", "'unsafe-inline'"],
+      styleSrc: ["'self'", "'unsafe-inline'", "https://cdnjs.cloudflare.com"], // Allow styles from the same origin, unsafe-inline, and the specified CDN
+      // Add other directives as needed
+    },
+  };
 
-    // set cors blocked resources
-    app.use(cors())
-    app.options('*', cors())
-
-    // setup limits
-    if (env.isProduction) {
-        // app.use('/v1/auth', customizeLimiter)
-    }
-
-
-    // api routes
-    app.use(env.app.routePrefix, routeConfig)
+  // Override CSP directive settings if needed
+  app.use(helmet.contentSecurityPolicy(cspConfig));
 
 
+  // parse json request body
+  app.use(express.json())
 
-    // convert error to ApiError, if needed
-    app.use(errorConverter)
+  // parse urlencoded request body
+  app.use(express.urlencoded({ extended: true }))
 
-    // handle error
-    app.use(errorHandler)
+  // sanitize request data
+  //app.use(xss())
+  //app.use(mongoSanitize())
+
+  // gzip compression
+  //app.use(compression())
+
+  // set cors blocked resources
+  app.use(cors())
+  app.options('*', cors())
+
+  // setup limits
+  if (env.isProduction) {
+    // app.use('/v1/auth', customizeLimiter)
+  }
+
+
+  // api routes
+  app.use(env.app.routePrefix, autocodeRoutes)
 
 
 
-    app.listen(env.app.port)
+  // convert error to ApiError, if needed
+  app.use(errorConverter)
 
-    return app
+  // handle error
+  app.use(errorHandler)
+
+
+
+  app.listen(env.app.port)
+
+  return app
 }
