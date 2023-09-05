@@ -2,7 +2,7 @@ const path = require('path');
 const TerserPlugin = require('terser-webpack-plugin');
 const webpack = require('webpack');
  
-  module.exports = {
+/*   module.exports = {
     entry: {
         'app-client': './src/client/components/index.js',
     },
@@ -44,9 +44,9 @@ const webpack = require('webpack');
     },
 
     mode: 'production',
- }; 
+ };  */
  
- /*   module.exports = {
+    module.exports = {
     entry: {
         'autocode-server': './autocodeClient/server.js',
     },
@@ -91,7 +91,7 @@ const webpack = require('webpack');
 
     mode: 'production',
  };   
- */
+ 
  
 //   module.exports = {
 //     entry: {

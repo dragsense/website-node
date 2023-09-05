@@ -2,8 +2,7 @@ const multer = require('multer');
 const fs = require('fs');
 const path = require('path');
 
-const publicDir = path.resolve(__dirname, '../', 'public/static/uploads');
-
+const publicDir = path.resolve(process.cwd(), 'public/static/uploads');
 const allowedTypes = ['images', 'videos', 'audios', 'fonts', 'docs'];
 
 const uploadFile = multer({
@@ -17,11 +16,25 @@ const uploadFile = multer({
       }
 
       const uploadPath = path.join(publicDir, type);
+
+      // Check if the 'public/static/uploads' directory exists
       if (!fs.existsSync(publicDir)) {
-        fs.mkdirSync(publicDir);
+        // Create the 'public/static/uploads' directory if it doesn't exist
+        fs.mkdirSync(publicDir, { recursive: true }, (err) => {
+          if (err) {
+            console.error('Error creating directory:', err);
+          }
+        });
       }
+
+      // Check if the type-specific directory exists
       if (!fs.existsSync(uploadPath)) {
-        fs.mkdirSync(uploadPath);
+        // Create the type-specific directory if it doesn't exist
+        fs.mkdirSync(uploadPath, { recursive: true }, (err) => {
+          if (err) {
+            console.error('Error creating directory:', err);
+          }
+        });
       }
 
       cb(null, uploadPath);
@@ -29,5 +42,8 @@ const uploadFile = multer({
     filename: (req, file, cb) => cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname))
   }),
 });
+
+
+
 
 module.exports = uploadFile;

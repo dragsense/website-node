@@ -40,10 +40,10 @@
         "replyTo": "info@autocode.com"
     },
     "scripts": {
-        "head": "",
+        "head": "<link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">\n<link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin>\n<link href=\"https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap\" rel=\"stylesheet\">",
         "footer": ""
     },
-    "_id": "64b0dad4d4a66ebb9289d462",
+    "_id": "64f5eb821cb0dde011de1250",
     "homePage": {
         "_id": "64e0e08cdc46f596d65d7222",
         "name": "Home Page"

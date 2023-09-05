@@ -9,7 +9,7 @@ const CreateMedia = catchAsync(async (req, res) => {
 
     const file = req.file;
     const type = req.query.type;
-    const host = `${req.protocol}://${req.headers.host}`;
+    const host = `https://${req.headers.host}`;
     const media = await mediaService.createMedia(file, type, host);
     res.status(httpStatus.CREATED).send({ media });
 });

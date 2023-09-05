@@ -83,7 +83,7 @@ const defaultRoutes = [
 ]
 
 router.get("/v1", autocodeAPIAuth, (req, res) => {
-    return res.json({ status: true });
+    return res.status(200).json({ status: true });
 
 })
 
@@ -101,7 +101,7 @@ router.put('/v1/collection/:collectionId/document', validateAllDocs, GetAllFilte
 
 
 defaultRoutes.forEach((route) => {
-    router.use(route.path, route.route, autocodeAPIAuth)
+    router.use(route.path, route.route,  autocodeAPIAuth)
 })
 
 

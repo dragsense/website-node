@@ -49,6 +49,8 @@ module.exports = (autocodeRoutes) => {
   // gzip compression
   //app.use(compression())
 
+
+
   // set cors blocked resources
   app.use(cors())
   app.options('*', cors())
