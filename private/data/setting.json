@@ -1,5 +1,5 @@
 {
-    "webtitle": "Autocode Website",
+    "webTitle": "Autocode Website",
     "tagLine": "Contrary to popular belief, Lorem Ipsum is not simply ",
     "desc": "Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 4",
     "lang": "en",
@@ -29,10 +29,10 @@
         "ignoreTLS": true,
         "secure": false,
         "auth": {
-            "user": "admin",
-            "pass": "fb6whNW1E^82sv$!kj"
+            "user": "test",
+            "pass": "test"
         },
-        "subject": "Message from autocode",
+        "subject": "Message from autocode {{webTitle}}",
         "from": "info@autocode.com",
         "to": "info@autocode.com",
         "cc": "info@autocode.com",
@@ -40,10 +40,10 @@
         "replyTo": "info@autocode.com"
     },
     "scripts": {
-        "head": "<link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">\n<link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin>\n<link href=\"https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap\" rel=\"stylesheet\">",
+        "head": "<link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">\n<link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin>\n<link href=\"https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap\" rel=\"stylesheet\">\n<link rel=\"stylesheet\" href=\"https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.2.1/css/fontawesome.min.css\" integrity=\"sha384-QYIZto+st3yW+o8+5OHfT6S482Zsvz2WfOzpFSXMF9zqeLcFV0/wlZpMtyFcZALm\" crossorigin=\"anonymous\">",
         "footer": ""
     },
-    "_id": "64f5eb821cb0dde011de1250",
+    "_id": "64f458c4a459bfd838be4d87",
     "homePage": {
         "_id": "64e0e08cdc46f596d65d7222",
         "name": "Home Page"

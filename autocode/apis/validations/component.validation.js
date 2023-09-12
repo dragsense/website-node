@@ -35,6 +35,8 @@ const elementObject = {
     Joi.string(),
     Joi.object()
   ),
+  states: Joi.object().allow({}),
+  events: Joi.object().allow({}),
   collStates: Joi.object().allow({}),
   components: Joi.array().items(Joi.string().pattern(/^[0-9a-fA-F]{24}$/)),
   forms: Joi.array().items(Joi.string().pattern(/^[0-9a-fA-F]{24}$/)),

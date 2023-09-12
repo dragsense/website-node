@@ -44,9 +44,10 @@ const GetAllFilteredDocuments = catchAsync(async (req, res) => {
 });
 
 const GetFilteredDocuments = catchAsync(async (req, res) => {
-  
-    const documents = await documentService.getFilteredDocuments(req.params.collectionId, req.body);
-    res.status(httpStatus.OK).send({ documents });
+    const options = pickKeys(req.query, ['sortBy', 'limit', 'page']);
+
+    const results = await documentService.getFilteredDocuments(req.params.collectionId, req.body, options);
+    res.status(httpStatus.OK).send(results);
 });
 
 

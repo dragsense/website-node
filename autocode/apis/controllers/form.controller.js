@@ -83,7 +83,31 @@ const GetForms = catchAsync(async (req, res) => {
 
 
 const Submit = catchAsync(async (req, res) => {
-    await formService.submit(req.params.id, req.body);
+    let files = req.files;
+
+    const updatedFiles = [];
+
+    if (files)
+        for (let i = 0; i < files.length; i++) {
+            const file = files[i];
+
+            const mimetype = file.mimetype.toLowerCase();
+            let type = 'docs';
+
+            if (mimetype.startsWith('image')) {
+                type = 'images';
+            } else if (mimetype.startsWith('video')) {
+                type = 'videos';
+            } else if (mimetype.startsWith('audio')) {
+                type = 'audios';
+            }
+            const protocol = req.protocol || 'http';
+            const host = `${protocol}://${req.headers.host}`;
+            updatedFiles.push({ file, type, protocol, host })
+
+        }
+
+    await formService.submit(updatedFiles, req.params.id, req.body);
     res.status(httpStatus.OK).send({ status: true });
 });
 

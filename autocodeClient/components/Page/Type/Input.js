@@ -40,6 +40,7 @@ const Input = (props) => {
     // </div>
 
     return React.cloneElement(children, { customAttributes: { 
+        
         onChange: onChangeValue, value: v } });
 
 };

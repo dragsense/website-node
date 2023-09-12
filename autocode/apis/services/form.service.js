@@ -1,4 +1,4 @@
-const { Form, Document, Component, Collection,  } = require('../models');
+const { Form, Document, Component, Collection, } = require('../models');
 const { generateCss, generateElementsCss, getCurrentDate } = require('../../utils/utils');
 const { v4: uuidv4 } = require('uuid');
 const mongoose = require('mongoose');
@@ -8,9 +8,12 @@ const handlebars = require('handlebars');
 const httpStatus = require('http-status')
 const he = require('he');
 const settingService = require('./setting.service');
-
+const mediaService = require('./media.service');
 const ApiError = require('../../utils/api-error')
+const path = require('path');
+const fs = require('fs');
 
+const publicDir = path.resolve(process.cwd(), 'public/static/uploads');
 
 /**
  * Create a form
@@ -238,12 +241,12 @@ const getElements = async (id, stream) => {
                 stream.push(chunkStr);
 
                 const collection = component.attached;
-                if(collection)
-                await loadCollection(collection);
+                if (collection)
+                    await loadCollection(collection);
 
                 const innerComponents = component.components || [];
 
-                
+
                 await loadComponents(innerComponents)
 
                 const forms = component.forms || [];
@@ -350,6 +353,11 @@ const getCss = async (id) => {
 };
 
 
+function isValidEmail(email) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+}
+
 
 /**
  * Duplicate Form
@@ -406,9 +414,8 @@ const deleteForm = async (id) => {
  * @param {Object} formBody
  * @returns {Promise<>}
  */
-const submit = async (id, formBody) => {
+const submit = async (files, id, states) => {
 
-    let { states } = formBody;
 
     const form = await Form.findById(id)
     if (!form) {
@@ -416,51 +423,133 @@ const submit = async (id, formBody) => {
     }
 
     const formStates = form.states;
-    let errorMessage = {};
-
 
     let isValid = true;
-    Object.keys(states).forEach((key) => {
-        const fieldData = states[key];
+
+    Object.keys(formStates).forEach((key) => {
         const stateData = formStates[key];
-        const regexString = stateData.regex;
-        const regex = new RegExp(regexString);
-        if ((stateData.required && !fieldData) || !regex.test(fieldData)) {
-            stateData.error = 1;
-            errorMessage[key] = stateData.errorMessage
-            isValid = false;
-        }
-        else {
-            stateData.error = 0;
-            if (formStates[key])
+
+        if (stateData.type !== 'file') {
+            const fieldData = states[key];
+
+            let regexTest = true;
+
+            if (stateData.regex) {
+                const regexString = stateData.regex;
+                const cleanedRegexString = regexString.replace(/^\/|\/$/g, '');
+                const regex = new RegExp(cleanedRegexString);
+
+                regexTest = regex.test(fieldData)
+            }
+
+            if ((stateData.required && !fieldData) || !regexTest) {
+                stateData.error = 1;
+                isValid = false;
+            }
+            else {
+                stateData.error = 0;
                 formStates[key].defaultValue = fieldData;
+            }
         }
     });
 
-    if (!isValid)
-        throw new ApiError(httpStatus[403], errorMessage || 'Something Went Wrong.');
+    if (!isValid) {
+
+        if (files) {
+
+            files.forEach(f => {
+                const file = f.file;
+                const path = `${publicDir}/temp/${file.filename}`;
+
+                fs.unlink(path, (err) => {
+                    if (err) {
+                        console.error(err)
+                    }
+                })
+            })
+
+        }
+
+        throw new ApiError(httpStatus[403], 'Something Went Wrong.');
+
+    }
+    const setting = await settingService.getSettings();
+    let attachments = [];
+
+    if (files) {
+
+        for (let i = 0; i < files.length; i++) {
+            const f = files[i];
+            const type = f.type;
+            const file = f.file;
+            const host = f.host;
+            const key = file.originalname.split(".")[0]
+
+            const media = await mediaService.createMedia(file, type, host);
+
+            if (formStates[key]) {
+                formStates[key].fileType = type;
+                formStates[key].defaultValue = media.src;
+                formStates[key].src = {
+                    _id: media._id,
+                    src: media.src
+                }
+
+                const path = `${publicDir}/temp/${file.filename}`;
+                const uploadPath = `${publicDir}/${type}`;
+                const destPath = `${uploadPath}/${file.filename}`;
+
+                // Check if the type-specific directory exists
+                if (!fs.existsSync(uploadPath)) {
+                    // Create the type-specific directory if it doesn't exist
+                    fs.mkdirSync(uploadPath, { recursive: true }, (err) => {
+                        if (err) {
+                            console.error('Error creating directory:', err);
+                        }
+                    });
+                }
+
+                fs.rename(path, destPath, function (err) {
+                    if (err) throw err
+                    console.log('Successfully renamed - AKA moved!')
+                })
+
+                attachments.push({ filename: file.originalname, path: destPath })
+
+            }
+
+        }
+
+
+    }
+
 
     if (!form.recordOnly) {
-        let from = form.setting['from'];
-        let to = form.setting['to'];
-        let cc = form.setting['cc'];
-        let bcc = form.setting['bcc'];
-        let replyTo = form.setting['replyTo'];
-        let subject = form.setting['subject'];
+        let from = form.setting['from'] || setting.email.from;
+        let to = form.setting['to'] || setting.email.to;
+        let cc = form.setting['cc'] || setting.email.cc;
+        let bcc = form.setting['bcc'] || setting.email.bcc;
+        let replyTo = form.setting['replyTo'] || setting.email.replyTo;
+        let subject = form.setting['subject'] || setting.email.subject || "Untitled Email";
 
-        const setting = await settingService.getSettings();
+        if (from && to) {
 
-        let transporter = nodemailer.createTransport({
-            host: setting.email.host,
-            port: setting.email.port,
-            secure: setting.email.secure,
-            ignoreTLS: true,
-            //  auth: setting.email.auth
-        });
+            let transporter = nodemailer.createTransport({
+                host: setting.email.host || 'localhost',
+                port: setting.email.port || 1025,
+                secure: setting.email.secure || false,
+                ignoreTLS: setting.email.ignoreTLS || true,
+                auth: setting.email.auth || {
+                    "user": "",
+                    "pass": ""
+                }
+            });
 
-        const { html, body, head, footer, plain } = form.emailbody || {};
 
-        const email = html == 1 ? `<!DOCTYPE html>
+
+            const { html, body, head, footer, plain } = form.emailbody || {};
+
+            const email = html == 1 ? `<!DOCTYPE html>
         <html>
         <head>
           <meta charset="UTF-8">
@@ -472,22 +561,34 @@ const submit = async (id, formBody) => {
         </body>
         </html>` : plain;
 
-        let compiledTemplate = handlebars.compile(email);
-        let compiledSubject = handlebars.compile(subject ? subject : setting.email.subject);
+            let compiledTemplate = handlebars.compile(email);
+            let compiledSubject = handlebars.compile(subject ? subject : setting.email.subject);
 
-        let content = compiledTemplate(states);
-        subject = compiledSubject(states);
+            states['webTitle'] = setting.webTitle;
+            states['tagLine'] = setting.tagLine;
+            states['desc'] = setting.desc;
+            states['author'] = setting.author;
+
+            let content = compiledTemplate(states);
+            subject = compiledSubject(states);
 
 
-        const info = await transporter.sendMail({
-            from: from ? from : setting.email.from,
-            to: to ? to : setting.email.to,
-            subject: subject ? subject : setting.email.subject,
-            [html == 1 ? 'html' : 'text']: content,
-            cc: cc ? cc : setting.email.cc,
-            bcc: bcc ? bcc : setting.email.bcc,
-            replyTo: replyTo ? replyTo : setting.email.replyTo
-        });
+            if (form.setting?.sendCopy && isValidEmail(states['email'])) {
+                to = to + "," + states['email'];
+            }
+
+
+            const info = await transporter.sendMail({
+                from,
+                to,
+                subject,
+                [html === 1 ? 'html' : 'text']: content,
+                cc,
+                bcc,
+                replyTo,
+                attachments
+            });
+        }
     }
 
     if (form.record || form.recordOnly) {
@@ -495,6 +596,9 @@ const submit = async (id, formBody) => {
         const DocumentModel = Document(modelName)
 
         const uniqueId = uuidv4().substring(0, 6);
+
+        console.log(formStates)
+
 
         const body = {
             name: form.name + " " + getCurrentDate(),
@@ -504,6 +608,20 @@ const submit = async (id, formBody) => {
         await DocumentModel.create(body)
     }
 
+    if (files) {
+
+        files.forEach(f => {
+            const file = f.file;
+            const path = `${publicDir}/temp/${file.filename}`;
+
+            fs.unlink(path, (err) => {
+                if (err) {
+                    console.error(err)
+                }
+            })
+        })
+
+    }
     return;
 };
 

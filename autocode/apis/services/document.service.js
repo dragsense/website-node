@@ -138,13 +138,13 @@ const getDocument = async (collectionId, id, isForm) => {
 
 
 
-    const collection = isForm ? await Form.document(collectionId, collections, projection) : await Collection.document(collectionId, collections, projection)
+    const collection = isForm ? await Form.document(collectionId, [], projection) : await Collection.document(collectionId, collections, projection)
     if (!collection) {
         throw new ApiError(httpStatus.NOT_FOUND, `${isForm ? 'Form' : 'Collection'} not found`);
     }
 
 
-    const relationships = [
+    const relationships = isForm ? [] : [
 
         ...(collection.populatedRelationships.map(rel => {
             const modelName = pluralize.plural(rel.slug.toLowerCase());
@@ -231,31 +231,75 @@ const deleteDocument = async (collectionId, id, isForm) => {
  * @param {String} id
  * @returns {Promise<Document[]>}
  */
-const getFilteredDocuments = async (collectionId, documentBody) => {
+const getFilteredDocuments = async (collectionId, documentBody, options) => {
 
-    const collection = await Collection.findById(collectionId)
+
+    
+    let { documentIds, filters, withRelationship, selectedRelationships } = documentBody;
+
+
+    
+    const collections = withRelationship ? [
+        {
+            collectionName: 'ac_collections',
+            localField: 'relationships',
+            foreignField: '_id',
+
+            as: 'populatedRelationships',
+            projection: { name: 1, slug: 1, _id: 1 }
+        },
+
+    ] : [];
+
+
+    let projection = {
+        slug: 1,
+        _id: 1,
+        relationships: 1,
+    };
+
+
+
+
+
+    const collection = await Collection.document(collectionId, collections, projection)
+
+
+
     if (!collection) {
         throw new ApiError(httpStatus.NOT_FOUND, `Collection not found`);
     }
 
-    let { documentIds, withRelationship, selectedRelationships } = documentBody;
 
     if (!documentIds || documentIds?.length <= 0)
         throw new ApiError(httpStatus.NOT_FOUND, `Not Found.`);
 
     const docIds = Array.isArray(documentIds) ? documentIds : [documentIds];
 
-    let relationships = undefined;
+    let relationships = [];
+    if (withRelationship && collection.populatedRelationships) {
+        relationships = collection.populatedRelationships.filter(relation =>
+            selectedRelationships.some(_id => _id === relation._id.toString())
+        ).map(rel => {
+            const modelName = rel.slug.toLowerCase();
 
-    if (withRelationship && Array.isArray(selectedRelationships) && Array.isArray(collection.relationships)) {
-        relationships = collection.relationships.filter(relation => selectedRelationships.some(selected => relation._id == selected._id))
+            return {
+                collectionName: modelName,
+                localField: `relationships.${rel._id}`,
+                foreignField: '_id',
+                as: `populatedRelationships.${rel._id}`,
+                projection: { name: 1, _id: 1, setting: 1, states: 1,  }
+               
+            }
+        })
     }
 
     const modelName = collection.slug;
     const DocumentModel = Document(modelName);
 
 
-    const collections = [
+
+    const otherCollections = [
         {
             collectionName: 'ac_medias',
             localField: 'setting.image',
@@ -266,8 +310,10 @@ const getFilteredDocuments = async (collectionId, documentBody) => {
         },
     ];
 
+   
 
-    const results = await DocumentModel.filterDocuments(docIds, relationships, collections);
+
+    const results = await DocumentModel.filterDocuments(docIds, filters, relationships, otherCollections, options);
 
     return results;
 
@@ -321,7 +367,7 @@ const getAllFilteredDocuments = async (collectionId, documentBody, filter, optio
         relationships = collection.populatedRelationships.filter(relation =>
             selectedRelationships.some(_id => _id === relation._id.toString())
         ).map(rel => {
-            const modelName = pluralize.plural(rel.slug.toLowerCase());
+            const modelName = rel.slug.toLowerCase();
 
             return {
                 collectionName: modelName,

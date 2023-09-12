@@ -65,8 +65,8 @@ function updateContentWithType(object, type) {
 
       if (value.states) {
         updateContentWithType(value.states, type);
-      } 
-      
+      }
+
       if (value.type === type) {
         value.defaultValue = he.decode(value.defaultValue);
       }
@@ -85,24 +85,24 @@ const generateElementsCss = (elements, _id) => {
     const style = elements[key].style || {};
     const selectorText = elements[key].selectorText;
 
-    if(selectorText)
-    Object.keys(style).map((key) => {
-      if (style[key]) {
-        if (key !== 'normal')
-          css += '@media ' + key + ' {\n';
-        const s = style[key];
-        Object.keys(s).map((key) => {
-          let properties = Object.entries(s[key].properties || {}).map(([key, property]) => `${key}: ${property.value} ${property.priority ? "!important": "" }`).join(';');
-        
-          let selector = key !== 'root' ? selectorText+key : selectorText
-          css += `${selector} {\n  ${properties}\n}\n\n`;
+    if (selectorText)
+      Object.keys(style).map((key) => {
+        if (style[key]) {
+          if (key !== 'normal')
+            css += '@media ' + key + ' {\n';
+          const s = style[key];
+          Object.keys(s).map((key) => {
+            let properties = Object.entries(s[key].properties || {}).map(([key, property]) => `${key}: ${property.value} ${property.priority ? "!important" : ""}`).join(';');
 
-        });
+            let selector = key !== 'root' ? selectorText + key : selectorText
+            css += `${selector} {\n  ${properties}\n}\n\n`;
 
-        if (key !== 'normal')
-          css += ' }\n';
-      }
-    });
+          });
+
+          if (key !== 'normal')
+            css += ' }\n';
+        }
+      });
   });
 
   return css;
@@ -166,15 +166,16 @@ const generateAnimations = (elements) => {
     Object.keys(style).map((key) => {
       if (style[key]) {
         const s = style[key];
-        let properties = Object.entries(s.properties || {}).map(([key, property]) => `${key}: ${property.value}`).join(';');
+        let properties = Object.entries(s.properties || {}).map(([key, property]) => `${key}: ${property.value} ${property.priority ? "!important" : ""}`).join(';');
         css += `${s.selectorText} {\n  ${properties}\n}\n\n`;
 
 
 
       }
     });
+    css += ' }\n';
   });
-  css += ' }\n';
+
 
 
   return css;

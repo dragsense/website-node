@@ -71,6 +71,10 @@ const ComponentSchema = new Schema(
             type: Object,
             default: {}
         },
+        events: {
+            type: Object,
+            default: {}
+        },
         updater: {
             type: Object,
             default: {},

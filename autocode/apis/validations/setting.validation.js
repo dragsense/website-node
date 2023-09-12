@@ -16,7 +16,7 @@ const pageSchema = Joi.object({
 
 const settingSchema = {
     body: Joi.object().keys({
-        webtitle: Joi.string().min(3),
+        webTitle: Joi.string().min(3),
         tagLine: Joi.string().allow(""),
         desc: Joi.string().allow(""),
         timeZone: Joi.string().allow(""),

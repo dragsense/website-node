@@ -1,7 +1,26 @@
 const { ObjectId } = require("mongodb");
 
 const filter = function (schema) {
-    schema.statics.filterDocuments = async function (docIds, relationships, collections = []) {
+    schema.statics.filterDocuments = async function (docIds, filters, relationships, collections = [], options) {
+
+        let sort = {};
+
+        if (options.sortBy) {
+            sort = options.sortBy.split(',').reduce((acc, sortOption) => {
+                const [key, order] = sortOption.split(':');
+                acc[key] = order === 'desc' ? -1 : 1;
+                return acc;
+            }, {});
+        } else {
+            sort.createdAt = 1;
+        }
+
+        const limit = options.limit && parseInt(options.limit, 10) > 0 ? parseInt(options.limit, 10) : 10
+        const page = options.page && parseInt(options.page, 10) > 0 ? parseInt(options.page, 10) : 1
+        const skip = (page - 1) * limit;
+
+        
+
         const res = await this.aggregate([
             {
                 $facet: {
@@ -10,7 +29,36 @@ const filter = function (schema) {
                             $match: {
                                 _id: {
                                     $in: docIds.map(id => new ObjectId(id))
-                                }
+                                },
+                                ...filters.reduce((criteria, filter) => {
+
+                                    if (!filter.defaultValue) return {};
+
+                                    if (filter.filterKey[0] === 'STATES') {
+
+                                        criteria[`states.${filter.filterKey[1]}.defaultValue`] = {
+                                            $regex: filter.defaultValue ?? '',
+                                            $options: 'i'
+                                        };
+                                    }
+                                    else
+
+                                        if (filter.filterKey[0] === 'RELATIONSHIPS') {
+                                            const values = Array.isArray(filter.defaultValue) ? filter.defaultValue : [filter.defaultValue]
+
+                                            criteria[`relationships.${filter.filterKey[1]}`] = {
+                                                $in: values.map(id => id)
+                                            }
+
+
+                                        } else
+                                            if (filter.filterKey[0] === '_id')
+                                                criteria._id = new ObjectId(filter.defaultValue)
+                                            else
+                                                criteria[filter.filterKey[0]] = { $regex: filter.defaultValue + '', $options: 'i' }
+
+                                    return criteria;
+                                }, {})
                             }
                         },
                         ...collections.map((collection) => ({
@@ -73,8 +121,10 @@ const filter = function (schema) {
 
                             }
                         },
-                        { $skip: (pageNumber - 1) * pageSize },
-                        { $limit: pageSize }
+                        { $sort: sort },
+                        { $skip: skip },
+                        { $limit: limit },
+                      
                     ]
                 }
             },

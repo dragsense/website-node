@@ -1,1 +1,86 @@
-{}
+{
+    "q-adaJH0o": {
+        "name": "h1FontSize",
+        "value": "24px",
+        "type": "font",
+        "variable": "--var-h1fontsize-variable",
+        "_uid": "q-adaJH0o"
+    },
+    "kYZNWuzG1": {
+        "name": "h2FontSize",
+        "value": "18px",
+        "type": "font",
+        "variable": "--var-h2fontsize-variable",
+        "_uid": "kYZNWuzG1"
+    },
+    "nvjgdXY9v": {
+        "name": "bodyFontSize",
+        "value": "16px",
+        "type": "font",
+        "variable": "--var-bodyfontsize-variable",
+        "_uid": "nvjgdXY9v"
+    },
+    "rbGKW1wGA": {
+        "name": "smallFontSize",
+        "value": "14px",
+        "type": "font",
+        "variable": "--var-smallfontsize-variable",
+        "_uid": "rbGKW1wGA"
+    },
+    "hcJR6FJUm": {
+        "name": "medium",
+        "value": "300px",
+        "type": "size",
+        "variable": "--var-medium-variable",
+        "_uid": "hcJR6FJUm"
+    },
+    "GSJTqu3s_": {
+        "name": "small",
+        "value": "150px",
+        "type": "size",
+        "variable": "--var-small-variable",
+        "_uid": "GSJTqu3s_"
+    },
+    "a-l8lRBMb": {
+        "name": "large",
+        "value": "600px",
+        "type": "size",
+        "variable": "--var-large-variable",
+        "_uid": "a-l8lRBMb"
+    },
+    "-EeCWMtZW": {
+        "name": "smallSpace",
+        "value": "10px",
+        "type": "space",
+        "variable": "--var-smallspace-variable",
+        "_uid": "-EeCWMtZW"
+    },
+    "hh9LjIBQF": {
+        "name": "meduim",
+        "value": "20px",
+        "type": "space",
+        "variable": "--var-meduim-variable",
+        "_uid": "hh9LjIBQF"
+    },
+    "nNGceHhgq": {
+        "name": "largeSpace",
+        "value": "50px",
+        "type": "space",
+        "variable": "--var-largespace-variable",
+        "_uid": "nNGceHhgq"
+    },
+    "ulKHU8J2K": {
+        "name": "xlargeSpace",
+        "value": "100px",
+        "type": "space",
+        "variable": "--var-xlargespace-variable",
+        "_uid": "ulKHU8J2K"
+    },
+    "LNGbHqZvx": {
+        "name": "radiusSize",
+        "value": "10px",
+        "type": "size",
+        "variable": "--var-radiussize-variable",
+        "_uid": "LNGbHqZvx"
+    }
+}

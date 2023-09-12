@@ -30,9 +30,15 @@ const documentSchema = {
 }
 
 const filterDocObject = {
+  
+  documentIds: Joi.array()
+  .items(
+    Joi.string().pattern(/^[0-9a-fA-F]{24}$/))
+  .default([]),
   filters: Joi.array()
   .items(
     Joi.object({
+      name: Joi.string(),
       filterKey: Joi.array()
         .items().default([]),
       defaultValue: Joi.string().allow(""),
@@ -55,6 +61,7 @@ const filterObject = {
   filters: Joi.array()
     .items(
       Joi.object({
+        name: Joi.string(),
         filterKey: Joi.array()
           .items().default([]),
         defaultValue: Joi.string().allow(""),

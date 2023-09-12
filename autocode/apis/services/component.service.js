@@ -51,6 +51,7 @@ const updateComponent = async (id, componentBody) => {
     if (!component) {
         throw new ApiError(httpStatus.NOT_FOUND, 'Component not found');
     }
+
     Object.assign(component, componentBody);
     await component.save();
     return component;
@@ -154,6 +155,7 @@ const getElements = async (id, stream) => {
         forms: 1,
         states: 1,
         parent: 1,
+        events: 1,
         collStates: 1,
         type: 1,
         attached: 1,

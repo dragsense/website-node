@@ -43,9 +43,9 @@ const formObject = {
     Joi.object()
   ),
   setting: Joi.object({
-    to: Joi.string().required().custom(validateMultipleEmails),
-    from: Joi.string().email().required(),
-    subject: Joi.string().default('Untitled Email'),
+    to: Joi.string().custom(validateMultipleEmails).allow(''),
+    from: Joi.string().email().allow(""),
+    subject: Joi.string().allow('').default('Untitled Email'),
     cc: Joi.string().custom(validateMultipleEmails).allow(''),
     bcc: Joi.string().custom(validateMultipleEmails).allow(''),
     replyTo: Joi.string().email().allow(''),
@@ -72,6 +72,8 @@ const elementObject = {
     Joi.string(),
     Joi.object()
   ),
+  states: Joi.object().allow({}),
+
   components: Joi.array().items(Joi.string().pattern(/^[0-9a-fA-F]{24}$/)),
   forms: Joi.array().items(Joi.string().pattern(/^[0-9a-fA-F]{24}$/)),
   updater: Joi.object().allow({}),
