@@ -75,6 +75,35 @@ const ComponentSchema = new Schema(
             type: Object,
             default: {}
         },
+        _events: {
+            type: Object,
+            default: {}
+        },
+        _states: {
+            type: Object,
+            default: {}
+        },
+        _components: {
+            type: Array,
+            default: [],
+        },
+        _forms: {
+            type: Array,
+            default: [],
+        },
+        _elements: {
+            type: Object,
+            default: {}
+        },
+        _styles: {
+            type: Object,
+            default: {
+            },
+        },
+        published: {
+            type: Boolean,
+            default: true,
+        },
         updater: {
             type: Object,
             default: {},
@@ -94,7 +123,7 @@ const ComponentSchema = new Schema(
 ComponentSchema.pre('save', async function (next) {
     const component = this;
 
-    if (component.isNew && !component.duplicated){ 
+    if (component.isNew && !component.duplicated) {
 
         let id = shortid.generate();
         const className = `ac-elem-${id}`;

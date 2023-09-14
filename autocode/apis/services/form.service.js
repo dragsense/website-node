@@ -80,6 +80,42 @@ const updateElements = async (id, formBody) => {
         throw new ApiError(httpStatus.NOT_FOUND, 'Form not found');
     }
 
+    form.published = false;
+
+    Object.assign(form, formBody);
+    await form.save();
+    return form;
+};
+
+
+
+/**
+ * Publish a form
+ * @param {String} id
+ * @param {Object} formBody
+ * @returns {Promise<Form>}
+ */
+const publishForm = async (id, formBody) => {
+
+    const form = await Form.findOne({ _id: id })
+    if (!form) {
+        throw new ApiError(httpStatus.NOT_FOUND, 'Form not found.');
+    }
+
+    const { updater } = pageBody;
+
+    if (form.published) {
+        throw new ApiError(httpStatus.NOT_FOUND, 'Form is already published.');
+    }
+
+    form.elements = form._elements;
+    form.components = form._components;
+    form.styles = form._styles;
+
+    form.published = true;
+
+    form.updater = updater
+    
     Object.assign(form, formBody);
     await form.save();
     return form;
@@ -156,9 +192,22 @@ const getElements = async (id, stream) => {
     const projection = {
         elements: 1,
         components: 1,
-        forms: 1,
         states: 1,
         setting: 1,
+        forms: 1,
+
+        collStates: 1,
+        events: 1,
+        _collStates: 1,
+        published: 1,
+       _forms: 1,
+        _elements: 1,
+        _components: 1,
+        _states: 1,
+        _events: 1,
+
+        creator: 1,
+        createdAt: 1,
         type: 1,
         _id: 1
     };
@@ -169,8 +218,25 @@ const getElements = async (id, stream) => {
         throw new ApiError(httpStatus.NOT_FOUND, 'Form not found');
     }
 
+    const doc = {
+        type: form.type,
+        createdAt: form.createdAt,
+        creator: form.creator,
+        _id: form._id
+    }
+    if (!form.published) {
+        doc.elements = form._elements;
+        doc.components = form._components;
+        doc.states = form._states;
 
-    const chunkStr = JSON.stringify(form._doc) + '\n';
+    } else {
+        doc.elements = form.elements;
+        doc.components = form.components;
+        doc.states = form.states;
+
+    }
+
+    const chunkStr = JSON.stringify(doc) + '\n';
     stream.push(chunkStr);
 
 
@@ -216,15 +282,39 @@ const getElements = async (id, stream) => {
             if (form && !laoded[forms[i]]) {
                 laoded[form[i]] = true;
 
-                const chunkStr = JSON.stringify(form) + '\n';
+                const doc = {
+
+                    type: form.type,
+                    attached: form.attached,
+                    createdAt: form.createdAt,
+                    creator: form.creator,
+                    setting: form.setting,
+                    url: form.url,
+                    _id: form._id
+                }
+                if (!form.published) {
+                    doc.elements = form._elements;
+                    doc.components = form._components;
+                    doc.forms = form._forms;
+                    doc.states = form._states;
+                    doc.collStates = form._collStates;
+                } else {
+                    doc.elements = form.elements;
+                    doc.components = form.components;
+                    doc.forms = form.forms;
+                    doc.states = form.states;
+                    doc.collStates = form.collStates;
+                }
+
+                const chunkStr = JSON.stringify(doc) + '\n';
                 stream.push(chunkStr);
 
                 laoded[form[i]] = true;
 
-                const innerComponents = form.components || [];
+                const innerComponents = doc.components || [];
                 await loadComponents(innerComponents, projection)
 
-                const forms = form.forms || [];
+                const forms = doc.forms || [];
                 await loadForms(forms, projection)
 
             }
@@ -237,30 +327,56 @@ const getElements = async (id, stream) => {
             if (component && !laoded[components[i]]) {
                 laoded[components[i]] = true;
 
-                const chunkStr = JSON.stringify(component._doc) + '\n';
+                const doc = {
+                    parent: component.parent,
+                    type: component.type,
+                    attached: component.attached,
+                    createdAt: component.createdAt,
+                    creator: component.creator,
+                    setting: component.setting,
+                    url: component.url,
+                    _id: component._id
+                }
+                if (!component.published) {
+                    doc.elements = component._elements;
+                    doc.components = component._components;
+                    doc.forms = component._forms;
+                    doc.states = component._states;
+                    doc.collStates = component._collStates;
+                } else {
+                    doc.elements = component.elements;
+                    doc.components = component.components;
+                    doc.forms = component.forms;
+                    doc.states = component.states;
+                    doc.collStates = component.collStates;
+                }
+
+                const chunkStr = JSON.stringify(doc) + '\n';
                 stream.push(chunkStr);
 
                 const collection = component.attached;
                 if (collection)
                     await loadCollection(collection);
 
-                const innerComponents = component.components || [];
+                const innerComponents = doc.components || [];
 
 
                 await loadComponents(innerComponents)
 
-                const forms = component.forms || [];
+                const forms = doc.forms || [];
                 await loadForms(forms, projection)
 
             }
         }
     }
 
-    const components = form.components || [];
-    const forms = form.forms || [];
+    const components = doc.components || [];
+    const forms = doc.forms || [];
 
     await loadComponents(components, projection);
     await loadForms(forms, projection)
+
+
 
 
     stream.push(null);
@@ -279,7 +395,9 @@ const getStyle = async (id, stream) => {
 
     const projection = {
         styles: 1,
-        _id: 1
+        _id: 1,
+        published: 1,
+        _styles: 1,
     };
 
 
@@ -288,8 +406,16 @@ const getStyle = async (id, stream) => {
         throw new ApiError(httpStatus.NOT_FOUND, 'Form not found');
     }
 
-    if (Object.keys(form.styles).length > 0) {
-        const chunkStr = JSON.stringify({ elements: form.styles, _id: form._id }) + '\n';
+    const doc = {
+        _id: form._id
+    }
+    if (!form.published) {
+        doc.styles = form._styles;
+    } else
+        doc.styles = form.styles;
+
+    if (Object.keys(doc.styles).length > 0) {
+        const chunkStr = JSON.stringify({ elements: doc.styles, _id: doc._id }) + '\n';
         stream.push(chunkStr);
     }
 
@@ -309,7 +435,11 @@ const getCss = async (id) => {
 
     const projection = {
         styles: 1,
-        elements: 1
+        elements: 1,
+        published: 1,
+        _components: 1,
+        _styles: 1,
+        _id: 1
     };
 
 
@@ -319,29 +449,61 @@ const getCss = async (id) => {
     }
     let css = [];
 
-    const elements = form.elements || {};
+    const doc = {
+        _id: form._id
+    }
+    if (!form.published) {
+        doc.components = form._components;
+        doc.forms = form._forms;
+        doc.styles = form._styles;
 
-    css = [generateElementsCss(elements)];
+    } else {
+        doc.styles = form.styles;
+        doc.components = form.components;
+        doc.forms = form.forms;
+
+    }
 
 
 
-    const styles = form.styles || {};
+   
+    const styles = doc.styles || {};
 
 
 
-    css = [...css, generateElementsCss(styles)];
+    css = [...css, generateElementsCss(styles, doc._id)];
 
-    const components = form.components || [];
+    const components = doc.components || [];
 
     const loadComponentsCSS = async (components) => {
         for (let i = 0; i < components.length; i++) {
-            const component = await Component.findById(id).select(projection);
+            const component = await Component.findById(components[i]).select(projection);
             if (component) {
-                let styles = component.styles || {};
-                css = [...css, generateCss(styles)];
-                const innerComponents = component.components || [];
+
+                const doc = {
+                    _id: component._id
+                }
+                if (!component.published) {
+                    doc.components = component._components;
+                    doc.styles = component._styles;
+                    doc.forms = component._forms;
+
+
+                } else {
+                    doc.styles = component.styles;
+                    doc.components = component.components;
+                    doc.forms = component.forms;
+
+                }
+
+                let styles = doc.styles || {};
+                css = [...css, generateElementsCss(styles, doc._id)];
+
+                const innerComponents = doc.components || [];
 
                 await loadComponentsCSS(innerComponents)
+                const forms = doc.forms || [];
+                await loadFormsCSS(forms);
             }
         }
     }
@@ -631,6 +793,7 @@ module.exports = {
     getForm,
     deleteForm,
     updateForm,
+    publishForm,
     createForm,
     getCss,
     getElements,

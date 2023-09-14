@@ -82,6 +82,28 @@ const FormSchema = new Schema(
             type: Object,
             default: {}
         },
+        _states: {
+            type: Object,
+            default: {}
+        },
+        _components: {
+            type: Array,
+            default: [],
+        },
+    
+        _elements: {
+            type: Object,
+            default: {}
+        },
+        _styles: {
+            type: Object,
+            default: {
+            },
+        },
+        published: {
+            type: Boolean,
+            default: true,
+        },
         setting: {
             type: {
                 to: {

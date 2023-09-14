@@ -61,11 +61,33 @@ const PageSchema = new Schema(
             type: Array,
             default: [],
         },
+        _components: {
+            type: Array,
+            default: [],
+        },
+        _forms: {
+            type: Array,
+            default: [],
+        },
+        _elements: {
+            type: Object,
+            default: {}
+        },
+        _styles: {
+            type: Object,
+            default: {
+            },
+        },
+        published: {
+            type: Boolean,
+            default: true,
+        },
         styles: {
             type: Object,
             default: {
             },
         },
+    
         setting: {
             type: {
                 title: {
@@ -107,6 +129,7 @@ const PageSchema = new Schema(
             type: Boolean,
             default: false,
         },
+     
         creator: {
             type: Object,
             default: {},
@@ -118,7 +141,7 @@ const PageSchema = new Schema(
 PageSchema.pre('save', async function (next) {
 
     const page = this;
-    
+
     if (page.isNew && !page.duplicated) {
 
         let id = shortid.generate();
@@ -128,16 +151,16 @@ PageSchema.pre('save', async function (next) {
         let styleUid = shortid.generate();
         page.elements['0'].styleUid = styleUid;
 
-      
-            page.styles = {
-                [styleUid]: {
-                    _uid: styleUid,
-                    selectorText: `.${className}`,
-                    type: 'div',
-                    style: {
-                    }
+
+        page.styles = {
+            [styleUid]: {
+                _uid: styleUid,
+                selectorText: `.${className}`,
+                type: 'div',
+                style: {
                 }
             }
+        }
     }
 
 

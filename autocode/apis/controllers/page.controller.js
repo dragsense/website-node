@@ -66,10 +66,18 @@ const UpdatePage = catchAsync(async (req, res) => {
     res.status(httpStatus.OK).send({ page });
 });
 
+const PublishPage = catchAsync(async (req, res) => {
+    await pageService.publishPage(req.params.id, req.body);
+    res.status(httpStatus.OK).send({ status: true });
+});
+
+
 const UpdateStyle = catchAsync(async (req, res) => {
     await pageService.updateStyle(req.params.id, req.body);
     res.status(httpStatus.OK).send({ status: true });
 });
+
+
 
 const UpdateElements = catchAsync(async (req, res) => {
     await pageService.updateElements(req.params.id, req.body);
@@ -101,4 +109,5 @@ module.exports = {
     UpdatePage,
     DeletePage,
     GetPages,
+    PublishPage
 };

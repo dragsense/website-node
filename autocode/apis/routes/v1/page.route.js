@@ -20,6 +20,8 @@ router.get('/css/:id', pageController.GetCss);
 
 router.put('/:id', validate(pageValidation.pageSchema),  pageController.UpdatePage);
 router.post('/elements/:id', validate(pageValidation.elementsSchema), pageController.UpdateElements);
+router.post('/publish/:id', pageController.PublishPage);
+
 router.post('/style/:id', validate(pageValidation.styleSchema), pageController.UpdateStyle);
 
 

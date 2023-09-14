@@ -7,7 +7,7 @@ const httpStatus = require('http-status')
 const ApiError = require('../../utils/api-error')
 
 
-const { getStateValue }  = require('../../utils/element-value');
+const { getStateValue } = require('../../utils/element-value');
 const documentService = require('./document.service');
 
 
@@ -73,6 +73,7 @@ const updatePage = async (id, pageBody) => {
     return page;
 };
 
+
 /**
  * Update a page Elements
  * @param {String} id
@@ -86,10 +87,45 @@ const updateElements = async (id, pageBody) => {
         throw new ApiError(httpStatus.NOT_FOUND, 'Page not found');
     }
 
+    page.published = false;
     Object.assign(page, pageBody);
     await page.save();
     return page;
 };
+
+/**
+ * Publish a page
+ * @param {String} id
+ * @param {Object} pageBody
+ * @returns {Promise<Page>}
+ */
+const publishPage = async (id, pageBody) => {
+
+    const page = await Page.findOne({ _id: id })
+    if (!page) {
+        throw new ApiError(httpStatus.NOT_FOUND, 'Page not found.');
+    }
+
+    const { updater } = pageBody;
+
+    if (page.published) {
+        throw new ApiError(httpStatus.NOT_FOUND, 'Page is already published.');
+    }
+
+    page.elements = page._elements;
+    page.components = page._components;
+    page.forms = page._forms;
+    page.styles = page._styles;
+
+    page.published = true;
+
+    page.updater = updater
+
+    Object.assign(page, pageBody);
+    await page.save();
+    return page;
+};
+
 
 /**
  * Update a page Style
@@ -103,7 +139,6 @@ const updateStyle = async (id, pageBody) => {
     if (!page) {
         throw new ApiError(httpStatus.NOT_FOUND, 'Page not found');
     }
-
     Object.assign(page, pageBody);
     await page.save();
     return page;
@@ -212,7 +247,7 @@ const getPageData = async (id, withCss = false) => {
 
 
     if (withCss) {
-   
+
         const styles = page.styles || {};
         css = [...css, generateElementsCss(styles, page._id)];
     }
@@ -342,7 +377,7 @@ const getPageData = async (id, withCss = false) => {
                 }
 
                 if (withCss) {
-                   
+
                     let styles = component.styles || {};
                     css = [...css, generateElementsCss(styles, component._id)];
                 }
@@ -404,7 +439,7 @@ const getPageData = async (id, withCss = false) => {
 
                 if (withCss) {
 
-              
+
                     const styles = form.styles || {};
                     css = [...css, generateElementsCss(styles, form._id)];
                 }
@@ -456,11 +491,22 @@ const getElements = async (id, stream) => {
 
     const projection = {
         elements: 1,
+       
+        collStates: 1,
+        events: 1,
+        _collStates: 1,
+        published: 1,
+       
+        _forms: 1,
+        _elements: 1,
+        _components: 1,
+        _states: 1,
+        _events: 1,
+
         components: 1,
         forms: 1,
         states: 1,
         parent: 1,
-        collStates: 1,
         type: 1,
         attached: 1,
         createdAt: 1,
@@ -476,8 +522,32 @@ const getElements = async (id, stream) => {
         throw new ApiError(httpStatus.NOT_FOUND, 'Page not found');
     }
 
+    const doc = {
+        parent: page.parent,
+        type: page.type,
+        attached: page.attached,
+        createdAt: page.createdAt,
+        creator: page.creator,
+        setting: page.setting,
+        url: page.url,
+        _id: page._id
+    }
+    if (!page.published) {
+        doc.elements = page._elements;
+        doc.components = page._components;
+        doc.forms = page._forms;
+        doc.states = page._states;
+        doc.collStates = page._collStates;
+    } else {
+        doc.elements = page.elements;
+        doc.components = page.components;
+        doc.forms = page.forms;
+        doc.states = page.states;
+        doc.collStates = page.collStates;
+    }
 
-    const chunkStr = JSON.stringify(page._doc) + '\n';
+
+    const chunkStr = JSON.stringify(doc) + '\n';
     stream.push(chunkStr);
 
 
@@ -523,15 +593,39 @@ const getElements = async (id, stream) => {
             if (form && !laoded[forms[i]]) {
                 laoded[form[i]] = true;
 
-                const chunkStr = JSON.stringify(form) + '\n';
+                const doc = {
+                    
+                    type: form.type,
+                    attached: form.attached,
+                    createdAt: form.createdAt,
+                    creator: form.creator,
+                    setting: form.setting,
+                    url: form.url,
+                    _id: form._id
+                }
+                if (!form.published) {
+                    doc.elements = form._elements;
+                    doc.components = form._components;
+                    doc.forms = form._forms;
+                    doc.states = form._states;
+                    doc.collStates = form._collStates;
+                } else {
+                    doc.elements = form.elements;
+                    doc.components = form.components;
+                    doc.forms = form.forms;
+                    doc.states = form.states;
+                    doc.collStates = form.collStates;
+                }
+
+                const chunkStr = JSON.stringify(doc) + '\n';
                 stream.push(chunkStr);
 
                 laoded[form[i]] = true;
 
-                const innerComponents = form.components || [];
+                const innerComponents = doc.components || [];
                 await loadComponents(innerComponents, projection)
 
-                const forms = form.forms || [];
+                const forms = doc.forms || [];
                 await loadForms(forms, projection)
 
             }
@@ -544,27 +638,51 @@ const getElements = async (id, stream) => {
             if (component && !laoded[components[i]]) {
                 laoded[components[i]] = true;
 
-                const chunkStr = JSON.stringify(component._doc) + '\n';
+                const doc = {
+                    parent: component.parent,
+                    type: component.type,
+                    attached: component.attached,
+                    createdAt: component.createdAt,
+                    creator: component.creator,
+                    setting: component.setting,
+                    url: component.url,
+                    _id: component._id
+                }
+                if (!component.published) {
+                    doc.elements = component._elements;
+                    doc.components = component._components;
+                    doc.forms = component._forms;
+                    doc.states = component._states;
+                    doc.collStates = component._collStates;
+                } else {
+                    doc.elements = component.elements;
+                    doc.components = component.components;
+                    doc.forms = component.forms;
+                    doc.states = component.states;
+                    doc.collStates = component.collStates;
+                }
+
+                const chunkStr = JSON.stringify(doc) + '\n';
                 stream.push(chunkStr);
 
                 const collection = component.attached;
                 if (collection)
                     await loadCollection(collection);
 
-                const innerComponents = component.components || [];
+                const innerComponents = doc.components || [];
 
 
                 await loadComponents(innerComponents)
 
-                const forms = component.forms || [];
+                const forms = doc.forms || [];
                 await loadForms(forms, projection)
 
             }
         }
     }
 
-    const components = page.components || [];
-    const forms = page.forms || [];
+    const components = doc.components || [];
+    const forms = doc.forms || [];
 
     await loadComponents(components, projection);
     await loadForms(forms, projection)
@@ -584,8 +702,11 @@ const getStyle = async (id, stream) => {
 
 
     const projection = {
+        _styles: 1,
         styles: 1,
-        _id: 1
+        _id: 1,
+        published: 1,
+
     };
 
 
@@ -594,8 +715,17 @@ const getStyle = async (id, stream) => {
         throw new ApiError(httpStatus.NOT_FOUND, 'Page not found');
     }
 
-    if (Object.keys(page.styles).length > 0) {
-        const chunkStr = JSON.stringify({ elements: page.styles, _id: page._id }) + '\n';
+    const doc = {
+        _id: page._id
+    }
+    if (!page.published) {
+        doc.styles = page._styles;
+    } else
+        doc.styles = page.styles;
+
+
+    if (Object.keys(doc.styles).length > 0) {
+        const chunkStr = JSON.stringify({ elements: doc.styles, _id: doc._id }) + '\n';
         stream.push(chunkStr);
     }
 
@@ -610,7 +740,7 @@ const getStyle = async (id, stream) => {
  * @param {String} id
  * @returns {Promise<CSS>}
  */
-const getCss = async (id) => {
+const getCss = async (id,) => {
 
 
     const projection = {
@@ -618,7 +748,11 @@ const getCss = async (id) => {
         elements: 1,
         components: 1,
         forms: 1,
-        _id: 1
+        _id: 1,
+        published: 1,
+        _forms: 1,
+        _components: 1,
+        _styles: 1,
     };
 
     let css = [];
@@ -628,30 +762,47 @@ const getCss = async (id) => {
     }
 
 
-    const elements = page.elements || {};
+    const doc = {
+        _id: page._id
+    }
+    if (!page.published) {
+        doc.components = page._components;
+        doc.forms = page._forms;
+        doc.styles = page._styles;
 
-    css = [generateElementsCss(elements, page._id)];
+    } else {
+        doc.styles = page.styles;
+        doc.components = page.components;
+        doc.forms = page.forms;
 
+    }
 
-
-    const styles = page.styles || {};
-
-
-
-    css = [...css, generateElementsCss(styles, page._id)];
+    const styles = doc.styles || {};
+    css = [...css, generateElementsCss(styles, doc._id)];
 
 
     const loadFormsCSS = async (forms) => {
         for (let i = 0; i < forms.length; i++) {
             const form = await Form.findById(forms[i]).select(projection);
             if (form) {
-                const elements = form.elements || {};
 
-                css = [...css, generateElementsCss(elements, form._id)];
-                let styles = form.styles || {};
-                css = [...css, generateElementsCss(styles, form._id)];
+                const doc = {
+                    _id: form._id
+                }
+                if (!form.published) {
+                    doc.components = form._components;
+                    doc.styles = form._styles;
+            
+                } else {
+                    doc.styles = form.styles;
+                    doc.components = form.components;
+            
+                }
 
-                const components = form.components || [];
+                let styles = doc.styles || {};
+                css = [...css, generateElementsCss(styles, doc._id)];
+
+                const components = doc.components || [];
                 await loadComponentsCSS(components)
             }
         }
@@ -662,25 +813,39 @@ const getCss = async (id) => {
         for (let i = 0; i < components.length; i++) {
             const component = await Component.findById(components[i]).select(projection);
             if (component) {
-                const elements = component.elements || {};
 
-                css = [...css, generateElementsCss(elements, component._id)];
-                let styles = component.styles || {};
-                css = [...css, generateElementsCss(styles, component._id)];
+                const doc = {
+                    _id: component._id
+                }
+                if (!component.published) {
+                    doc.components = component._components;
+                    doc.styles = component._styles;
+                    doc.forms = component._forms;
 
-                const innerComponents = component.components || [];
+            
+                } else {
+                    doc.styles = component.styles;
+                    doc.components = component.components;
+                    doc.forms = component.forms;
+
+                }
+
+                let styles = doc.styles || {};
+                css = [...css, generateElementsCss(styles, doc._id)];
+
+                const innerComponents = doc.components || [];
 
                 await loadComponentsCSS(innerComponents)
-                const forms = component.forms || [];
+                const forms = doc.forms || [];
                 await loadFormsCSS(forms);
             }
         }
     }
 
 
-    const components = page.components || [];
+    const components = doc.components || [];
     await loadComponentsCSS(components);
-    const forms = page.forms || [];
+    const forms = doc.forms || [];
     await loadFormsCSS(forms);
 
     return { css }
@@ -724,5 +889,6 @@ module.exports = {
     updatePage,
     updateElements,
     updateStyle,
-    createPage
+    createPage,
+    publishPage
 }

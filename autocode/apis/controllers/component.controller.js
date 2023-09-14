@@ -27,10 +27,22 @@ const CreateComponent = catchAsync(async (req, res) => {
     res.status(httpStatus.CREATED).send({ component });
 });
 
+const PublishComponent = catchAsync(async (req, res) => {
+    await componentService.publishComponent(req.params.id, req.body);
+    res.status(httpStatus.OK).send({ status: true });
+});
+
+
 const UpdateComponent = catchAsync(async (req, res) => {
     const component = await componentService.updateComponent(req.params.id, req.body);
     res.status(httpStatus.OK).send({ component });
 });
+
+const UpdateElements = catchAsync(async (req, res) => {
+    const component = await componentService.updateElements(req.params.id, req.body);
+    res.status(httpStatus.OK).send({ component });
+});
+
 
 const DeleteComponent = catchAsync(async (req, res) => {
     await componentService.deleteComponent(req.params.id);
@@ -97,6 +109,8 @@ module.exports = {
     GetStyle,
     GetElements,
     GetCss,
+    PublishComponent,
+    UpdateElements,
     UpdateStyle,
     GetPaths
 };

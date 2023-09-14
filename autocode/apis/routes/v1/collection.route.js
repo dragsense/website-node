@@ -21,6 +21,7 @@ router.get('/:id',  collectionController.GetCollection);
 router.put('/:id', validate(collectionValidation.collectionSchema), collectionController.UpdateCollection);
 router.post('/elements/:id', validate(collectionValidation.elementsSchema), collectionController.UpdateElements);
 router.post('/style/:id', validate(collectionValidation.styleSchema), collectionController.UpdateStyle);
+router.post('/publish/:id', collectionController.PublishCollection);
 
 router.delete('/:id', collectionController.DeleteCollection);
 

@@ -34,13 +34,13 @@ const pageSchema = {
 }
 
 const elementObject= {
-  elements: Joi.object().pattern(
+  _elements: Joi.object().pattern(
     Joi.string(),
     Joi.object()
   ),
-  states: Joi.object().allow({}),
-  components: Joi.array().items(Joi.string().pattern(/^[0-9a-fA-F]{24}$/)),
-  forms: Joi.array().items(Joi.string().pattern(/^[0-9a-fA-F]{24}$/)),
+  _states: Joi.object().allow({}),
+  _components: Joi.array().items(Joi.string().pattern(/^[0-9a-fA-F]{24}$/)),
+  _forms: Joi.array().items(Joi.string().pattern(/^[0-9a-fA-F]{24}$/)),
   updater: Joi.object().allow({}),
 };
 
@@ -50,7 +50,7 @@ const elementsSchema = {
 }
 
 const styleObject= {
-  styles: Joi.object(),
+  _styles: Joi.object(),
   updater: Joi.object().allow({}),
 };
 

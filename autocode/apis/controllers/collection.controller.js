@@ -55,6 +55,13 @@ const CreateCollection = catchAsync(async (req, res) => {
     res.status(httpStatus.CREATED).send({ collection });
 });
 
+const PublishCollection = catchAsync(async (req, res) => {
+    await collectionService.publishCollection(req.params.id, req.body);
+    res.status(httpStatus.OK).send({ status: true });
+});
+
+
+
 const DuplicateCollection = catchAsync(async (req, res) => {
     const collection = await collectionService.duplicateCollection(req.params.id);
     res.status(httpStatus.OK).send({ collection });
@@ -99,5 +106,6 @@ module.exports = {
     GetPageData,
     GetCss,
     GetElements,
-    GetStyle
+    GetStyle,
+    PublishCollection
 };
