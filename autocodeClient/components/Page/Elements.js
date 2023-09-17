@@ -64,8 +64,11 @@ const MemoizedTreeNode = React.memo(TreeNode, (prevProps, nextProps) => {
 
 export default function Elements({ setting, type, pages, states, _uid, _id, AutocodeCustom }) {
 
+  const [pageSetting, setPageSetting] = React.useState(pages[_id].pageSetting || {});
+
+
   return <MemoizedTreeNode
-    setting={setting}
+    setting={{...setting, ...pageSetting}}
     _states={states}
     pages={pages}
     pageType={type}

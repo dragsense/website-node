@@ -101,6 +101,7 @@ const publishComponent = async (id, componentBody) => {
     component.forms = component._forms;
     component.styles = component._styles;
     component.states = component._states;
+    component.collStates = component._collStates;
 
     component.published = true;
 
@@ -258,6 +259,7 @@ const getElements = async (id, stream) => {
         doc.forms = component._forms;
         doc.states = component._states;
         doc.events = component._events;
+        doc.collStates = component._collStates;
 
     } else {
         doc.elements = component.elements;
@@ -265,6 +267,7 @@ const getElements = async (id, stream) => {
         doc.forms = component.forms;
         doc.states = component.states;
         doc.events = component.events;
+        doc.collStates = component.collStates;
 
     }
 

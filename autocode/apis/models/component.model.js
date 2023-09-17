@@ -45,7 +45,7 @@ const ComponentSchema = new Schema(
             type: mongoose.Schema.Types.ObjectId,
             ref: 'AC_Collection',
         },
-        collStates: {
+        _collStates: {
             type: Object,
             default: {
                 limit: 10,
@@ -60,6 +60,12 @@ const ComponentSchema = new Schema(
                 pagination: {
                     leftRange: 1, rightRange: 1, nearRange: 4, dots: "..."
                 }
+            }
+        },
+        collStates: {
+            type: Object,
+            default: {
+
             }
         },
         styles: {

@@ -1,23 +1,50 @@
 
-const React = require("react");
+import React, { Children, useMemo } from 'react';
 
 
-const General = ({  _uid, onClick, innerWraaper, children }) => {
 
-
-    const spanElement = !innerWraaper ? [] : innerWraaper;
+const Component = ({
   
+    onMouseMove,
+    conds,
+    onScroll,
+    onClick,
+    innerWraaper,
+    value,
+    children,
+    }) => {
+
+
+ 
+
+    const spanElement = innerWraaper ? (<>
+        {React.isValidElement(value) ? value : <div
+            dangerouslySetInnerHTML={{ __html: value }}
+         
+        />
+        }
+        {innerWraaper}</>
+    ) : <span style={{ userSelect: 'none', color: "#cccccc" }}></span>;
+
+
+
     const clonedElement = React.cloneElement(children, {
         customAttributes: {
-            key:_uid,
+            onMouseMove: onMouseMove,
+            onScroll: onScroll,
             onClick: onClick
         }
     }, spanElement);
 
 
-    return clonedElement;
+
+
+   
+
+
+    return conds ? clonedElement : null;
 
 
 };
 
-export default General;
+export default Component;

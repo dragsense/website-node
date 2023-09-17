@@ -6,9 +6,10 @@ import ElementMapping from './ElementMapping';
 
 import { updateStateValue, getStateRef } from '../../utils/element-value';
 
+
 const ElementComponent = (props) => {
 
-    const { node, children } = props;s
+    const { node, _id, fun, children, onUpdateStates } = props;
 
     const [states, setStates] = useState(node.states);
     const [state, setState] = useState(null);
@@ -21,10 +22,9 @@ const ElementComponent = (props) => {
 
         switch (type) {
             case 'Menu': case 'Flex': case 'Tabs': case 'Accordion': case 'Sider':
-                case 'Grid': case 'Container': case 'Slider': case 'Gallery': case 'Dropdown':
-                case 'Dropdown': case 'Observable': case 'Modal': case 'GoToTop':
+            case 'Grid': case 'Container': case 'Slider': case 'Gallery': case 'Dropdown':
+            case 'Dropdown': case 'Observable': case 'Modal': case 'GoToTop':
                 updateStateValue(elem, withValue, states, value);
-
                 setStates({ ...states });
             default:
                 return;
@@ -33,6 +33,18 @@ const ElementComponent = (props) => {
     }
 
 
+
+    useEffect(() => {
+
+
+        if (!node)
+            return;
+
+        setStates({ ...node.states });
+        const cascaderStates = generateCascader(node.states, node.name, node.cname);
+        onUpdateStates(node.cname, cascaderStates, setStates)
+
+    }, [node]);
 
     useEffect(() => {
 
@@ -46,10 +58,10 @@ const ElementComponent = (props) => {
 
         if (node && node.onClick) {
             const elem = node.onClick;
-
-
-
             setState({ elem, stateValue, withValue })
+
+            if (fun?.onClick)
+                fun.onClick(node, stateValue, withValue)
         }
 
     }, [states]);
@@ -64,14 +76,17 @@ const ElementComponent = (props) => {
         if (key === 'items') {
 
 
-            const oldValues = Array.isArray(states['items'].states) ? states['items'].states : []
-            const values = Array.from({ length: parseInt(value) }, (_, index) => {
-                return oldValues[index] || `${states['items'].text || "Item"} ${index + 1}`
-            });
-            states['items'] = {
-                ...(states['items'] || {}),
-                states: values
-            };
+            const oldValues = states['items']?.states || {};
+            const resultObject = Array.from({ length: parseInt(value) }, (_, index) => ({
+                value: `${index + 1}:${oldValues[index]?.value || states['items']?.text || "Item"} ${index + 1}`,
+                idx: index,
+            })).reduce((acc, currentValue) => {
+                acc[currentValue.idx] = currentValue;
+                return acc;
+            }, {});
+
+
+            states['items'].states = resultObject;
 
 
             states['total'] = { ...(states['total'] || {}), max: value, defaultValue: value };
@@ -90,59 +105,87 @@ const ElementComponent = (props) => {
 
 
 
+    const onChange = useCallback(async (values, node, all = false) => {
 
-    const onChange = useCallback(async (node, value, all = false) => {
+        let allvalues = [];
+        if (fun?.onChange)
+            allvalues = fun.onChange(values, node, all)
 
 
-        if (node && node.state) {
+        if (all) {
+            let options = [];
 
+            if (node.options) {
+                options = node.options.split(",");
+                options = Object.values(options).map((val) => val.split(":")[0]);
+                if (Array.isArray(allvalues))
+                    options = [...(new Set([...allvalues, ...options]))];
 
-            if (all && node.map) {
-
-                if (value.includes('all')) {
-                    const maKey = node.map.key;
-                    const mapType = node.map.type;
-                    let map = null;
-                    if (mapType == 'STATES')
-                        map = getStateRef(maKey, states);
-                    else
-                        map = getStateRef(maKey, states);
-
-                    if (map) {
-                        const states = Object.values(map.states).map((val) => val.split(":")[0]);
-                        let options = node.options.split(",");
-                        options = Object.values(options).map((val) => val.split(":")[0]);
-                        value = [...(new Set([...options, ...states]))].join(',');
-
-                    }
-                } else
-                    value = ''
             }
 
-            setValue(node.state, value, '');
+            if (node.map) {
+                const maKey = node.map.key;
+                const mapType = node.map.type;
 
+
+                switch (mapType) {
+                    case 'Menu': case 'Flex': case 'Tabs': case 'Accordion': case 'Sider':
+                    case 'Grid': case 'Container': case 'Slider': case 'Gallery': case 'Dropdown':
+                    case 'Dropdown': case 'Observable': case 'Modal': case 'GoToTop':
+                        if (maKey[0] === 'items') {
+                            const stateValues = Object.values(states['items']?.states || {}).map((val) => val.value.split(":")[0]);
+
+                            options = [...(new Set([...options, ...stateValues]))];
+
+                        }
+                    default:
+
+
+                }
+            }
+            allvalues = options;
         }
+
+        for (const elem of values) {
+            let value = elem.value;
+            const onChange = elem.elem;
+
+
+            if (value === 'all')
+                value = allvalues.join(",");
+
+            setValue(onChange, value, '');
+        }
+
+
+
 
     }, [states]);
 
 
 
-    return <span style={{border: '#ffaa4f5e solid 1px', display:'inline-block', width: '-webkit-fill-available'  }}><ElementMapping
+    return <span style={{ border: '#ffaa4f5e solid 1px', display: 'inline-block', width: '-webkit-fill-available' }}><ElementMapping
         {...props} map={node.map}
         _cstates={states}
         updateStates={updateStates}
-        onChange={onChange}
+        fun={{
+            onChange: onChange,
+            onClick: onClick,
+        }}
         onClick={onClick}>
-        {React.Children.map(children, (child) => {
+        {React.Children.map(children, (child, i) => {
             return child && React.cloneElement(child, {
-                onChange: onChange,
-                onClick: onClick,
+                key: child.props?._uid,
+                fun: {
+                    onChange: onChange,
+                    onClick: onClick,
+                },
                 _cstates: states,
                 updateStates: updateStates
             })
         })}
     </ElementMapping>
-</span>
+    </span>
 
 
 

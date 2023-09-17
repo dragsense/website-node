@@ -1,50 +1,104 @@
 
-const React = require("react");
-
-import { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
+import { debounce } from '../../../utils/utils'
 
 const InputGroup = (props) => {
-    const { labelPos, onChange, conds, attributes, type, mapValue, value, _uid, pos, children } = props;
+    const { labelPos, onChange, conds,
+        attributes, type, mapValue, disabled, onClick, value, _uid, pos, children } = props;
 
-    const option = mapValue ? { value: mapValue.value, label: mapValue.label || mapValue.value } : { value, label: value };
+    const option = mapValue ? { value: mapValue.value, label: mapValue.label || mapValue.value } : { value: '' };
 
     const [checked, setChecked] = useState(false);
 
     const onChangeValue = (e) => {
         e.preventDefault();
+        const optionValue = e.target.value;
+        let newValue = '';
+
+        if (checked) {
+            if (type === 'radio' || !value)
+                newValue = "''"
+            else {
+                const valuesArray = String(value).split(",");
+                newValue = valuesArray.filter(v => v !== optionValue).join(",");
+                if (newValue === 'all')
+                    newValue = '';
+            }
+        }
+        else {
+            if (type === 'radio' || !value)
+                newValue = optionValue;
+            else {
+                newValue = value + "," + optionValue;
+                if(optionValue === 'all')
+                newValue = 'all';
+
+            }
+        }
 
         if (onChange) {
-            const optionValue = e.target.value;
-            let newValue = value;
-            if (checked) {
-                newValue = type == 'radio' ? "" : value.replace(optionValue, "").replace(/(^,|,$)/g, "");
-            } else {
-                newValue = type == 'radio' ? optionValue : value ? value + "," + optionValue : optionValue;
-            }
-            onChange(_uid, newValue, optionValue == 'all');
+            debounce(onChange(newValue, optionValue === 'all'), 500)
         }
-        else
-            setChecked(!checked);
+        setChecked(!checked);
 
 
     }
 
 
     useEffect(() => {
-        const isChecked = type == 'radio' ? value == option.value || (option.value == 'all' && value.includes('all')) : value.split(',').find(v => v == option.value);
+        let isChecked = false;
+
+        if (typeof value === 'string') {
+            isChecked = type === 'radio'
+                ? value === option.value || (option.value === 'all' && value.includes('all'))
+                : value.split(',').some(v => v === option.value);
+
+
+        } else if (typeof value === 'boolean') {
+            isChecked = value === (option.value.toLowerCase() === 'true'); // Convert string to boolean
+        } else if (!isNaN(Number(value))) { // Check if value is a number
+            isChecked = Number(value) === Number(option.value); // Convert string to number
+        }
+
         setChecked(isChecked);
-    }, [value])
+    }, [value]);
 
-    const input = <>{labelPos == 0 && option.label}<input type={type} {...attributes} onChange={onChangeValue}
+    const input = <>{labelPos == 0 && option.label}<input key={checked} type={type} {...attributes}
+
+        onClick={onChangeValue}
         value={option.value}
-        checked></input>  {labelPos == 1 && option.label}</>
+        checked={checked === true} />  {labelPos == 1 && option.label}</>
+
+    const disabledStyles = {
+        opacity: 0.2,
+        border: '1px dashed #ccc',
+    };
+
+    const clonedElement = React.cloneElement(children, {
+        customAttributes: {
+            onClick: onClick,
+
+            "data-id": _uid,
+            "data-pos": pos,
+            "draggable": false,
+            style: { ...(conds ? {} : disabledStyles), outline: '1px dotted #bdbdbd', cursor: 'pointer', paddingInline: '1%', }
+        }
+    }, input);
 
 
 
-const clonedElement = React.cloneElement(children, {}, input);
+
+    const disabledElement = React.cloneElement(children, {
+        customAttributes: {
+
+            onClick: onClick,
+            style: conds ? {} : disabledStyles
+        }
+    });
 
 
-    return clonedElement;
+    return disabled ? disabledElement : clonedElement;
+
 
 };
 

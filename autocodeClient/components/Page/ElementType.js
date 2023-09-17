@@ -5,6 +5,7 @@ import Element from "./Element";
 
 
 
+
 const ElementType = (props) => {
 
     const {
@@ -16,6 +17,8 @@ const ElementType = (props) => {
         mapIndex,
         onChange,
         onClick,
+        onScroll,
+        onMouseMove,
         disabled,
         options,
         node,
@@ -24,7 +27,7 @@ const ElementType = (props) => {
 
     const _uid = node._uid;
     let tagType = node.tagName;
-
+  
 
     const layout = node.layout;
     if (layout == 'inputgroup')
@@ -41,7 +44,7 @@ const ElementType = (props) => {
         if (node.tagName == 'hr')
         tagType = "close";
 
-    const element = <Element key={_uid} classes={classes} attributes={attributes} tagName={node.tagName} />
+    const element = <Element  key={_uid}  classes={classes} attributes={attributes} tagName={node.tagName} />
 
     switch (tagType) {
 
@@ -89,6 +92,7 @@ const ElementType = (props) => {
                 pos={pos}
                 conds={conds}
                 onClick={onClick}
+                onMouseMove={onMouseMove}
 
                 attributes={attributes}
                 options={options}
@@ -97,6 +101,7 @@ const ElementType = (props) => {
             return <Image disabled={disabled}
                 conds={conds}
                 onClick={onClick}
+                onMouseMove={onMouseMove}
 
                 _uid={_uid} name={node.name || node.tagName} pos={pos} value={value}>{element}</Image>
         case 'video':
@@ -108,12 +113,14 @@ const ElementType = (props) => {
                 _uid={_uid}
                 pos={pos}
                 onClick={onClick}
+                onMouseMove={onMouseMove}
 
                 value={value}>{element}</Media>
         case 'close':
             return <CloseTag disabled={disabled}
                 conds={conds}
                 onClick={onClick}
+                onMouseMove={onMouseMove}
 
                 name={node.name || node.tagName} _uid={_uid} pos={pos}>{element}</CloseTag>
         case 'icon':
@@ -124,6 +131,7 @@ const ElementType = (props) => {
                 _uid={_uid}
                 pos={pos}
                 onClick={onClick}
+                onMouseMove={onMouseMove}
 
                 conds={conds}
                 layout={layout}
@@ -139,21 +147,23 @@ const ElementType = (props) => {
                 name={node.cname || node.name || node.tagName}
                 conds={conds}
                 onClick={onClick}
+                onScroll={onScroll}
+                onMouseMove={onMouseMove}
                 innerWraaper={children}>
                 {element}
             </Component>
         default:
-
             return <General
-                key={_uid}
                 disabled={disabled}
                 
                 pos={pos}
                 _uid={_uid}
                 name={node.cname || node.name || node.tagName}
                 conds={conds} 
+                onMouseMove={onMouseMove}
+                onScroll={onScroll}
                 onClick={onClick}
-                value={value.label ?? value} innerWraaper={children}>
+                value={value?.label || value} innerWraaper={children}>
                 {element}
             </General>
 

@@ -72,29 +72,47 @@ const document = function (schema) {
     const lookups = collections.map((collection) => ({
       $lookup: {
         from: collection.collectionName,
-        let: { localFieldValue: `$${collection.localField}` },
+        localField: collection.localField,
+        foreignField: collection.foreignField,
+        as: collection.as,
         pipeline: [
+          { $project: collection.projection },
           {
-            $match: {
-              $expr: {
-                $cond: {
-                  if: { $isArray: `$${collection.localField}` },
-                  then: { $in: [`$${collection.foreignField}`, { $map: { input: `$$localFieldValue`, as: 'id', in: { $toObjectId: '$$id' } } }] },
-                  else: { $eq: [`$${collection.foreignField}`, `$$localFieldValue`] }
-                }
-              }
-            },
+            $lookup: {
+              from: 'ac_medias',
+              localField: 'setting.image',
+              foreignField: '_id',
+              as: 'setting.populatedImage',
+              pipeline: [
+                {
+                  $project: { src: 1, _id: 1, alt: 1 }
+                },
+              ]
+            }
           },
-          { $project: collection.projection } // Add the projection for the $lookup here
-        ],
-        as: collection.as
+          {
+            $unwind: {
+              path: '$setting.populatedImage',
+              preserveNullAndEmptyArrays: true
+
+            }
+          }
+        ]
       }
     }))
 
     const doc = await this.aggregate([
       { $match: { _id: new ObjectId(id) } },
       { $project: projection },
-      ...lookups
+   
+      ...lookups,
+      {
+        $unwind: {
+          path: '$setting.populatedImage',
+          preserveNullAndEmptyArrays: true
+
+        }
+      },
     ]);
 
 
@@ -116,9 +134,7 @@ const document = function (schema) {
 
     if (duplicatedDoc.slug) {
       const name = duplicatedDoc.name.toLowerCase().replace(/\s+/g, "_");
-
       duplicatedDoc.slug = 'copy' + `_${name}` + `_${uniqueId}`
-      duplicatedDoc.url = `/${duplicatedDoc.slug}`
     }
 
     if (duplicatedDoc.elements)

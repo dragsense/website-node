@@ -46,7 +46,7 @@ const webpack = require('webpack');
     mode: 'production',
  };  
  
-    module.exports = {
+   /*   module.exports = {
     entry: {
         'autocode-server': './autocodeClient/server.js',
     },
@@ -90,10 +90,10 @@ const webpack = require('webpack');
     },
 
     mode: 'production',
- };   
+ }; */   
   
  
- /*  module.exports = {
+ /*   module.exports = {
     entry: {
         'autocode-client': './autocodeClient/index.js',
     },
@@ -137,7 +137,7 @@ const webpack = require('webpack');
     },
 
     mode: 'production',
- };  */ 
+ }; */   
  
 
 

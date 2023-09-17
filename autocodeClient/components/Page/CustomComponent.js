@@ -3,10 +3,15 @@ const React = require("react");
 import { useEffect, useMemo } from "react";
 
 import ElementSetting from "./ElementSetting";
+import { getStates,} from '../../utils/element-value';
 
 const CustomComponent = (props) => {
 
-    const { children, customPath, node, _states, _props, AutocodeCustom, onUpdateStates, mapValue, mapIndex } = props;
+    const { children, customPath, 
+        node, 
+        _states, _props, 
+        AutocodeCustom, 
+        onSetStates, mapValue, mapIndex } = props;
 
 
     const loadComponent = async (path) => {
@@ -16,35 +21,33 @@ const CustomComponent = (props) => {
             loadComponent(customPath);
         }, [])
 
-    const states = useMemo(() => {
-        if (!_states) {
-            return {};
+    const getStateValue = (key) => {
+        if (!_states || !key) {
+            return null;
         }
 
-        return Object.keys(_states).reduce((accumulator, key) => {
-            accumulator[key] = _states[key].defaultValue;
-            return accumulator;
-        }, {});
+        return getStates(key, _states)
 
-    }, [_states]);
+    };
 
-    const computedProps = useMemo(() => {
-        if (!_props) {
-            return {};
+    const getPropValue = (key) => {
+        if (!_states || !key) {
+            return null;
         }
+        return getStates(key, _props)
 
-        return Object.keys(_props).reduce((accumulator, key) => {
-            accumulator[key] = _props[key].defaultValue;
-            return accumulator;
-        }, {});
-    }, [_props]);
+    };
 
-    const updateStates = (key, value, type) => {
-        if (onUpdateStates)
-            onUpdateStates(key, value, type)
+
+    const updateState = (key, value) => {
+        if (onSetStates)
+            onSetStates(key, value, 'STATES')
     }
 
-
+    const updateProp = (key, value) => {
+        if (onSetStates)
+            onSetStates(key, value, "PROPS")
+    }
     return (
         <div id="custom-component">
             <ElementSetting
@@ -54,11 +57,12 @@ const CustomComponent = (props) => {
                 conditions={node.conditions}
                 mapValue={mapValue}
                 mapIndex={mapIndex}
-            >
-                {AutocodeCustom ? <AutocodeCustom name={customPath} states={states} props={computedProps} updateStates={updateStates}>
-                    {children}
-                </AutocodeCustom> : children}
-            </ElementSetting>
+            >{AutocodeCustom ? <><AutocodeCustom
+                name={customPath}
+                getStateValue={getStateValue}
+                getPropValue={getPropValue}
+                updateProp={updateProp}
+                updateState={updateState}>{children}</AutocodeCustom></> : children}</ElementSetting>
 
         </div>
     );

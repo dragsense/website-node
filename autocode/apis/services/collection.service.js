@@ -1,16 +1,17 @@
+// Importing required modules and dependencies
 const { Collection, Form, Component, Document } = require('../models');
 const he = require('he');
+const { ObjectId } = require('mongodb');
+
 const { generateCss, generateElementsCss, updateContentWithType } = require('../../utils/utils');
 const mongoose = require('mongoose');
 const pluralize = require('pluralize');
-
-const httpStatus = require('http-status')
-
-const ApiError = require('../../utils/api-error')
+const httpStatus = require('http-status');
+const ApiError = require('../../utils/api-error');
 const { getStateValue } = require('../../utils/element-value');
 const documentService = require('./document.service');
 
-
+// Function to get value based on the type
 const getValue = (elem, value = '', states, props) => {
     const type = elem.type;
     const key = elem.key;
@@ -23,17 +24,10 @@ const getValue = (elem, value = '', states, props) => {
         default:
             return value;
     }
-
 }
 
-/**
- * Create a collection
- * @param {Object} collectionBody
- * @returns {Promise<Collection>}
- */
+// Function to create a new collection
 const createCollection = async (collectionBody) => {
-
-
     if (collectionBody.setting)
         collectionBody.setting.content = he.decode(collectionBody.setting.content || '')
 
@@ -45,19 +39,11 @@ const createCollection = async (collectionBody) => {
     if (collectionBody.states)
         updateContentWithType(collectionBody.states, 'content')
 
-
-
     return Collection.create(collectionBody);
 };
 
-/**
- * Update a collection
- * @param {String} id
- * @param {Object} collectionBody
- * @returns {Promise<Collection>}
- */
+// Function to update a collection
 const updateCollection = async (id, collectionBody) => {
-
     const collection = await Collection.findOne({ _id: id })
     if (!collection) {
         throw new ApiError(httpStatus.NOT_FOUND, 'Collection not found');
@@ -74,22 +60,13 @@ const updateCollection = async (id, collectionBody) => {
     if (collectionBody.states)
         updateContentWithType(collectionBody.states, 'content')
 
-
     Object.assign(collection, collectionBody);
     await collection.save();
     return collection;
 };
 
-
-
-/**
- * Update a collection
- * @param {String} id
- * @param {Object} collectionBody
- * @returns {Promise<Collection>}
- */
+// Function to update elements in a collection
 const updateElements = async (id, collectionBody) => {
-
     const collection = await Collection.findOne({ _id: id })
     if (!collection) {
         throw new ApiError(httpStatus.NOT_FOUND, 'Collection not found');
@@ -101,20 +78,14 @@ const updateElements = async (id, collectionBody) => {
     return collection;
 };
 
-/**
- * Publish a collection
- * @param {String} id
- * @param {Object} collectionBody
- * @returns {Promise<Collection>}
- */
+// Function to publish a collection
 const publishCollection = async (id, collectionBody) => {
-
     const collection = await Collection.findOne({ _id: id })
     if (!collection) {
         throw new ApiError(httpStatus.NOT_FOUND, 'Collection not found.');
     }
 
-    const { updater } = pageBody;
+    const { updater } = collectionBody;
 
     if (collection.published) {
         throw new ApiError(httpStatus.NOT_FOUND, 'Collection is already published.');
@@ -135,22 +106,20 @@ const publishCollection = async (id, collectionBody) => {
     return collection;
 };
 
-
-/**
- * Update a collection Style
- * @param {String} id
- * @param {Object} collectionBody
- * @returns {Promise<Collection>}
- */
+// Function to update style of a collection
 const updateStyle = async (id, collectionBody) => {
-
+    // Find the collection by id
     const collection = await Collection.findOne({ _id: id })
+    // If collection does not exist, throw an error
     if (!collection) {
         throw new ApiError(httpStatus.NOT_FOUND, 'Collection not found');
     }
 
+    // Merge the collectionBody into the collection
     Object.assign(collection, collectionBody);
+    // Save the updated collection
     await collection.save();
+    // Return the updated collection
     return collection;
 };
 
@@ -160,6 +129,7 @@ const updateStyle = async (id, collectionBody) => {
  */
 const getCollections = async (filter, options) => {
 
+    // Define the fields to be returned
     const projection = {
         name: 1,
         slug: 1,
@@ -171,8 +141,9 @@ const getCollections = async (filter, options) => {
         _id: 1,
     };
 
-
+    // Fetch the collections based on the filter, options and projection
     const collections = await Collection.paginate(filter, options, projection);
+    // Return the fetched collections
     return collections;
 
 };
@@ -184,6 +155,7 @@ const getCollections = async (filter, options) => {
  */
 const getCollection = async (id) => {
 
+    // Define the collections to be populated
     const collections = [
 
         {
@@ -212,22 +184,22 @@ const getCollection = async (id) => {
         },
     ];
 
-
+    // Define the fields to be returned
     const projection = {
         name: 1,
         scripts: 1,
         slug: 1,
         type: 1, _id: 1, layout: 1,
-        setting: 1, relationships: 1, states: 1
+        setting: 1, relationships: 1, states: 1, populatedRelationships: 1
     };
 
-
-
-
+    // Fetch the collection by id, populate the defined collections and return the defined fields
     const collection = await Collection.document(id, collections, projection);
+    // If collection does not exist, throw an error
     if (!collection) {
         throw new ApiError(httpStatus.NOT_FOUND, 'Collection not found');
     }
+    // Return the fetched collection
     return collection;
 
 
@@ -240,72 +212,214 @@ const getCollection = async (id) => {
  * @param {String} id
  * @returns {Promise<Collection>}
  */
-const getPageData = async (id, withCss = false) => {
+const getPageData = async (id, withCss = false, document) => {
 
 
 
+    // Define the fields to be returned
     const projection = {
         elements: 1,
         components: 1,
         forms: 1,
         states: 1,
-        parent: 1,
+        relationships: 1,
+        styles: 1,
+
         collStates: 1,
-        type: 1,
-        layout: 1,
-        setting: 1,
+        events: 1,
+        published: 1,
+
+
         attached: 1,
+        type: 1,
+        setting: 1,
+        createdAt: 1,
+        creator: 1,
+        url: 1,
+        slug: 1,
+        name: 1,
         _id: 1
     };
 
 
-    const page = await Collection.findById(id).select(projection).populate('layout', 'components');;
+    const collections = [
 
+        {
+            collectionName: 'ac_collections',
+            localField: 'relationships',
+            foreignField: '_id',
+
+            as: 'populatedRelationships',
+            projection: { name: 1, slug: 1, _id: 1, }
+        },
+
+        {
+            collectionName: 'ac_medias',
+            localField: 'setting.image',
+            foreignField: '_id',
+            as: 'setting.populatedImage',
+            projection: { src: 1, alt: 1 }
+
+        },
+    ];
+
+    const page = await Collection.document(id, collections, projection);
+
+    // Initialize the pages object
     const pages = {}
 
+    // Initialize the css array
     let css = [];
+    // If page does not exist, return the pages object, layout object, states object and css array
     if (!page) {
         return { pages, layout: {}, states: {}, css };
     }
 
 
+    // If withCss is true, generate the css for the page styles and add it to the css array
     if (withCss) {
         const styles = page.styles || {};
         css = [...css, generateElementsCss(styles, page._id)];
     }
 
+    const settingData = {};
 
-    pages[page._id] = { elements: page.elements || {} }
+    const relationships = page.populatedRelationships.reduce((result, rel) => {
+        result[rel._id] = rel.name;
+        return result;
+    }, {});
 
+    if (document) {
+
+        const relationships = [
+
+            ...(page.populatedRelationships.map(rel => {
+                const modelName = rel.slug.toLowerCase();
+                return {
+                    collectionName: modelName,
+                    localField: `relationships.${rel._id}`,
+                    foreignField: '_id',
+
+                    as: `populatedRelationships.${rel._id}`,
+                    projection: { name: 1, _id: 1 }
+                }
+            })),
+            {
+                collectionName: 'ac_medias',
+                localField: 'setting.image',
+                foreignField: '_id',
+                as: 'setting.populatedImage',
+                projection: { src: 1, alt: 1 }
+
+            },
+        ];
+
+
+
+        const modelName = page.slug;
+        const DocumentModel = Document(modelName)
+        document = await DocumentModel.document(document._id, relationships, projection);
+
+        if (document) {
+            const proj = {
+                name: 1,
+                url: 1,
+                slug: 1,
+                setting: 1,
+            };
+            const nextDoc = await DocumentModel.
+                findOne({ _id: { $gt: new ObjectId(document._id) }, 'setting.status': 'PUBLIC' }).sort({ _id: -1 })
+                .select(proj).populate({
+                    path: 'setting.image',
+                    select: 'src alt'
+                }).exec();
+            const prevDoc = await DocumentModel.
+                findOne({ _id: { $lt: new ObjectId(document._id) }, 'setting.status': 'PUBLIC' })
+                .sort({ _id: 1 })
+                .select(proj).populate({
+                    path: 'setting.image',
+                    select: 'src alt'
+                }).exec();
+
+            if (nextDoc)
+                settingData.NEXTDOCUMNET = {
+                    _id: nextDoc._id,
+                    slug: nextDoc.slug,
+                    name: nextDoc.name,
+                    title: nextDoc.setting?.title,
+                    image: nextDoc.setting?.image,
+                    url: nextDoc.url,
+                };
+
+            if (prevDoc) {
+                settingData.PREVDOCUMNET = {
+                    _id: prevDoc._id,
+                    slug: prevDoc.slug,
+                    name: prevDoc.name,
+                    title: prevDoc.setting?.title,
+                    image: prevDoc.setting?.image,
+                    url: prevDoc.url,
+                };
+            }
+        }
+
+
+    }
+    // Add the page elements to the pages object
+    pages[page._id] = {
+        elements: page.elements || {},
+
+        pageSetting: {
+            _id: page._id,
+            setting: document?.setting || page.setting,
+            states: document?.states || page.states,
+            name: document?.name || page.name,
+            slug: document?.slug || page.slug,
+            relationships: relationships,
+            populatedRelationships: document.populatedRelationships,
+            creator: document?.creator || page.creator,
+            createdAt: document?.createdAt || page.createdAt,
+            url: document?.url || page.url,
+            ...settingData
+        }
+
+    }
+
+    // Get the components of the page
     const components = page.components || [];
 
 
+    // Function to get filters
     const getFilters = (filters, states, props) => {
 
+        // Initialize the _filters array
         let _filters = [];
 
+        // If filters does not exist, return the _filters array
         if (!filters)
             return _filters;
 
+        // Map through filters and return an array of filter objects
         _filters = Object.values(filters).map(filter => {
             const type = filter.triggerType;
             const key = filter.triggerKey;
             const value = filter.defaultValue;
 
+            // Get the default value based on the type and key
             let defaultValue = getValue({ type, key }, value, states, props);
             return { filterKey: [filter.type, ...filter.filterKey], defaultValue: defaultValue || '' }
-        }
-        )
+        })
 
         return _filters;
 
     }
 
+    // Function to load documents based on the collection, states, and props
     const laodDocumnents = async (collection, _states, _props) => {
-
 
         let _id = collection._id;
 
+        // If no id is provided, return the collection as is
         if (!_id)
             return collection;
 
@@ -315,22 +429,21 @@ const getPageData = async (id, withCss = false) => {
         const withRelationship = collection.withRelationship || false;
         const selectedRelationships = collection.selectedRelationships || [];
 
-
         let documents = [];
         let maxPage = collection.maxPage || 0;
 
+        // If docs is an array and has length greater than 0, get the document ids and fetch the documents
         if (Array.isArray(docs) && docs?.length > 0) {
 
             const docIds = docs.map(doc => doc._id);
 
-
             const res = await documentService.getFilteredDocuments(_id, { documentIds: docIds, withRelationship, selectedRelationships })
-
 
             documents = Array.isArray(res.documents) ? res.documents : [];
             maxPage = res.total;
 
         }
+        // If docs is not an array or has length 0, get the filters and fetch all documents
         else {
             const filters = collection.filters || null;
             let sortBy = collection.sortBy || 'createdAt';
@@ -350,10 +463,12 @@ const getPageData = async (id, withCss = false) => {
             maxPage = res.total;
         }
 
+        // Return the collection with the fetched documents, states, setting, and maxPage
         return { ...collection, documents, states, setting, maxPage }
 
     }
 
+    // Function to load a collection based on the collection and projection
     const loadCollection = async (collection, projection = {
         states: 1,
         relationships: 1,
@@ -363,7 +478,6 @@ const getPageData = async (id, withCss = false) => {
     }) => {
         if (collection) {
 
-
             const collections = [
 
                 {
@@ -372,20 +486,31 @@ const getPageData = async (id, withCss = false) => {
                     foreignField: '_id',
 
                     as: 'populatedRelationships',
-                    projection: { name: 1, slug: 1, _id: 1, states: 1 }
+                    projection: { name: 1, url: 1, createdAt: 1, creator: 1, slug: 1, _id: 1, states: 1, setting: 1 }
                 },
 
             ];
 
-
+            // Fetch the collection document and add it to the pages object
             const coll = await Collection.document(collection._id, collections, projection);
             if (coll) {
-                pages[coll._id] = { elements: coll.elements || {}, states: coll.states || {}, setting: coll.setting || {} }
+                pages[coll._id] = {
+                    createdAt: coll.createdAt,
+                    url: coll.url,
+                    name: coll.name,
+
+                    slug: coll.slug,
+
+                    elements: coll.elements || {},
+                    states: coll.states || {},
+                    setting: coll.setting || {}
+                }
             }
 
         }
     }
 
+    // Function to load components based on the components and projection
     const loadComponents = async (components, projection) => {
         for (let i = 0; i < components.length; i++) {
             const component = await Component.findById(components[i]).select(projection);
@@ -403,31 +528,62 @@ const getPageData = async (id, withCss = false) => {
                     css = [...css, generateElementsCss(styles, component._id)];
                 }
 
+                let parent = {};
+
+                if (component.parent) {
+                    const parentId = component.parent.toString();
+
+                    if (!pages[parentId]) {
+                        pages[parentId] = await Component.findById(parentId).select(projection);
+                        parent = pages[parentId];
+                    } else
+                        parent = pages[parentId];
+                }
+
                 const collection = component.attached;
 
-                if (collection && !pages[collection?.toString()]) {
-                    let parent = {};
-
-                    if (component.parent) {
-                        const parentId = component.parent.toString();
+                if (collection) {
 
 
-                        if (!pages[parentId]) {
-                            pages[parentId] = await Component.findById(parentId).select(projection);
-                            parent = pages[parentId];
-                        } else
-                            parent = pages[parentId];
-                    }
-
-
-
-                    await loadCollection(collection);
+                    if (!pages[collection?.toString()])
+                        await loadCollection(collection);
                     if (pages[collection]) {
+                        const pageSetting = pages[collection].pageSetting;
+                        if (pageSetting?.populatedRelationships
+                            &&
+                            component.collStates?.related) {
+
+
+                            if (!component.collStates.filters)
+                                component.collStates.filters = {};
+
+                            for (let i = 0; i <= page.populatedRelationships?.length; i++) {
+                                const rel = page.populatedRelationships[i];
+                                if (rel) {
+                                    component.collStates.filters[`__related_${i}__`] = {
+                                        name: 'Related',
+                                        type: 'RELATIONSHIPS',
+
+                                        filterKey: [rel._id],
+                                        defaultValue: pageSetting.populatedRelationships[rel._id] ? pageSetting.populatedRelationships[rel._id].map(v => v._id) : []
+
+                                    }
+                                }
+                            }
+                        }
+
+
+
                         let collStates = {
                             ...component.collStates,
                             _id: collection,
-                            setting: pages[collection].setting,
-                            states: pages[collection].states
+                            name: pageSetting?.name,
+                            slug: pageSetting?.slug,
+                            createdAt: pageSetting?.createdAt,
+                            creator: pageSetting?.creator,
+                            setting: pageSetting?.setting,
+                            states: pageSetting?.states,
+
                         }
                         collStates = await laodDocumnents(collStates, component.states, parent?.states || {})
                         pages[component._id].collStates = collStates;
@@ -519,37 +675,70 @@ const getElements = async (id, stream) => {
         components: 1,
         forms: 1,
         states: 1,
+        relationships: 1,
 
         collStates: 1,
         events: 1,
         _collStates: 1,
         published: 1,
-       
+
         _forms: 1,
         _elements: 1,
         _components: 1,
         _states: 1,
         _events: 1,
 
+        attached: 1,
         type: 1,
         setting: 1,
         createdAt: 1,
         creator: 1,
         url: 1,
+        slug: 1,
+        name: 1,
         _id: 1
     };
 
 
-    const collection = await Collection.findById(id).select(projection);
+    const collections = [
+
+        {
+            collectionName: 'ac_collections',
+            localField: 'relationships',
+            foreignField: '_id',
+
+            as: 'populatedRelationships',
+            projection: { name: 1, url: 1, createdAt: 1, creator: 1, slug: 1, _id: 1, states: 1, setting: 1 }
+        },
+
+        {
+            collectionName: 'ac_medias',
+            localField: 'setting.image',
+            foreignField: '_id',
+            as: 'setting.populatedImage',
+            projection: { src: 1, _id: 1, alt: 1 }
+
+        },
+    ];
+
+    const collection = await Collection.document(id, collections, projection);
+
     if (!collection) {
         throw new ApiError(httpStatus.NOT_FOUND, 'Collection not found');
+
+
     }
+
 
     const doc = {
         type: collection.type,
         createdAt: collection.createdAt,
         creator: collection.creator,
         setting: collection.setting,
+        populatedRelationships: collection.populatedRelationships,
+        name: collection.name,
+        slug: collection.slug,
+
         url: collection.url,
         _id: collection._id
     }
@@ -566,10 +755,11 @@ const getElements = async (id, stream) => {
     }
 
 
+
     const chunkStr = JSON.stringify(doc) + '\n';
     stream.push(chunkStr);
 
-    const laoded = {};
+    const laoded = { [doc._id]: true };
 
     const loadCollection = async (collection, projection = {
         states: 1,
@@ -589,7 +779,7 @@ const getElements = async (id, stream) => {
                     foreignField: '_id',
 
                     as: 'populatedRelationships',
-                    projection: { name: 1, slug: 1, _id: 1, states: 1 }
+                    projection: { name: 1, url: 1, createdAt: 1, creator: 1, slug: 1, _id: 1, states: 1, setting: 1 }
                 },
 
             ];
@@ -895,7 +1085,7 @@ const deleteCollection = async (id) => {
 
         const modelName = collection.slug;
 
-        const res = await mongoose.connection.db.dropCollection(pluralize(modelName.toLowerCase()));
+        const res = await mongoose.connection.db.dropCollection(modelName.toLowerCase());
 
         if (!res) {
             throw new ApiError(httpStatus.NOT_FOUND, 'Documents not found');
@@ -932,3 +1122,5 @@ module.exports = {
     getPageData,
     getStyle,
 }
+
+

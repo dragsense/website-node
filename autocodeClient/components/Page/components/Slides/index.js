@@ -1,6 +1,4 @@
-const React = require("react");
-
-import  { useState, useEffect, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import Slide from './Slide';
 
 const Slides = (props) => {

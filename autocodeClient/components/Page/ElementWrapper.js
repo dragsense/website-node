@@ -9,7 +9,6 @@ import ElementMapping from "./ElementMapping";
 const ElementWrapper = (props) => {
 
     const { component, form, customPath, node, children, AutocodeCustom, _id } = props;
-
     return component ? <Component _id={_id} {...props} component={component} >
             {children}
         </Component> : form ?
@@ -21,7 +20,7 @@ const ElementWrapper = (props) => {
                 </Form>
             </Component>
             :
-            customPath ? <CustomComponent AutocodeCustom={AutocodeCustom} id={_id} {...props}> {children}</CustomComponent> :
+            customPath ? <CustomComponent AutocodeCustom={AutocodeCustom} id={_id} {...props}>{children}</CustomComponent> :
 
                 node.type == 'component' ?
                     <ElementComponent id={_id} {...props} >{children}</ElementComponent>

@@ -1,6 +1,4 @@
-const React = require("react");
-
-import { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 
 const Observable =
     (props) => {
@@ -38,11 +36,13 @@ const Observable =
         let observer;
 
         useEffect(() => {
+
             if (ref.current && onVisible) {
                 observer = new IntersectionObserver(function (entries) {
                     entries.forEach(function (entry) {
 
-                    
+                        console.log(onVisible)
+
 
                         if (entry.isIntersecting && entry.intersectionRatio >= visible) {
 
@@ -54,7 +54,7 @@ const Observable =
                             }
 
                         } else {
-                            setVisibleClasses({ name: inVisibleClass});
+                            setVisibleClasses({ name: inVisibleClass });
                         }
                     });
                 }, { threshold: visible });
@@ -126,16 +126,38 @@ const Observable =
             };
         }, [onScroll, scrollLeft, scrollTop, scrollTopClass, scrollLeftClass]);
 
+
+        const getCLasses = () => {
+
+            let classes = node.classes;
+            if (!classes)
+                classes = {};
+
+            if (topClass?.name)
+                classes['topClass'] = topClass;
+            else
+                delete classes['topClass']
+
+            if (leftClass?.name)
+                classes['leftClass'] = leftClass;
+            else
+                delete classes['leftClass']
+
+            if (visibleCls?.name)
+                classes['visibleCls'] = visibleCls;
+            else
+                delete classes['visibleCls']
+
+
+                return classes;
+        }
+
         const observableItem = useMemo(
             () => element(
                 {
                     ...node,
                     tagName,
-                    classes: [...(Array.isArray(node.classes) ? node.classes : []),
-                    topClass?.name ? topClass : '',
-                    leftClass?.name ? leftClass : '',
-                    visibleCls?.name ? visibleCls : '',
-                    ], state: undefined, map: undefined
+                    classes: getCLasses(), state: undefined, map: undefined
                 },
                 children
             ),
@@ -143,8 +165,8 @@ const Observable =
         );
 
         return <span style={{ display: 'inline' }} ref={ref}
-        
-        
+
+
         >{observableItem}</span>;
 
     };

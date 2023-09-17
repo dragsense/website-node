@@ -1,6 +1,4 @@
-const React = require("react");
-
-import  { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 
 //import ProjectServices from "../../../../../../lib/services/projects"
 

@@ -2,14 +2,18 @@
 import React from "react";
 
 
-const ComplexLogics = ({ children, states, props, updateStates }) => {
+const ComplexLogics = ({ children, getStateValue, getPropValue, updateProp, updateState }) => {
 
 
     return (
         <div>
-            <h1>Hello Custom Component</h1>
+            <h1>HEllo {getStateValue(['name'])}</h1>
             {children}
-          
+            <button onClick={() => {
+                updateState(['name'], 'Adam')
+            }}>
+            Set name
+            </button>
 
         </div>
     );

@@ -32,6 +32,9 @@ const createDocument = async (collectionId, isForm, documentBody) => {
 
 
     const modelName = collection.slug;
+
+    documentBody.coll = { _id: collection._id, slug: collection.slug };
+
     const DocumentModel = Document(modelName)
 
     return DocumentModel.create(documentBody);
@@ -124,7 +127,7 @@ const getDocument = async (collectionId, id, isForm) => {
             as: 'populatedRelationships',
             projection: { name: 1, slug: 1, _id: 1 }
         },
-     
+
     ];
 
 
@@ -147,7 +150,7 @@ const getDocument = async (collectionId, id, isForm) => {
     const relationships = isForm ? [] : [
 
         ...(collection.populatedRelationships.map(rel => {
-            const modelName = pluralize.plural(rel.slug.toLowerCase());
+            const modelName = rel.slug.toLowerCase();
             return {
                 collectionName: modelName,
                 localField: `relationships.${rel._id}`,
@@ -234,11 +237,11 @@ const deleteDocument = async (collectionId, id, isForm) => {
 const getFilteredDocuments = async (collectionId, documentBody, options) => {
 
 
-    
+
     let { documentIds, filters, withRelationship, selectedRelationships } = documentBody;
 
 
-    
+
     const collections = withRelationship ? [
         {
             collectionName: 'ac_collections',
@@ -288,8 +291,8 @@ const getFilteredDocuments = async (collectionId, documentBody, options) => {
                 localField: `relationships.${rel._id}`,
                 foreignField: '_id',
                 as: `populatedRelationships.${rel._id}`,
-                projection: { name: 1, _id: 1, setting: 1, states: 1,  }
-               
+                projection: { name: 1, url: 1, createdAt: 1, creator: 1, slug: 1, _id: 1, states: 1, setting: 1 }
+
             }
         })
     }
@@ -310,7 +313,7 @@ const getFilteredDocuments = async (collectionId, documentBody, options) => {
         },
     ];
 
-   
+
 
 
     const results = await DocumentModel.filterDocuments(docIds, filters, relationships, otherCollections, options);
@@ -354,12 +357,17 @@ const getAllFilteredDocuments = async (collectionId, documentBody, filter, optio
 
 
 
-    const collection = await Collection.document(collectionId, collections, projection)
+    const collection = await Collection.document(collectionId, collections, projection);
+
+
+
+
 
 
     if (!collection) {
         throw new ApiError(httpStatus.NOT_FOUND, `Collection not found`);
     }
+
 
 
     let relationships = [];
@@ -374,8 +382,8 @@ const getAllFilteredDocuments = async (collectionId, documentBody, filter, optio
                 localField: `relationships.${rel._id}`,
                 foreignField: '_id',
                 as: `populatedRelationships.${rel._id}`,
-                projection: { name: 1, _id: 1, setting: 1, states: 1,  }
-               
+                projection: { name: 1, url: 1, createdAt: 1, creator: 1, slug: 1, _id: 1, states: 1, setting: 1 }
+
             }
         })
     }
@@ -389,7 +397,7 @@ const getAllFilteredDocuments = async (collectionId, documentBody, filter, optio
             collectionName: 'ac_medias',
             localField: 'setting.image',
             foreignField: '_id',
-            as: 'populatedImage',
+            as: 'setting.populatedImage',
             projection: { src: 1, _id: 1, alt: 1 }
 
         },

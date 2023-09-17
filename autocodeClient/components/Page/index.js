@@ -9,7 +9,7 @@ export default function Page({ _id,
     type,
     pages,
     setting,
-    states, AutocodeCustom }) {
+    AutocodeCustom }) {
 
 
     return <>
@@ -27,7 +27,6 @@ export default function Page({ _id,
             _uid={'0'}
             _id={_id}
             pages={pages}
-            states={states}
             type={type}
             setting={setting}
             AutocodeCustom={AutocodeCustom}

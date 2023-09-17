@@ -1,4 +1,4 @@
-const React = require("react");
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 
 import { Transition } from 'react-transition-group';
 

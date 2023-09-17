@@ -1,5 +1,5 @@
 
-const React = require("react");
+import React, { useMemo } from 'react';
 
 const Option = (props) => {
     const { mapValue, mapIndex, value, children } = props;
@@ -9,6 +9,7 @@ const Option = (props) => {
     { value, label: value };
 
     let inputs = React.cloneElement(children, { customAttributes: { 
+        
         value: option.value,
         } },
         [mapValue.label || mapValue.value]

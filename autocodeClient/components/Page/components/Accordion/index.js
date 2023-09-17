@@ -55,9 +55,8 @@
 
 // export default Accordion;
 
-const React = require("react");
 
-import { useState, useEffect, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 
 // function flattenChildren(children) {
 //   return React.Children.toArray(children).reduce((acc, child) => {
@@ -108,8 +107,8 @@ const AccordionItems = (props) => {
       accordions.push(flattenedChildren[i].props?.children ?
           React.Children.map(flattenedChildren[i].props.children, child =>
             React.cloneElement(
-              child, { mapIndex: i, isActive })) :
-          React.cloneElement(flattenedChildren[i], { mapIndex: i, isActive }));
+              child, { mapIndex: i, isActive, key: child.props?._uid })) :
+          React.cloneElement(flattenedChildren[i], { mapIndex: i, isActive, key: flattenedChildren[i].props?._uid  }));
     }
 
 

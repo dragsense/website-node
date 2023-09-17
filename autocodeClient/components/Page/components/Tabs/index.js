@@ -1,6 +1,4 @@
-const React = require("react");
-
-import { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 
 
 
@@ -29,6 +27,7 @@ const Tabs = (props) => {
             element(
                 { ...node, state: undefined, map: undefined },
                 React.Children.map(flattenedChildren, (child, index) => React.cloneElement(child, {
+                    key: child.props?._uid,
                     node: {
                         ...child.props.node,
                         state: undefined, map: undefined,

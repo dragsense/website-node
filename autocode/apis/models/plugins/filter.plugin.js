@@ -61,46 +61,57 @@ const filter = function (schema) {
                                 }, {})
                             }
                         },
-                        ...collections.map((collection) => ({
+                        {
                             $lookup: {
-                                from: collection.collectionName,
-                                let: { localFieldValue: `$${collection.localField}` },
-                                pipeline: [
-                                    {
-                                        $match: {
-                                            $expr: {
-                                                $cond: {
-                                                    if: { $isArray: `$${collection.localField}` },
-                                                    then: { $in: [`$${collection.foreignField}`, `$$localFieldValue`] },
-                                                    else: { $eq: [`$${collection.foreignField}`, `$$localFieldValue`] }
-                                                }
-                                            }
-                                        },
-                                    },
-                                    { $project: collection.projection } // Add the projection for the $lookup here
-                                ],
-                                as: collection.as
+                              from: 'ac_medias',
+                              localField: 'setting.image',
+                              foreignField: '_id',
+                              as: 'setting.populatedImage',
+                              pipeline: [
+                                {
+                                  $project: { src: 1, _id: 1, alt: 1 }
+                                },
+                              ]
                             }
-                        })),
+                          },
+                          {
+                            $unwind: {
+                              path: '$setting.populatedImage',
+                              preserveNullAndEmptyArrays: true
+                
+                            }
+                          },,
                         ...(Array.isArray(relationships)
                             ? relationships.map((rel, i) => ({
                                 $lookup: {
                                     from: rel.collectionName,
-                                    let: { localFieldValue: `$${rel.localField}` },
+                                    localField: rel.localField,
+                                    foreignField: rel.foreignField,
+                                    as: rel.as,
                                     pipeline: [
-                                        {
-                                            $match: {
-                                                $expr: {
-
-                                                    $in: [`$${rel.foreignField}`, { $map: { input: `$$localFieldValue`, as: 'id', in: { $toObjectId: '$$id' } } }]
-                                                }
+                                      { $project: rel.projection },
+                                      {
+                                        $lookup: {
+                                          from: 'ac_medias',
+                                          localField: 'setting.image',
+                                          foreignField: '_id',
+                                          as: 'setting.populatedImage',
+                                          pipeline: [
+                                            {
+                                              $project: { src: 1, _id: 1, alt: 1 }
                                             },
-                                        },
-                                        { $project: rel.projection }
-                                    ],
-
-                                    as: rel.as
-                                }
+                                          ]
+                                        }
+                                      },
+                                      {
+                                        $unwind: {
+                                          path: '$setting.populatedImage',
+                                          preserveNullAndEmptyArrays: true
+                            
+                                        }
+                                      }
+                                    ]
+                                  }
                             })
 
                             )
@@ -113,10 +124,7 @@ const filter = function (schema) {
                                 setting: 1,
                                 creator: 1,
                                 createdAt: 1,
-                                ...collections.reduce((acc, collection) => {
-                                    acc[collection.as] = 1;
-                                    return acc;
-                                }, {}),
+                           
                                 populatedRelationships: 1
 
                             }
@@ -189,7 +197,7 @@ const filter = function (schema) {
                                             const values = Array.isArray(filter.defaultValue) ? filter.defaultValue : [filter.defaultValue]
 
                                             criteria[`relationships.${filter.filterKey[1]}`] = {
-                                                $in: values.map(id => id)
+                                                $in: values.map(id => new ObjectId(id))
                                             }
 
 
@@ -203,44 +211,57 @@ const filter = function (schema) {
                                 }, {})
                             }
                         },
-                        ...collections.map((collection) => ({
+                        {
                             $lookup: {
-                                from: collection.collectionName,
-                                let: { localFieldValue: `$${collection.localField}` },
-                                pipeline: [
-                                    {
-                                        $match: {
-                                            $expr: {
-                                                $cond: {
-                                                    if: { $isArray: `$${collection.localField}` },
-                                                    then: { $in: [`$${collection.foreignField}`, `$$localFieldValue`] },
-                                                    else: { $eq: [`$${collection.foreignField}`, `$$localFieldValue`] }
-                                                }
-                                            }
-                                        },
-                                    },
-                                    { $project: collection.projection } // Add the projection for the $lookup here
-                                ],
-                                as: collection.as
+                              from: 'ac_medias',
+                              localField: 'setting.image',
+                              foreignField: '_id',
+                              as: 'setting.populatedImage',
+                              pipeline: [
+                                {
+                                  $project: { src: 1, _id: 1, alt: 1 }
+                                },
+                              ]
                             }
-                        })),
+                          },
+                          {
+                            $unwind: {
+                              path: '$setting.populatedImage',
+                              preserveNullAndEmptyArrays: true
+                
+                            }
+                          },
                         ...(Array.isArray(relationships)
                             ? relationships.map((rel, i) => ({
                                 $lookup: {
                                     from: rel.collectionName,
-                                    let: { localFieldValue: `$${rel.localField}` },
+                                    localField: rel.localField,
+                                    foreignField: rel.foreignField,
+                                    as: rel.as,
                                     pipeline: [
-                                        {
-                                            $match: {
-                                                $expr: {
-                                                    $in: [`$${rel.foreignField}`, { $map: { input: `$$localFieldValue`, as: 'id', in: { $toObjectId: '$$id' } } }]
-                                                }
+                                      { $project: rel.projection },
+                                      {
+                                        $lookup: {
+                                          from: 'ac_medias',
+                                          localField: 'setting.image',
+                                          foreignField: '_id',
+                                          as: 'setting.populatedImage',
+                                          pipeline: [
+                                            {
+                                              $project: { src: 1, _id: 1, alt: 1 }
                                             },
-                                        },
-                                        { $project: rel.projection }
-                                    ],
-                                    as: rel.as
-                                }
+                                          ]
+                                        }
+                                      },
+                                      {
+                                        $unwind: {
+                                          path: '$setting.populatedImage',
+                                          preserveNullAndEmptyArrays: true
+                            
+                                        }
+                                      }
+                                    ]
+                                  }
                             })
 
                             )
@@ -255,10 +276,7 @@ const filter = function (schema) {
                                 setting: 1,
                                 creator: 1,
                                 createdAt: 1,
-                                ...collections.reduce((acc, collection) => {
-                                    acc[collection.as] = 1;
-                                    return acc;
-                                }, {}),
+                           
                                 populatedRelationships: 1
                             }
                         },

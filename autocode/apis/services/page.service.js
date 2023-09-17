@@ -1,6 +1,6 @@
 const { Page, Component, Collection, Form } = require('../models');
 const he = require('he');
-const { generateCss, generateElementsCss } = require('../../utils/utils');
+const { generateElementsCss } = require('../../utils/utils');
 
 const httpStatus = require('http-status')
 
@@ -231,6 +231,11 @@ const getPageData = async (id, withCss = false) => {
         type: 1,
         setting: 1,
         attached: 1,
+        slug: 1,
+        name: 1,
+        creator: 1,
+        createdAt: 1,
+        url: 1,
         _id: 1
     };
 
@@ -254,7 +259,19 @@ const getPageData = async (id, withCss = false) => {
 
 
     const pages = {}
-    pages[page._id] = { elements: page.elements || {} }
+    pages[page._id] = { elements: page.elements || {}, 
+
+    pageSetting: {
+        _id: page._id,
+        setting:  page.setting,
+        name: page.name,
+        slug: page.slug,
+        creator: page.creator,
+        createdAt: page.createdAt,
+        url: page.url,
+    }
+
+}
 
     const components = page.components || [];
 
@@ -351,7 +368,7 @@ const getPageData = async (id, withCss = false) => {
                     foreignField: '_id',
 
                     as: 'populatedRelationships',
-                    projection: { name: 1, slug: 1, _id: 1, states: 1 }
+                    projection: { name: 1, url: 1, createdAt: 1, creator: 1, slug: 1, _id: 1, states: 1, setting: 1 }
                 },
 
             ];
@@ -406,7 +423,11 @@ const getPageData = async (id, withCss = false) => {
                             ...component.collStates,
                             _id: collection,
                             setting: pages[collection].setting,
-                            states: pages[collection].states
+                            states: pages[collection].states,
+                            name: pages[collection]?.name,
+                            slug: pages[collection]?.slug,
+                            creator: pages[collection]?.creator,
+                            createdAt: pages[collection]?.createdAt
                         }
                         collStates = await laodDocumnents(collStates, component.states, parent?.states || {})
                         pages[component._id].collStates = collStates;
@@ -572,7 +593,7 @@ const getElements = async (id, stream) => {
                     foreignField: '_id',
 
                     as: 'populatedRelationships',
-                    projection: { name: 1, slug: 1, _id: 1, states: 1 }
+                    projection: { name: 1, url:1 , createdAt: 1, creator: 1, slug: 1, _id: 1, states: 1, setting: 1 }
                 },
 
             ];

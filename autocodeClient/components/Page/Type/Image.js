@@ -1,25 +1,34 @@
 
-const React = require("react");
+import React, { useMemo } from 'react';
 
 const Image = (props) => {
-    const { value, children } = props;
+    const { conds,
+        onMouseMove,
+        onClick, value, children } = props;
 
 
     const image =
         value.value ?
             { src: value.value, alt: value.label || "image" } :
-            { src: value, alt: "image" };
+            { src: value || value, alt: "image" };
 
     const ImageElement = React.cloneElement(children, {
-            customAttributes: {
-                src: image.src, alt: image.alt,
-                
-            }
-        })
+        customAttributes: {
+            onMouseMove: onMouseMove,
+            onClick: onClick,
+
+            src: image.src, alt: image.alt,
+
+
+        }
+
+    })
 
 
 
-    return ImageElement;
+
+    return conds ? ImageElement : null;
+
 
 };
 

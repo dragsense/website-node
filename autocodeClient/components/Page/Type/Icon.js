@@ -1,19 +1,27 @@
 
-const React = require("react");
+import React, { Children, useMemo } from 'react';
 
-const Icon = ({  onClick, value, layout, children }) => {
+const Icon = ({  conds, onMouseMove, onClick, value, layout, children }) => {
+
+
 
 
 
     const clonedElement = React.cloneElement(children, {
         customAttributes: {
             onClick,
-            dangerouslySetInnerHTML:{ __html: layout === 'svg-icon' ? value : '' },
+            onMouseMove: onMouseMove,
+
+            dangerouslySetInnerHTML: { __html: layout === 'svg-icon' ? value : '' },
+           
         }
     });
 
 
-    return clonedElement;
+
+
+    return conds ? clonedElement : null;
+
 
 
 };

@@ -5,6 +5,7 @@ const React = require("react");
 
 import { useEffect } from "react";
 import FormServices from '../../libs/services/forms'
+import { getFileExtension }  from '../../utils/utils'
 
 const Form = (props) => {
 
@@ -14,10 +15,9 @@ const Form = (props) => {
           _states,
           _props,
           colStates,
-          onChange,
+          fun,
           disabled,
-          onSubmit,
-          onClick, } = props;
+     } = props;
 
      useEffect(() => {
 
@@ -27,6 +27,7 @@ const Form = (props) => {
 
      const onSubmitForm = async (e) => {
 
+          e.stopPropagation();
           e.preventDefault();
 
 
@@ -35,36 +36,89 @@ const Form = (props) => {
 
           const formDataObject = Object.fromEntries(formData.entries());
 
-          _states["__setting__"].laoding = 1;
-          onSubmit(_states);
+
+          _states["__setting__"].loading = 1;
+          _states["__setting__"].error = 0;
+          _states["__setting__"].success = 0;
+          if (fun?.onSubmit)
+               fun.onSubmit(_states);
 
           let isValid = true;
-          const data = {};
+          const data = new FormData();
 
-          Object.keys(formDataObject).forEach((key) => {
 
-               const stateData = _states[key];
-               const fieldData = formDataObject[key];
+          Object.keys(_states).forEach((key) => {
 
-               const regexString = stateData.regex;
-               const regex = new RegExp(regexString);
+               if (key !== '__setting__') {
 
-               if ((stateData.required && !fieldData) || !regex.test(fieldData)) {
-                    stateData.error = 1;
-                    isValid = false;
-               }
-               else {
-                    stateData.error = 0;
-                    data[key] = fieldData;
+                    const stateData = _states[key];
 
+
+                    let fieldData = '';
+                    let regexTest = true;
+                    if (stateData.type === 'file') {
+                         fieldData = formDataObject[key];
+          
+                         if (fieldData) {
+                              const maxSize = stateData.maxSize || 1;
+                              const acceptOptions = stateData.acceptOptions || '';
+
+                              const maxSizeInBytes = maxSize * 1024 * 1024;
+
+                              if (!acceptOptions.includes(fieldData.type)) {
+                                   alert('Invalid file type. Please select a valid file type.');
+                                   regexTest = false;
+                              } else if (fieldData.size > maxSizeInBytes) {
+                                   alert('File size exceeds the maximum allowed size.');
+                                   regexTest = false;
+
+                              } else {
+                                   const ext = getFileExtension(fieldData.name);
+                                   data.append(`files[]`, fieldData, `${key}.${ext}`);
+
+                              }
+
+                         }
+
+                        
+
+                    } else {
+                         fieldData = stateData.defaultValue || formDataObject[key];
+
+                         if (stateData.regex) {
+                              const regexString = stateData.regex;
+                              const cleanedRegexString = regexString.replace(/^\/|\/$/g, '');
+                              const regex = new RegExp(cleanedRegexString);
+
+                              regexTest = regex.test(fieldData)
+                         }
+
+                         if (regexTest)
+                              data.append(key, fieldData);
+
+                    }
+
+                    if ((stateData.required && !fieldData) || !regexTest) {
+
+                         stateData.error = 1;
+                         isValid = false;
+                    }
+                    else {
+                         stateData.error = 0;
+
+
+                    }
                }
 
 
 
           });
 
+
+
           if (isValid) {
                try {
+                    console.log(Object.fromEntries(data.entries()), formData)
 
                     const res = await FormServices.submit(_id, data);
 
@@ -73,24 +127,25 @@ const Form = (props) => {
                          _states["__setting__"].success = 1;
                          _states["__setting__"].laoding = 0;
 
-                         onSubmit(_states)
+                         Object.keys(_states).forEach((key) => {
+                              if (key !== '__setting__') {
+                                   _states[key].defaultValue = '';
+                              }
+                         })
+
+                         if (fun?.onSubmit)
+                              fun.onSubmit(_states);
                     }
 
                } catch (e) {
+
 
                     _states["__setting__"].error = 1;
                     _states["__setting__"].success = 0;
                     _states["__setting__"].laoding = 0;
 
-                    if (e?.message && typeof e.message === 'object') {
-                         for (const key in e.message) {
-                              if (_states[key]) {
-                                   _states[key].errorMessage = e.message[key];
-                              }
-                         }
-                    }
-
-                    onSubmit(_states);
+                    if (fun?.onSubmit)
+                         fun.onSubmit(_states);
 
 
 
@@ -100,21 +155,23 @@ const Form = (props) => {
 
 
           } else {
+
                _states["__setting__"].error = 1;
                _states["__setting__"].success = 0;
-               _states["__setting__"].laoding = 0;
-
-               onSubmit(_states)
+               _states["__setting__"].loading = 0;
+               if (fun?.onSubmit)
+                    fun.onSubmit(_states);
           }
 
      }
 
-     return <form onSubmit={onSubmitForm} >
+     return <form onSubmit={onSubmitForm} target="_self">
 
           {React.Children.map(children, (child) => {
                return child && React.cloneElement(child, {
-                    onChange: onChange,
-                    onClick: onClick,
+                    key: child.props?._uid,
+
+                    fun,
                     disabled,
                     _id: _id,
                     _states: _states,
@@ -122,7 +179,7 @@ const Form = (props) => {
                     colStates: colStates
                })
           })}
-
+          <button type="submit">SUbmit</button>
      </form>
 
 
