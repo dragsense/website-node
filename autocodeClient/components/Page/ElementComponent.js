@@ -9,7 +9,7 @@ import { updateStateValue, getStateRef } from '../../utils/element-value';
 
 const ElementComponent = (props) => {
 
-    const { node, _id, fun, children, onUpdateStates } = props;
+    const { node, _id, fun, children } = props;
 
     const [states, setStates] = useState(node.states);
     const [state, setState] = useState(null);
@@ -41,8 +41,7 @@ const ElementComponent = (props) => {
             return;
 
         setStates({ ...node.states });
-        const cascaderStates = generateCascader(node.states, node.name, node.cname);
-        onUpdateStates(node.cname, cascaderStates, setStates)
+    
 
     }, [node]);
 

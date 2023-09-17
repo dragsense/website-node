@@ -19,7 +19,7 @@ router.post('/duplicate/:id', validate(sharedValidation.sharedSchema), formContr
 router.get('/:id',  formController.GetForm);
 router.put('/:id', validate(formValidation.formSchema), formController.UpdateForm);
 router.post('/elements/:id', validate(formValidation.elementsSchema), formController.UpdateElements);
-router.post('/style/:id', validate(formValidation.styleSchema), formController.UpdateStyle);
+router.post('/styles/:id', validate(formValidation.styleSchema), formController.UpdateStyle);
 router.post('/submit/:id',  uploadFile.array('files[]', 10), formController.Submit);
 router.post('/publish/:id', formController.PublishForm);
 

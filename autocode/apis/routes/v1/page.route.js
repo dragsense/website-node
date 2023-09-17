@@ -22,7 +22,7 @@ router.put('/:id', validate(pageValidation.pageSchema),  pageController.UpdatePa
 router.post('/elements/:id', validate(pageValidation.elementsSchema), pageController.UpdateElements);
 router.post('/publish/:id', pageController.PublishPage);
 
-router.post('/style/:id', validate(pageValidation.styleSchema), pageController.UpdateStyle);
+router.post('/styles/:id', validate(pageValidation.styleSchema), pageController.UpdateStyle);
 
 
 router.delete('/:id', pageController.DeletePage);

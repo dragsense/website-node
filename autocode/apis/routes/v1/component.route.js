@@ -20,7 +20,7 @@ router.post('/duplicate/:id', validate(sharedValidation.sharedSchema), component
 router.get('/:id',  componentController.GetComponent);
 router.post('/elements/:id', validate(componentValidation.elementsSchema), componentController.UpdateElements);
 
-router.post('/style/:id', validate(componentValidation.styleSchema), componentController.UpdateStyle);
+router.post('/styles/:id', validate(componentValidation.styleSchema), componentController.UpdateStyle);
 router.post('/publish/:id', componentController.PublishComponent);
 
 router.put('/:id', validate(componentValidation.componentSchema), componentController.UpdateComponent);

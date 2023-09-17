@@ -41,8 +41,15 @@ module.exports = (app, AutoCode, AutocodeCustom, libraryName) => {
       }).select(projection);
     }
     else {
-      page = await Page.findOne({ slug: dynamicSlugs, 'setting.status': "PUBLIC" }
-      ).select(projection);
+
+      console.log(slugParts, setting.homePage)
+      if (setting.homePage && (slugParts.length <= 0 || dynamicSlugs === '')) {
+        page = await Page.findOne({ _id: setting.homePage._id, 'setting.status': "PUBLIC" }
+        ).select(projection);
+
+      } else
+        page = await Page.findOne({ slug: dynamicSlugs, 'setting.status': "PUBLIC" }
+        ).select(projection);
 
       if (!page)
         for (let i = 0; i < slugParts.length; i++) {
@@ -102,7 +109,7 @@ module.exports = (app, AutoCode, AutocodeCustom, libraryName) => {
       }
     };
 
-  
+
 
     const htmlString = AutoCode === undefined ? '' :
       ReactDOMServer.renderToString(<AutoCode
@@ -131,8 +138,8 @@ module.exports = (app, AutoCode, AutocodeCustom, libraryName) => {
     const globalCss = await themeService.getCss();
     const rootCss = `html {
       ${fonts.data.reduce((cssString, variable) => {
-        return cssString + variable.variable + ':' + variable.fontFamily + ";";
-      }, '')}
+      return cssString + variable.variable + ':' + variable.fontFamily + ";";
+    }, '')}
       ${colors.data.reduce((cssString, color) => {
       return cssString + color.variable + ':' + color.color + ";";
     }, '')}
@@ -143,17 +150,17 @@ module.exports = (app, AutoCode, AutocodeCustom, libraryName) => {
 
 
 
-  const fontCssString =  fonts.data.reduce((cssString, font) => {
-    if (font.isGoogleFont && font.src) {
-      // Google Fonts
-      return cssString + `<style>${font.src}</style>`;
-    } else if (Array.isArray(font.fontSrc)) {
-      // Custom Fonts
-      const fontSrcString = font.fontSrc
-        .map((src) => `url("${src.src}")`)
-        .join(',');
-  
-      return cssString + `
+    const fontCssString = fonts.data.reduce((cssString, font) => {
+      if (font.isGoogleFont && font.src) {
+        // Google Fonts
+        return cssString + `<style>${font.src}</style>`;
+      } else if (Array.isArray(font.fontSrc)) {
+        // Custom Fonts
+        const fontSrcString = font.fontSrc
+          .map((src) => `url("${src.src}")`)
+          .join(',');
+
+        return cssString + `
         <style>
           @font-face {
             font-family: "${font.fontFamily}";
@@ -161,9 +168,9 @@ module.exports = (app, AutoCode, AutocodeCustom, libraryName) => {
           }
         </style>
       `;
-    }
-    return cssString;
-  }, '');
+      }
+      return cssString;
+    }, '');
 
     res.send(`
           <!DOCTYPE html>
