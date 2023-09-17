@@ -222,14 +222,17 @@ const getPageData = async (id, type, withCss = true, document) => {
 
     let page = null;
 
-    if (type === 'page')
-        page = await Page.document(id, collections, projection);
-    else if (type === 'collection')
+
+    if (type === 'collection')
         page = await Collection.document(id, collections, projection);
     else if (type === 'component')
         page = await Component.document(id, collections, projection);
     else if (type === 'form')
         page = await Form.document(id, collections, projection);
+    else
+        page = await Page.document(id, collections, projection);
+
+
 
     // Initialize the pages object
     const pages = {}
@@ -342,7 +345,7 @@ const getPageData = async (id, type, withCss = true, document) => {
             name: document?.name || page.name,
             slug: document?.slug || page.slug,
             relationships: relationships,
-            populatedRelationships: document.populatedRelationships,
+            populatedRelationships: document?.populatedRelationships,
             creator: document?.creator || page.creator,
             createdAt: document?.createdAt || page.createdAt,
             url: document?.url || page.url,
@@ -651,6 +654,8 @@ const getPageData = async (id, type, withCss = true, document) => {
         }
     }
 
+
+
     return {
         css,
         pages,
@@ -686,7 +691,7 @@ const generatePages = async (_pages, pagesFolder, setting, fontCssString, AutoCo
 
 
 
-        const htmlString = AutoCode ? '' : ReactDOMServer.renderToString(<AutoCode
+        const htmlString = AutoCode === undefined ? '' : ReactDOMServer.renderToString(<AutoCode
             _id={page._id}
             pages={pagesResults.pages}
             top={pagesResults.layout?.top}
@@ -773,11 +778,13 @@ const download = async (query, res, AutoCode, AutocodeCustom) => {
         const rootFolder = zip.folder("");
         const assetsFolder = rootFolder.folder("public");
 
+        const filter = {};
+        const options = { limit: 100 };
         const fonts = await themeService.getFonts(filter, options);
         const fontCssString = fonts.data.reduce((cssString, font) => {
             if (font.isGoogleFont && font.src) {
                 // Google Fonts
-                return cssString + `<style>${font.src}</style>`;
+                return cssString + `${font.src}`;
             } else if (Array.isArray(font.fontSrc)) {
                 // Custom Fonts
                 const fontSrcString = font.fontSrc
@@ -797,7 +804,7 @@ const download = async (query, res, AutoCode, AutocodeCustom) => {
         }, '');
 
         if (Boolean(isPage == 'true')) {
-            const pages = await Page.find({}).select("_id, type");
+            const pages = await Page.find({}).select("name _id type");
             await generatePages(pages,
                 pagesFolder,
                 setting,
@@ -807,7 +814,7 @@ const download = async (query, res, AutoCode, AutocodeCustom) => {
         }
 
         if (Boolean(isComponent == 'true')) {
-            const pages = await Component.find({}).select("_id, type");
+            const pages = await Component.find({}).select("name _id type");
             await generatePages(pages,
                 compsFolder,
                 setting,
@@ -817,7 +824,7 @@ const download = async (query, res, AutoCode, AutocodeCustom) => {
         }
 
         if (Boolean(isForm == 'true')) {
-            const pages = await Form.find({}).select("_id, type");
+            const pages = await Form.find({}).select("name _id type");
             await generatePages(pages,
                 formsFolder,
                 setting,
@@ -827,7 +834,7 @@ const download = async (query, res, AutoCode, AutocodeCustom) => {
         }
 
         if (Boolean(isCollection == 'true')) {
-            const pages = await Collection.find({}).select("_id, type");
+            const pages = await Collection.find({}).select("name _id type");
             await generatePages(pages,
                 collsFolder,
                 setting,
@@ -836,8 +843,7 @@ const download = async (query, res, AutoCode, AutocodeCustom) => {
                 AutocodeCustom);
         }
 
-        const filter = {};
-        const options = { limit: 100 };
+
         const colors = await themeService.getColors(filter, options);
         const variables = await themeService.getVariables(filter, options);
 

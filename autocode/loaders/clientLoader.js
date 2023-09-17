@@ -153,7 +153,7 @@ module.exports = (app, AutoCode, AutocodeCustom, libraryName) => {
     const fontCssString = fonts.data.reduce((cssString, font) => {
       if (font.isGoogleFont && font.src) {
         // Google Fonts
-        return cssString + `<style>${font.src}</style>`;
+        return cssString + `${font.src}`;
       } else if (Array.isArray(font.fontSrc)) {
         // Custom Fonts
         const fontSrcString = font.fontSrc
