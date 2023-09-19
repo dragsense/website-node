@@ -142,50 +142,70 @@ PageSchema.pre('save', async function (next) {
 
     const page = this;
 
+    // If the page is new and not duplicated, generate unique identifiers and set up styles
     if (page.isNew && !page.duplicated) {
-
-        let id = shortid.generate();
-        const className = `ac-elem-${id}`;
-        page.elements['0'].className = className;
-        page.elements['0'].selector = `.${className}`;
-        let styleUid = shortid.generate();
-        page.elements['0'].styleUid = styleUid;
-
-
-        page.styles = {
-            [styleUid]: {
-                _uid: styleUid,
-                selectorText: `.${className}`,
-                type: 'div',
-                style: {
-                }
-            }
-        }
+        setupNewPage(page);
     }
 
-
+    // If the slug is not modified, proceed to the next middleware
     if (!page.isModified('slug')) {
         return next();
     }
 
-    const modelName = page.slug;
+    // Check if the slug is already taken
+    const isSlugTaken = await checkSlug(page);
 
+    if (isSlugTaken) {
+        const error = new Error('Slug already taken');
+        error.status = httpStatus.BAD_REQUEST;
+        return next(error);
+    }
+
+    // Set the URL of the page
+    page.url = `/${page.slug}`
+
+    next();
+
+});
+
+/**
+ * Setup new page with unique identifiers and styles
+ * @param {Object} page - The page object
+ */
+function setupNewPage(page) {
+    let id = shortid.generate();
+    const className = `ac-elem-${id}`;
+    page.elements['0'].className = className;
+    page.elements['0'].selector = `.${className}`;
+    let styleUid = shortid.generate();
+    page.elements['0'].styleUid = styleUid;
+
+    page.styles = {
+        [styleUid]: {
+            _uid: styleUid,
+            selectorText: `.${className}`,
+            type: 'div',
+            style: {
+            }
+        }
+    }
+}
+
+/**
+ * Check if the slug is already taken
+ * @param {Object} page - The page object
+ * @return {Promise<boolean>} - A promise that resolves to a boolean indicating whether the slug is taken
+ */
+async function checkSlug(page) {
+    const modelName = page.slug;
 
     const existingPage = await page.constructor.findOne({ slug: modelName });
 
     const Collection = mongoose.model('AC_Collection');
     const existingCollection = await Collection.findOne({ slug: modelName });
 
-    if (existingPage || existingCollection) {
-        const error = new Error('Slug already taken');
-        error.status = httpStatus.BAD_REQUEST;
-        return next(error);
-    }
-    page.url = `/${page.slug}`
-
-    next();
-
-});
+    return existingPage || existingCollection;
+}
 
 PageSchema.plugin(paginate)
 PageSchema.plugin(document);

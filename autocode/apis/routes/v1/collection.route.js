@@ -25,7 +25,4 @@ router.post('/publish/:id', collectionController.PublishCollection);
 
 router.delete('/:id', collectionController.DeleteCollection);
 
-module.exports = {
-    collectionRoute: router,
-    GetCollectionData: collectionController.GetPageData
-}
+module.exports = router

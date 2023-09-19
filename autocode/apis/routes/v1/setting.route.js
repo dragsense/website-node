@@ -10,4 +10,9 @@ const router = express.Router()
 router.get('/', settingController.GetSettings)
 router.post('/', validate(settingValidation.settingSchema), settingController.SaveSetting)
 
-module.exports =  router
+module.exports =  {
+    settingsRoute: router,
+    GetPageData: settingController.GetPageData,
+    GetCollectionData: settingController.GetCollectionData
+
+}

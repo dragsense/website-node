@@ -1,34 +1,36 @@
 import { fetcher } from '../../utils/fetch';
 
+// Helper function to sanitize URL
+const sanitizeUrl = (url) => url.replace(/([^:]\/)\/+/g, '$1');
 
-const DocumentServices = {
-
-
-    getAllFilteredDocuments: async function (collectionId, states, page = 1, limit=25, sortBy = 'createdAt', sort="acs") {
-
-    
-        const url =  `/api/v1/documents/collection/${collectionId}/document?limit=${limit}&page=${page}&sortBy=${sortBy+":"+sort}`;
-        const sanitizedUrl = url.replace(/([^:]\/)\/+/g, '$1');
-
-        return fetcher(`${sanitizedUrl}`, {
-            method: 'PUT',
+// Helper function to fetch data
+const fetchData = async (url, method, states) => {
+    try {
+        const response = await fetcher(url, {
+            method: method,
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({...states})
         });
+        return response;
+    } catch (error) {
+        console.error(`Error in fetchData: ${error}`);
+    }
+};
+
+const DocumentServices = {
+
+    // Fetch all documents with filters applied
+    getAllFilteredDocuments: async function (collectionId, states, page = 1, limit=25, sortBy = 'createdAt', sort="acs") {
+        const url =  `/api/v1/documents/collection/${collectionId}/document?limit=${limit}&page=${page}&sortBy=${sortBy+":"+sort}`;
+        const sanitizedUrl = sanitizeUrl(url);
+        return fetchData(sanitizedUrl, 'PUT', states);
     },
 
-    
+    // Fetch documents based on collectionId and states
     getFilteredDocuments: async function (collectionId, states) {
-
-    
         const url = `/api/v1/documents/collection/${collectionId}/document`;
-        const sanitizedUrl = url.replace(/([^:]\/)\/+/g, '$1');
-
-        return fetcher(`${sanitizedUrl}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json'},
-            body: JSON.stringify({...states})
-        });
+        const sanitizedUrl = sanitizeUrl(url);
+        return fetchData(sanitizedUrl, 'POST', states);
     },
 }
 

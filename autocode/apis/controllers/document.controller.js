@@ -38,17 +38,17 @@ const GetDocuments = catchAsync(async (req, res) => {
 
 const GetAllFilteredDocuments = catchAsync(async (req, res) => {
     const filter = pickKeys(req.query, ['name']);
-    const options = pickKeys(req.query, ['sortBy', 'limit', 'page', 'currect']);
+    const options = pickKeys(req.query, ['sortBy', 'limit', 'page', 'status']);
     const results = await documentService.getAllFilteredDocuments(req.params.collectionId, req.body, filter, options);
     res.status(httpStatus.OK).send(results);
 });
 
 const GetFilteredDocuments = catchAsync(async (req, res) => {
-    const options = pickKeys(req.query, ['sortBy', 'limit', 'page', 'currect']);
-
+    const options = pickKeys(req.query, ['sortBy', 'limit', 'page', 'status']);
     const results = await documentService.getFilteredDocuments(req.params.collectionId, req.body, options);
     res.status(httpStatus.OK).send(results);
 });
+
 
 
 module.exports = {

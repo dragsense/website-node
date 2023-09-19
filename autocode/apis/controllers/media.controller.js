@@ -9,9 +9,7 @@ const CreateMedia = catchAsync(async (req, res) => {
 
     const file = req.file;
     const type = req.query.type;
-    const protocol = req.protocol || 'http';
-    const host = `${protocol}://${req.headers.host}`;
-    const media = await mediaService.createMedia(file, type, host);
+    const media = await mediaService.createMedia(file, type);
     res.status(httpStatus.CREATED).send({ media });
 });
 
@@ -29,7 +27,11 @@ const GetMedia = catchAsync(async (req, res) => {
     const filter = pickKeys(req.query, ['name', 'type']);
     const options = pickKeys(req.query, ['sortBy', 'limit', 'page']);
     const media = await mediaService.getMedia(filter, options);
-    res.status(httpStatus.OK).send({ media });
+
+    const protocol = req.protocol || 'http';
+    const host = `${protocol}://${req.headers.host}`;
+
+    res.status(httpStatus.OK).send({ media, host });
 });
 
 module.exports = {

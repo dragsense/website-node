@@ -94,27 +94,39 @@ const Document = (slug) => {
             { timestamps: true, collection: slug }
         );
 
+    // Pre-save middleware function
     DocumentSchema.pre('save', async function (next) {
         const document = this;
 
+        // Check if the slug field is modified
         if (!document.isModified('slug')) {
             return next();
         }
 
-        const existingDocument = await document.constructor.findOne({ slug: document.slug });
+        // Check if the slug already exists in the database
+        const existingDocument = await checkSlugExistence(document);
         if (existingDocument) {
             const error = new Error('Slug already taken');
             error.status = httpStatus.BAD_REQUEST;
             return next(error);
         }
 
-            const coll = document.coll;
-            document.url = `/${coll.slug}/${document.slug}`
-        
-
+        // Generate the document URL
+        generateDocumentUrl(document);
 
         next();
     });
+
+    // Function to check if the slug already exists in the database
+    async function checkSlugExistence(document) {
+        return await document.constructor.findOne({ slug: document.slug });
+    }
+
+    // Function to generate the document URL
+    function generateDocumentUrl(document) {
+        const coll = document.coll;
+        document.url = `/${coll.slug}/${document.slug}`
+    }
 
     DocumentSchema.plugin(paginate)
     DocumentSchema.plugin(document);

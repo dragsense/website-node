@@ -3,7 +3,7 @@ const pickKeys = require('../../utils/pick-keys')
 const catchAsync = require('../../utils/catch-async')
 const { Readable } = require('stream');
 
-const { collectionService } = require('../services')
+const { collectionService, settingService } = require('../services')
 
 const GetCollection = catchAsync(async (req, res) => {
     const collection = await collectionService.getCollection(req.params.id);
@@ -24,7 +24,10 @@ const GetElements = catchAsync(async (req, res) => {
         read() { }
     });
 
-    await collectionService.getElements(req.params.id, stream);
+    const protocol = req.protocol || 'http';
+    const host = `${protocol}://${req.headers.host}`;
+
+    await settingService.getElements(req.params.id, stream, 'collection', host);
 
     res.setHeader('Transfer-Encoding', 'chunked');
     res.setHeader('Content-Type', 'application/json');
@@ -46,7 +49,7 @@ const GetStyle = catchAsync(async (req, res) => {
 });
 
 const GetCss = catchAsync(async (req, res) => {
-    const css = await collectionService.getCss(req.params.id);
+    const css = await settingService.getCss(req.params.id, 'collection');
     res.status(httpStatus.OK).send(css);
 });
 

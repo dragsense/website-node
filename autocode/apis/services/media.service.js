@@ -17,7 +17,7 @@ const publicDir = path.resolve(process.cwd(), 'public/static/uploads');
  * @param {String} host
  * @returns {Promise<Media>}
  */
-const createMedia = async (file, type, host) => {
+const createMedia = async (file, type) => {
 
     const stats = fs.statSync(file.path);
     const fileSizeInBytes = stats.size;
@@ -27,7 +27,7 @@ const createMedia = async (file, type, host) => {
         dimensions = sizeOf(file.path);
     }
 
-    const src = host + '/static/uploads/' + type + "/" + file.filename;
+    const src = '/static/uploads/' + type + "/" + file.filename;
 
     const mediaBody = {
         src,

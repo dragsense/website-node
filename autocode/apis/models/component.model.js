@@ -129,29 +129,61 @@ const ComponentSchema = new Schema(
 ComponentSchema.pre('save', async function (next) {
     const component = this;
 
+    // Check if the component is new and not duplicated
     if (component.isNew && !component.duplicated) {
+        // Generate unique IDs for the component and its style
+        const id = generateShortId();
+        const styleUid = generateShortId();
 
-        let id = shortid.generate();
-        const className = `ac-elem-${id}`;
-        component.elements['0'].className = className;
-        component.elements['0'].selector = `.${className}`;
+        // Create a unique class name for the component
+        const className = createClassName(id);
 
-        let styleUid = shortid.generate();
-        component.elements['0'].styleUid = styleUid;
+        // Assign the class name and selector to the component
+        assignClassNameAndSelector(component, className);
 
-        component.styles = {
-            [styleUid]: {
-                _uid: styleUid,
-                selectorText: `.${className}`,
-                type: 'div',
-                style: {
-                }
-            }
-        }
+        // Assign the styleUid to the component
+        assignStyleUid(component, styleUid);
+
+        // Create a new style for the component
+        createNewStyle(component, styleUid, className);
     }
 
+    // Proceed to the next middleware
     next();
 });
+
+// Function to generate a short ID
+function generateShortId() {
+    return shortid.generate();
+}
+
+// Function to create a class name
+function createClassName(id) {
+    return `ac-elem-${id}`;
+}
+
+// Function to assign class name and selector to the component
+function assignClassNameAndSelector(component, className) {
+    component.elements['0'].className = className;
+    component.elements['0'].selector = `.${className}`;
+}
+
+// Function to assign styleUid to the component
+function assignStyleUid(component, styleUid) {
+    component.elements['0'].styleUid = styleUid;
+}
+
+// Function to create a new style for the component
+function createNewStyle(component, styleUid, className) {
+    component.styles = {
+        [styleUid]: {
+            _uid: styleUid,
+            selectorText: `.${className}`,
+            type: 'div',
+            style: {},
+        },
+    };
+}
 
 
 ComponentSchema.plugin(paginate)

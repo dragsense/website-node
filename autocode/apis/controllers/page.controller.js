@@ -4,7 +4,7 @@ const { Readable } = require('stream');
 const catchAsync = require('../../utils/catch-async')
 const pickKeys = require('../../utils/pick-keys')
 
-const { pageService } = require('../services');
+const { pageService, settingService } = require('../services');
 
 const GetPage = catchAsync(async (req, res) => {
     const page = await pageService.getPage(req.params.id);
@@ -24,7 +24,10 @@ const GetElements = catchAsync(async (req, res) => {
         read() { }
     });
 
-    await pageService.getElements(req.params.id, stream);
+    const protocol = req.protocol || 'http';
+    const host = `${protocol}://${req.headers.host}`;
+
+    await settingService.getElements(req.params.id, stream, 'page', host);
 
     res.setHeader('Transfer-Encoding', 'chunked');
     res.setHeader('Content-Type', 'application/json');
@@ -46,7 +49,7 @@ const GetStyle = catchAsync(async (req, res) => {
 });
 
 const GetCss = catchAsync(async (req, res) => {
-    const css = await pageService.getCss(req.params.id);
+    const css = await settingService.getCss(req.params.id);
     res.status(httpStatus.OK).send(css);
 });
 

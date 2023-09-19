@@ -152,12 +152,14 @@ const CollectionSchema = new Schema(
     { timestamps: true }
 );
 
+// Pre-save hook for the CollectionSchema
 CollectionSchema.pre('save', async function (next) {
 
+    // Define the current collection
     const collection = this;
 
-    if (collection.isNew && !collection.duplicated){
-
+    // Function to handle new and non-duplicated collections
+    const handleNewCollection = (collection) => {
         let id = shortid.generate();
         const className = `ac-elem-${id}`;
         collection.elements['0'].className = className;
@@ -171,41 +173,48 @@ CollectionSchema.pre('save', async function (next) {
                 _uid: styleUid,
                 selectorText: `.${className}`,
                 type: 'div',
-                style: {
-                }
+                style: {}
             }
         }
     }
 
+    // If the collection is new and not duplicated, handle it
+    if (collection.isNew && !collection.duplicated){
+        handleNewCollection(collection);
+    }
 
-
+    // If the slug is not modified, proceed to the next middleware
     if (!collection.isModified('slug')) {
         return next();
     }
 
-    const modelName = collection.slug;
+    // Function to check if the slug is already taken
+    const isSlugTaken = async (modelName) => {
+        const existingCollection = await collection.constructor.findOne({ slug: modelName });
+        const Form = mongoose.model('AC_Form');
+        const existingForm = await Form.findOne({ slug: modelName });
 
-    const existingCollection = await collection.constructor.findOne({ slug: modelName });
-    const Form = mongoose.model('AC_Form');
-    const existingForm = await Form.findOne({ slug: modelName });
+        const Page = mongoose.model('AC_Page');
+        const existingPage = await Page.findOne({ slug: modelName });
 
-    const Page = mongoose.model('AC_Page');
-    const existingPage = await Page.findOne({ slug: modelName });
+        const modelNames = mongoose.modelNames().map(name => name.toLowerCase());
+        const isModelSingular = modelNames.includes(modelName.toLowerCase());
+        const isModelPlural = modelNames.includes(pluralize(modelName.toLowerCase()));
 
-    const modelNames = mongoose.modelNames().map(name => name.toLowerCase());
-    const isModelSingular = modelNames.includes(modelName.toLowerCase());
-    const isModelPlural = modelNames.includes(pluralize(modelName.toLowerCase()));
+        return existingCollection || existingPage || existingForm || isModelSingular || isModelPlural;
+    }
 
-    if (existingCollection || existingPage || existingForm || isModelSingular || isModelPlural) {
-
+    // Check if the slug is already taken
+    if (await isSlugTaken(collection.slug)) {
         const error = new Error('Slug already taken');
         error.status = httpStatus.BAD_REQUEST;
         return next(error);
     }
 
+    // Set the URL of the collection
     collection.url = `/${collection.slug}`
 
-
+    // Proceed to the next middleware
     next();
 });
 

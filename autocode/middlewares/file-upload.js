@@ -77,7 +77,14 @@ const uploadFile = multer({
 
       cb(null, uploadPath);
     },
-    filename: (req, file, cb) => cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname))
+    filename: (req, file, cb) => {
+      const originalName = path.basename(file.originalname, path.extname(file.originalname));
+      const dateTime = new Date().toISOString().slice(11,19).replace(/:/g, '');
+      const newFileName = `${originalName}-${dateTime}${path.extname(file.originalname)}`;
+
+      cb(null, newFileName);
+
+    }
   }),
   limits: {
     fileSize: maxSize, // Set the maximum file size

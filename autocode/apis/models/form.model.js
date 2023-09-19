@@ -232,31 +232,52 @@ FormSchema.pre('save', async function (next) {
 
     const form = this;
 
+    // If the form is new and not duplicated, generate unique identifiers and styles
     if (form.isNew && !form.duplicated){ 
-
-        let id = shortid.generate();
-        const className = `ac-elem-${id}`;
-        form.elements['0'].className = className;
-        form.elements['0'].selector = `.${className}`;
-
-        let styleUid = shortid.generate();
-        form.elements['0'].styleUid = styleUid;
-
-        form.styles = {
-            [styleUid]: {
-                _uid: styleUid,
-                selectorText: `.${className}`,
-                type: 'div',
-                style: {
-                }
-            }
-        }
+        generateUniqueIdentifiersAndStyles(form);
     }
 
+    // If the slug field is not modified, proceed to the next middleware
     if (!form.isModified('slug')) {
         return next();
     }
 
+    // Check if the slug already exists in the database
+    const isSlugTaken = await checkSlugExistence(form);
+
+    // If the slug is taken, return an error
+    if (isSlugTaken) {
+        const error = new Error('Slug already taken');
+        error.status = httpStatus.BAD_REQUEST;
+        return next(error);
+    }
+
+    // Proceed to the next middleware
+    next();
+});
+
+// Function to generate unique identifiers and styles for a form
+async function generateUniqueIdentifiersAndStyles(form) {
+    let id = shortid.generate();
+    const className = `ac-elem-${id}`;
+    form.elements['0'].className = className;
+    form.elements['0'].selector = `.${className}`;
+
+    let styleUid = shortid.generate();
+    form.elements['0'].styleUid = styleUid;
+
+    form.styles = {
+        [styleUid]: {
+            _uid: styleUid,
+            selectorText: `.${className}`,
+            type: 'div',
+            style: {}
+        }
+    }
+}
+
+// Function to check if the slug already exists in the database
+async function checkSlugExistence(form) {
     const modelName = form.slug;
 
     const existingForm = await form.constructor.findOne({ slug: modelName });
@@ -264,23 +285,14 @@ FormSchema.pre('save', async function (next) {
     const Collection = mongoose.model('AC_Collection');
     const existingCollection = await Collection.findOne({ slug: modelName });
     const Page = mongoose.model('AC_Page');
-
-        const existingPage = await Page.findOne({ slug: modelName });
-
+    const existingPage = await Page.findOne({ slug: modelName });
 
     const modelNames = mongoose.modelNames().map(name => name.toLowerCase());
     const isModelSingular = modelNames.includes(modelName.toLowerCase());
     const isModelPlural = modelNames.includes(pluralize(modelName.toLowerCase()));
 
-    if (existingCollection || existingPage || existingForm || isModelSingular || isModelPlural) {
-
-        const error = new Error('Slug already taken');
-        error.status = httpStatus.BAD_REQUEST;
-        return next(error);
-    }
-
-    next();
-});
+    return existingCollection || existingPage || existingForm || isModelSingular || isModelPlural;
+}
 
 FormSchema.plugin(paginate)
 FormSchema.plugin(document);

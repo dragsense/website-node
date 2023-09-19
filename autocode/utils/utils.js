@@ -74,40 +74,61 @@ function updateContentWithType(object, type) {
   }
 }
 
+// Function to generate CSS for elements
 const generateElementsCss = (elements, _id) => {
   let css = '';
 
+  // If no elements, return empty string
   if (!elements)
     return css;
 
+  // Iterate over each element
   Object.keys(elements).map((key) => {
-
     const style = elements[key].style || {};
     const selectorText = elements[key].selectorText;
 
+    // If selectorText exists, generate CSS
     if (selectorText)
-      Object.keys(style).map((key) => {
-        if (style[key]) {
-          if (key !== 'normal')
-            css += '@media ' + key + ' {\n';
-          const s = style[key];
-          Object.keys(s).map((key) => {
-            let properties = Object.entries(s[key].properties || {}).map(([key, property]) => `${key}: ${property.value} ${property.priority ? "!important" : ""}`).join(';');
-
-            let selector = key !== 'root' ? selectorText + key : selectorText
-            css += `${selector} {\n  ${properties}\n}\n\n`;
-
-          });
-
-          if (key !== 'normal')
-            css += ' }\n';
-        }
-      });
+      css += generateElementCss(style, selectorText);
   });
 
   return css;
 }
 
+// Function to generate CSS for a single element
+const generateElementCss = (style, selectorText) => {
+  let css = '';
+
+  Object.keys(style).map((key) => {
+    if (style[key]) {
+      if (key !== 'normal')
+        css += '@media ' + key + ' {\n';
+      const s = style[key];
+      css += generateStyleCss(s, selectorText);
+
+      if (key !== 'normal')
+        css += ' }\n';
+    }
+  });
+
+  return css;
+}
+
+// Function to generate CSS for a single style
+const generateStyleCss = (s, selectorText) => {
+  let css = '';
+
+  Object.keys(s).map((key) => {
+    let properties = Object.entries(s[key].properties || {}).map(([key, property]) => `${key}: ${property.value} ${property.priority ? "!important" : ""}`).join(';');
+
+    let selector = key !== 'root' ? selectorText + key : selectorText
+    css += `${selector} {\n  ${properties}\n}\n\n`;
+  });
+
+  return css;
+}
+
+// Function to generate a random key
 const generateRandomKey = (length) => {
   const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   let result = '';
@@ -118,142 +139,72 @@ const generateRandomKey = (length) => {
   return result;
 };
 
-
+// Function to generate CSS
 const generateCss = (styles) => {
   let css = '';
 
+  // If no styles, return empty string
   if (!styles)
     return css;
 
+  // Iterate over each style
   Object.keys(styles).map((key) => {
     if (styles[key]) {
-      if (key !== 'normal')
-        css += '@media ' + key + ' {\n';
-      Object.values(styles[key]).flatMap((element) => {
-
-
-        Object.values(element.selectors).map(selector => {
-          let properties = Object.entries(selector.properties).map(([key, property]) => `${key}: ${property.value}`).join(';');
-          css += `${selector.selectorText} {\n  ${properties}\n}\n\n`;
-        }).join('');
-
-      });
-
-      if (key !== 'normal')
-        css += ' }\n';
+      css += generateStyleCss(styles[key], key);
     }
   });
 
   return css;
 }
 
-
+// Function to generate animations
 const generateAnimations = (elements) => {
-
-
   let css = '';
 
+  // If no elements, return empty string
   if (!elements)
     return css;
 
+  // Iterate over each element
   Object.keys(elements).map((key) => {
-
     const style = elements[key].style || {};
-
-
-    css += `@keyframes ${elements[key].name}` + ' {\n';
-
-    Object.keys(style).map((key) => {
-      if (style[key]) {
-        const s = style[key];
-        let properties = Object.entries(s.properties || {}).map(([key, property]) => `${key}: ${property.value} ${property.priority ? "!important" : ""}`).join(';');
-        css += `${s.selectorText} {\n  ${properties}\n}\n\n`;
-
-
-
-      }
-    });
-    css += ' }\n';
+    css += generateAnimationCss(elements[key].name, style);
   });
 
-
-
   return css;
-
-
 }
 
+// Function to generate CSS for a single animation
+const generateAnimationCss = (name, style) => {
+  let css = '';
 
+  css += `@keyframes ${name}` + ' {\n';
+
+  Object.keys(style).map((key) => {
+    if (style[key]) {
+      const s = style[key];
+      css += generateStyleCss(s, s.selectorText);
+    }
+  });
+  css += ' }\n';
+
+  return css;
+}
+
+// Function to generate animation names
 const generateAnimationNames = (elements) => {
-
   let names = [];
 
+  // If no elements, return empty array
   if (!elements)
     return names;
 
+  // Iterate over each element and add its name to the array
   Object.keys(elements).map((key) => {
     names.push(elements[key].name);
   });
   return names;
-
 }
-
-const getPaginationRange = (currentPage, totalPages, pagination) => {
-  let leftRangeLength = pagination.leftRange || 1;
-  let rightRangeLength = pagination.rightRange || 1;
-  const rangeSize = pagination.nearRange || 2;
-
-  const dots = pagination.dots || "...";
-
-  let start = Math.max(currentPage - rangeSize, 1);
-  let end = Math.min(currentPage + rangeSize, totalPages);
-
-  if (leftRangeLength > totalPages) {
-    leftRangeLength = totalPages;
-    rightRangeLength = 0;
-  }
-
-  if (rightRangeLength + leftRangeLength > totalPages) {
-    rightRangeLength = totalPages - leftRangeLength;
-  }
-
-
-  if (start === 1) {
-    end = Math.min(start + rangeSize * 2, totalPages);
-  } else if (end === totalPages) {
-    start = Math.max(end - rangeSize * 2, 1);
-  }
-
-  const leftRange = [];
-  const rightRange = [];
-
-  for (let i = 1; i <= leftRangeLength; i++) {
-    leftRange.push(i);
-  }
-
-  if (start > leftRangeLength + 1) {
-    leftRange.push(dots);
-  }
-
-  if (end < totalPages - rightRangeLength) {
-    rightRange.push(dots);
-  }
-
-  for (let i = totalPages - rightRangeLength + 1; i <= totalPages; i++) {
-    rightRange.push(i);
-  }
-
-  const nearbyRange = [];
-
-  const startIndex = start > leftRangeLength ? start : leftRangeLength + 1;
-
-  const endIndex = end < totalPages - rightRangeLength + 1 ? end : end - rightRangeLength;
-  for (let i = startIndex; i <= endIndex; i++) {
-    nearbyRange.push(i);
-  }
-
-  return [...leftRange, ...nearbyRange, ...rightRange];
-};
 
 
 function throttle(func, limit) {
@@ -289,7 +240,6 @@ module.exports = {
   generateRandomKey,
   throttle,
   debounce,
-  getPaginationRange,
   updateContentWithType,
   formatDate,
   getCurrentDate,

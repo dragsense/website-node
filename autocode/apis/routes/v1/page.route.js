@@ -27,7 +27,5 @@ router.post('/styles/:id', validate(pageValidation.styleSchema), pageController.
 
 router.delete('/:id', pageController.DeletePage);
 
-module.exports = {
-    pageRoute: router,
-    GetPageData: pageController.GetPageData
-}
+module.exports = router;
+  

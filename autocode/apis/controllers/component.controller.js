@@ -2,7 +2,7 @@ const httpStatus = require('http-status')
 const pickKeys = require('../../utils/pick-keys')
 
 const catchAsync = require('../../utils/catch-async')
-const { componentService } = require('../services')
+const { componentService, settingService } = require('../services')
 
 const { Readable } = require('stream');
 
@@ -57,7 +57,10 @@ const GetElements = catchAsync(async (req, res) => {
         read() { }
     });
 
-    await componentService.getElements(req.params.id, stream);
+    const protocol = req.protocol || 'http';
+    const host = `${protocol}://${req.headers.host}`;
+
+    await settingService.getElements(req.params.id, stream, 'component', host);
 
     res.setHeader('Transfer-Encoding', 'chunked');
     res.setHeader('Content-Type', 'application/json');
@@ -86,7 +89,7 @@ const UpdateStyle = catchAsync(async (req, res) => {
 });
 
 const GetCss = catchAsync(async (req, res) => {
-    const css = await componentService.getCss(req.params.id);
+    const css = await settingService.getCss(req.params.id, 'component');
     res.status(httpStatus.OK).send(css);
 });
 

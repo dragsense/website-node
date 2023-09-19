@@ -3,7 +3,7 @@ const pickKeys = require('../../utils/pick-keys')
 const { Readable } = require('stream');
 
 const catchAsync = require('../../utils/catch-async')
-const { formService } = require('../services')
+const { formService, settingService } = require('../services')
 
 const GetForm = catchAsync(async (req, res) => {
     const form = await formService.getForm(req.params.id);
@@ -18,7 +18,10 @@ const GetElements = catchAsync(async (req, res) => {
         read() { }
     });
 
-    await formService.getElements(req.params.id, stream);
+    const protocol = req.protocol || 'http';
+    const host = `${protocol}://${req.headers.host}`;
+
+    await settingService.getElements(req.params.id, stream, 'form', host);
 
     res.setHeader('Transfer-Encoding', 'chunked');
     res.setHeader('Content-Type', 'application/json');
@@ -40,7 +43,7 @@ const GetStyle = catchAsync(async (req, res) => {
 });
 
 const GetCss = catchAsync(async (req, res) => {
-    const css = await formService.getCss(req.params.id);
+    const css = await settingService.getCss(req.params.id, 'form');
     res.status(httpStatus.OK).send(css);
 });
 
@@ -89,33 +92,45 @@ const GetForms = catchAsync(async (req, res) => {
 
 
 const Submit = catchAsync(async (req, res) => {
+    // Extract files from the request
     let files = req.files;
 
+    // Initialize an array to hold updated file information
     const updatedFiles = [];
 
-    if (files)
-        for (let i = 0; i < files.length; i++) {
-            const file = files[i];
+    // Check if files exist in the request
+    if (files) {
+        // Use map instead of for loop for better performance
+        files.map(file => {
+            // Determine the type of the file based on its mimetype
+            const type = determineFileType(file.mimetype.toLowerCase());
 
-            const mimetype = file.mimetype.toLowerCase();
-            let type = 'docs';
+            // Push the updated file information to the array
+            updatedFiles.push({ file, type });
+        });
+    }
 
-            if (mimetype.startsWith('image')) {
-                type = 'images';
-            } else if (mimetype.startsWith('video')) {
-                type = 'videos';
-            } else if (mimetype.startsWith('audio')) {
-                type = 'audios';
-            }
-            const protocol = req.protocol || 'http';
-            const host = `${protocol}://${req.headers.host}`;
-            updatedFiles.push({ file, type, protocol, host })
-
-        }
-
+    // Submit the updated files to the form service
     await formService.submit(updatedFiles, req.params.id, req.body);
+
+    // Send a response with a status of true
     res.status(httpStatus.OK).send({ status: true });
 });
+
+// Helper function to determine the file type based on the mimetype
+const determineFileType = (mimetype) => {
+    let type = 'docs';
+
+    if (mimetype.startsWith('image')) {
+        type = 'images';
+    } else if (mimetype.startsWith('video')) {
+        type = 'videos';
+    } else if (mimetype.startsWith('audio')) {
+        type = 'audios';
+    }
+
+    return type;
+};
 
 module.exports = {
     GetForm,

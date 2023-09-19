@@ -56,67 +56,6 @@ const generateRandomKey = (length) => {
 
 
 
-
-
-
-const getPaginationRange = (currentPage, totalPages, pagination) => {
-  let leftRangeLength = pagination.leftRange || 1;
-  let rightRangeLength = pagination.rightRange || 1;
-  const rangeSize = pagination.nearRange || 2;
-
-  const dots = pagination.dots || "...";
-
-  let start = Math.max(currentPage - rangeSize, 1);
-  let end = Math.min(currentPage + rangeSize, totalPages);
-
-  if (leftRangeLength > totalPages) {
-    leftRangeLength = totalPages;
-    rightRangeLength = 0;
-  }
-
-  if (rightRangeLength + leftRangeLength > totalPages) {
-    rightRangeLength = totalPages - leftRangeLength;
-  }
-
-
-  if (start === 1) {
-    end = Math.min(start + rangeSize * 2, totalPages);
-  } else if (end === totalPages) {
-    start = Math.max(end - rangeSize * 2, 1);
-  }
-
-  const leftRange = [];
-  const rightRange = [];
-
-  for (let i = 1; i <= leftRangeLength; i++) {
-    leftRange.push(i);
-  }
-
-  if (start > leftRangeLength + 1) {
-    leftRange.push(dots);
-  }
-
-  if (end < totalPages - rightRangeLength) {
-    rightRange.push(dots);
-  }
-
-  for (let i = totalPages - rightRangeLength + 1; i <= totalPages; i++) {
-    rightRange.push(i);
-  }
-
-  const nearbyRange = [];
-
-  const startIndex = start > leftRangeLength ? start : leftRangeLength + 1;
-
-  const endIndex = end < totalPages - rightRangeLength + 1 ? end : end - rightRangeLength;
-  for (let i = startIndex; i <= endIndex; i++) {
-    nearbyRange.push(i);
-  }
-
-  return [...leftRange, ...nearbyRange, ...rightRange];
-};
-
-
 function throttle(func, limit) {
   let inThrottle;
   return function (...args) {
@@ -165,7 +104,6 @@ module.exports = {
   generateRandomKey,
   throttle,
   debounce,
-  getPaginationRange,
   formatDate,
   getCurrentDate,
 }
