@@ -8,7 +8,12 @@ const { pageService, settingService } = require('../services');
 
 const GetPage = catchAsync(async (req, res) => {
     const page = await pageService.getPage(req.params.id);
-    res.status(httpStatus.OK).send({ page });
+
+    const protocol = req.protocol || 'http';
+    const host = `${protocol}://${req.headers.host}`;
+
+
+    res.status(httpStatus.OK).send({ page, host });
 });
 
 const GetPageData = catchAsync(async (req, res) => {

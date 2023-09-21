@@ -17,7 +17,6 @@ export default function Page({ _id,
             _uid={'0'}
             _id={top}
             pages={pages}
-            states={pages[top].states || {}}
             type={"component"}
             setting={setting}
             AutocodeCustom={AutocodeCustom}
@@ -35,7 +34,6 @@ export default function Page({ _id,
             _uid={'0'}
             _id={bottom}
             pages={pages}
-            states={pages[bottom].states || {}}
             type={"component"}
             setting={setting}
             AutocodeCustom={AutocodeCustom}

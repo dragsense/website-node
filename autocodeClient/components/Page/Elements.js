@@ -8,25 +8,21 @@ import ErrorBoundary from './ErrorBoundary';
 
 function TreeNode(props) {
 
-  let { pages, _uid, _states, _props, colStates, pageType, _id, AutocodeCustom } = props;
+  let { pages, _uid,  pageType, _id, AutocodeCustom } = props;
   const node = pages[_id].elements[_uid];
 
 
 
- if(!node)
- return null;
+  if (!node)
+    return null;
 
-  const children =  node.childNodes.map((key, i) => <MemoizedTreeNode
+  const children = node.childNodes.map((key, i) => <MemoizedTreeNode
     {...props}
     _uid={key}
-    _id={_id}
     key={key}
-    colStates={colStates}
-    _states={_states}
-    _props={_props}
     pageType={""}
   />)
- 
+
   const component = node.page?.pageType === 'component' ? node.page : null;
   const rootComponent = pageType === 'component' ? { _id } : null;
 
@@ -40,10 +36,6 @@ function TreeNode(props) {
     component={rootComponent || component}
     customPath={node.customPath}
     form={rootForm || form}
-    _id={_id}
-    colStates={colStates}
-    _states={_states}
-    _props={_props}
     node={node}
     AutocodeCustom={AutocodeCustom}
   >
@@ -68,7 +60,7 @@ export default function Elements({ setting, type, pages, states, _uid, _id, Auto
 
 
   return <MemoizedTreeNode
-    setting={{...setting, ...pageSetting}}
+    setting={{ ...setting, ...pageSetting }}
     _states={states}
     pages={pages}
     pageType={type}

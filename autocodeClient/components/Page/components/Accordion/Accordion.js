@@ -1,39 +1,9 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+const React = require("react");
 
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { Transition } from 'react-transition-group';
 
-
-const Accordion = (props) => {
-    const { children, isActive, duration } = props;
-
-    const nodeRef = useRef(null);
-
-    const accordionTransition = transitions["expand"].getTransition(duration);
-
-    const flattenedChildren = React.Children.toArray(children);
-
-    return <>
-        {flattenedChildren[0]}
-        <Transition nodeRef={nodeRef} in={isActive} timeout={duration}>
-            {state => {
-                const baseStyle = {
-                    width: '100%',
-                    overflow: 'hidden',
-                    ...accordionTransition.defaultStyles,
-                };
-                const transitionStyles = accordionTransition[state];
-                return (
-                    <div ref={nodeRef} style={{ ...baseStyle, ...transitionStyles }}>
-                        {flattenedChildren[1]}
-                    </div>
-                );
-            }}
-        </Transition>
-
-    </>
-};
-
-
+// Define transitions for accordion
 const transitions = {
     fade: {
         getTransition: (duration = 300) => {
@@ -65,5 +35,49 @@ const transitions = {
     },
 };
 
+// Function to flatten children
+const flattenChildren = (children) => {
+    return React.Children.toArray(children);
+}
+
+// Function to get transition styles
+const getTransitionStyles = (state, accordionTransition) => {
+    const baseStyle = {
+        width: '100%',
+        overflow: 'hidden',
+        ...accordionTransition.defaultStyles,
+    };
+    const transitionStyles = accordionTransition[state];
+    return { ...baseStyle, ...transitionStyles };
+}
+
+const Accordion = (props) => {
+    const { children, isActive, duration } = props;
+
+    // Use useRef for performance optimization
+    const nodeRef = useRef(null);
+
+    // Use useMemo for performance optimization
+    const accordionTransition = useMemo(() => transitions["expand"].getTransition(duration), [duration]);
+
+    // Use useMemo for performance optimization
+    const flattenedChildren = useMemo(() => flattenChildren(children), [children]);
+
+    return (
+        <>
+            {flattenedChildren[0]}
+            <Transition nodeRef={nodeRef} in={isActive} timeout={duration}>
+                {state => {
+                    const transitionStyles = getTransitionStyles(state, accordionTransition);
+                    return (
+                        <div ref={nodeRef} style={transitionStyles}>
+                            {flattenedChildren[1]}
+                        </div>
+                    );
+                }}
+            </Transition>
+        </>
+    );
+};
 
 export default Accordion;

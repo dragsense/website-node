@@ -11,8 +11,13 @@ const SaveSetting = catchAsync(async (req, res) => {
 
 
 const GetSettings = catchAsync(async (req, res) => {
-    const setting = await settingService.getSettings()
-    res.status(httpStatus.OK).send({ setting })
+    const setting = await settingService.getSettings();
+
+    const protocol = req.protocol || 'http';
+    const host = `${protocol}://${req.headers.host}`;
+
+
+    res.status(httpStatus.OK).send({ setting,host })
 })
 
 
@@ -28,7 +33,11 @@ const GetCollectionData = catchAsync(async (req, res) => {
 
 
 const Download = catchAsync(async (req, res, AutoCode, AutocodeCustom) => {
-    settingService.download(req.query, res, AutoCode, AutocodeCustom);
+
+    const protocol = req.protocol || 'http';
+    const host = `${protocol}://${req.headers.host}`;
+
+    settingService.download(req.query, res, host,  AutoCode, AutocodeCustom);
 })
 
 

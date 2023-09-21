@@ -43,6 +43,11 @@ const updateCollection = async (id, collectionBody) => {
     if (collectionBody.states)
         updateContentWithType(collectionBody.states, 'content')
 
+        if (collectionBody.states) {
+            collection._states = collectionBody.states;
+        }
+    
+
     Object.assign(collection, collectionBody);
     await collection.save();
     return collection;

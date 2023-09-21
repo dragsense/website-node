@@ -1,7 +1,7 @@
 const React = require("react");
 import { PageComponent } from './components';
 
-function App({ pages, _id, top, bottom, setting, states, type, AutocodeCustom }) {
+function App({ pages, _id, top, bottom, setting, type, AutocodeCustom }) {
     const memoizedPageComponent = <PageComponent 
     pages={pages}
     top={top}
@@ -9,7 +9,6 @@ function App({ pages, _id, top, bottom, setting, states, type, AutocodeCustom })
     _id={_id} 
     setting={setting}
     AutocodeCustom={AutocodeCustom}
-     states={states} 
     type={type} />;
     return <>{memoizedPageComponent}</>;
 };

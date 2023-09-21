@@ -3,11 +3,9 @@ const ReactDOMServer = require('react-dom/server');
 
 const { Page, Collection, Document } = require('../apis/models');
 const {
-  collectionService,
-  pageService,
   settingService,
   themeService,
-  layoutService }
+}
   = require('../apis/services');
 
 const { Download } = require('../apis/controllers/setting.controller');
@@ -29,10 +27,8 @@ const handlePageNotFound = (res) => {
 }
 
 // Function to fetch page data
-const fetchPageData = async (page, document) => {
-  return page.type === 'collection' ?
-    await collectionService.getPageData(page._id, true, document) :
-    await pageService.getPageData(page._id, true);
+const fetchPageData = async (page, host, document) => {
+  return await settingService.getPageData(page._id, page.type, host, true, document);
 }
 
 module.exports = (app, AutoCode, AutocodeCustom, libraryName) => {
@@ -108,7 +104,10 @@ module.exports = (app, AutoCode, AutocodeCustom, libraryName) => {
         return;
       }
 
-      const pagesResults = await fetchPageData(page, document);
+      const protocol = req.protocol || 'http';
+      const host = `${protocol}://${req.headers.host}`;
+
+      const pagesResults = await fetchPageData(page, host, document);
 
       const settingData = {
         global: {
@@ -127,7 +126,6 @@ module.exports = (app, AutoCode, AutocodeCustom, libraryName) => {
           top={pagesResults.layout?.top}
           bottom={pagesResults.layout?.bottom}
           setting={settingData}
-          states={pagesResults.states}
           type={page.type || 'page'}
           AutocodeCustom={AutocodeCustom}
         />);
@@ -184,14 +182,14 @@ module.exports = (app, AutoCode, AutocodeCustom, libraryName) => {
         <html>
           <head>
           <title>${page.setting?.title ?
-      page.setting.title :
-      setting.webtitle ?
-        setting.webtitle : 'Page'}</title>
+          page.setting.title :
+          setting.webtitle ?
+            setting.webtitle : 'Page'}</title>
     <meta name="description" content="${page.setting?.desc ?
-      page.setting.desc :
-      setting.desc ?
-        setting.desc :
-        ''}" />
+          page.setting.desc :
+          setting.desc ?
+            setting.desc :
+            ''}" />
 
           <meta name="author" content="${setting.author}" />
           <meta name="keywords" content="${setting.keywords}" />

@@ -1,174 +1,97 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 
-const Observable =
-    (props) => {
-        const {
-            children,
-            states,
-            element,
-            node,
-            updateStates
-        } = props;
+// Function to get default value from states
+const getDefaultValue = (states, key, defaultValue) => states[key] ? states[key].defaultValue : defaultValue;
 
-        const ref = useRef();
-
-        const [topClass, setTopClasses] = useState({});
-        const [leftClass, setLeftClasses] = useState({});
-
-
-        const tagName = states['tagName'] ? states['tagName'].defaultValue : 'div';
-
-        const onScroll = states['onScroll'] ? states['onScroll'].defaultValue : false;
-        const onVisible = states['onVisible'] ? states['onVisible'].defaultValue : false;
-
-        const scrollTop = states['scrollTop'] ? states['scrollTop'].defaultValue : 50; // to check if top scroll is greater than 50
-        const scrollLeft = states['scrollLeft'] ? states['scrollLeft'].defaultValue : 50; // to check if left scroll is greater than 50
-        const scrollTopClass = states['scrollTopClass'] ? states['scrollTopClass'].defaultValue : "";
-        const scrollLeftClass = states['scrollLeftClass'] ? states['scrollLeftClass'].defaultValue : "";
-
-        const oneTime = states['oneTime'] ? states['oneTime'].defaultValue : false;
-
-        const visible = states['visible'] ? states['visible'].defaultValue : 10 / 100; // element visible percentage
-        const visibleClass = states['visibleClass'] ? states['visibleClass'].defaultValue : "";
-        const inVisibleClass = states['inVisibleClass'] ? states['inVisibleClass'].defaultValue : "";
-        const [visibleCls, setVisibleClasses] = useState({ name: inVisibleClass })
-
-        let observer;
-
-        useEffect(() => {
-
-            if (ref.current && onVisible) {
-                observer = new IntersectionObserver(function (entries) {
-                    entries.forEach(function (entry) {
-
-                        console.log(onVisible)
-
-
-                        if (entry.isIntersecting && entry.intersectionRatio >= visible) {
-
-                            setVisibleClasses({ name: visibleClass });
-
-                            if (oneTime) {
-                                observer.disconnect();
-                                return;
-                            }
-
-                        } else {
-                            setVisibleClasses({ name: inVisibleClass });
-                        }
-                    });
-                }, { threshold: visible });
-
-                observer.observe(ref.current);
-            }
-
-
-            return () => {
-
-                if (onVisible) {
-                    observer.disconnect();
-                }
-            };
-        }, [visibleClass, onVisible, visible, ref.current, oneTime]);
-
-        useEffect(() => {
-
-            if (onScroll) {
-
-                const iframe = document.querySelector("#ac-editor-iframe-doc");
-
-
-
-                if (iframe) {
-                    const iframeWindow = iframe.contentWindow;
-
-                    const iframeDocument = iframe.contentDocument || iframe.contentWindow.document;
-
-                    const handleScroll = () => {
-                        const top = iframeWindow.pageYOffset || iframeDocument.documentElement.scrollTop;
-                        const left = iframeWindow.pageXOffset || iframeDocument.documentElement.scrollLeft;
-
-                        if (top > scrollTop)
-                            setTopClasses({ name: scrollTopClass })
-                        else
-                            setTopClasses({})
-
-
-
-                        if (left > scrollLeft)
-                            setLeftClasses({ name: scrollLeftClass })
-                        else
-                            setLeftClasses({})
-
-
-                    };
-
-                    iframeWindow.addEventListener('scroll', handleScroll);
-
-                }
-            }
-
-            return () => {
-                if (onScroll) {
-
-                    const iframe = document.querySelector("#ac-editor-iframe-doc");
-
-                    if (iframe) {
-                        const iframeWindow = iframe.contentWindow;
-
-                        iframeWindow.removeEventListener('scroll', () => {
-                            setLeftClasses({});
-                            setTopClasses({});
-
-                        });
-                    }
-                }
-            };
-        }, [onScroll, scrollLeft, scrollTop, scrollTopClass, scrollLeftClass]);
-
-
-        const getCLasses = () => {
-
-            let classes = node.classes;
-            if (!classes)
-                classes = {};
-
-            if (topClass?.name)
-                classes['topClass'] = topClass;
+// Function to handle scroll event
+const handleScroll = (onScroll, scrollTop, scrollLeft, scrollTopClass, scrollLeftClass, setTopClasses, setLeftClasses) => {
+    if (onScroll) {
+        const iframe = document.querySelector("#ac-editor-iframe-doc");
+        if (iframe) {
+            const iframeWindow = iframe.contentWindow;
+            const iframeDocument = iframe.contentDocument || iframe.contentWindow.document;
+            const top = iframeWindow.pageYOffset || iframeDocument.documentElement.scrollTop;
+            const left = iframeWindow.pageXOffset || iframeDocument.documentElement.scrollLeft;
+            if (top > scrollTop)
+                setTopClasses({ name: scrollTopClass })
             else
-                delete classes['topClass']
-
-            if (leftClass?.name)
-                classes['leftClass'] = leftClass;
+                setTopClasses({})
+            if (left > scrollLeft)
+                setLeftClasses({ name: scrollLeftClass })
             else
-                delete classes['leftClass']
-
-            if (visibleCls?.name)
-                classes['visibleCls'] = visibleCls;
-            else
-                delete classes['visibleCls']
-
-
-                return classes;
+                setLeftClasses({})
         }
+    }
+};
 
-        const observableItem = useMemo(
-            () => element(
-                {
-                    ...node,
-                    tagName,
-                    classes: getCLasses(), state: undefined, map: undefined
-                },
-                children
-            ),
-            [children, topClass, tagName, leftClass, visibleCls]
-        );
-
-        return <span style={{ display: 'inline' }} ref={ref}
-
-
-        >{observableItem}</span>;
-
+// Function to handle visibility
+const handleVisibility = (onVisible, visible, visibleClass, inVisibleClass, setVisibleClasses, oneTime, ref) => {
+    let observer;
+    if (ref.current && onVisible) {
+        observer = new IntersectionObserver(function (entries) {
+            entries.forEach(function (entry) {
+                if (entry.isIntersecting && entry.intersectionRatio >= visible) {
+                    setVisibleClasses({ name: visibleClass });
+                    if (oneTime) {
+                        observer.disconnect();
+                        return;
+                    }
+                } else {
+                    setVisibleClasses({ name: inVisibleClass });
+                }
+            });
+        }, { threshold: visible });
+        observer.observe(ref.current);
+    }
+    return () => {
+        if (onVisible) {
+            observer.disconnect();
+        }
     };
+};
+
+const Observable = (props) => {
+    const { children, states, element, node } = props;
+    const ref = useRef();
+    const [topClass, setTopClasses] = useState({});
+    const [leftClass, setLeftClasses] = useState({});
+    const [visibleCls, setVisibleClasses] = useState({ name: getDefaultValue(states, 'inVisibleClass', "") });
+
+    const tagName = getDefaultValue(states, 'tagName', 'div');
+    const onScroll = getDefaultValue(states, 'onScroll', false);
+    const onVisible = getDefaultValue(states, 'onVisible', false);
+    const scrollTop = getDefaultValue(states, 'scrollTop', 50);
+    const scrollLeft = getDefaultValue(states, 'scrollLeft', 50);
+    const scrollTopClass = getDefaultValue(states, 'scrollTopClass', "");
+    const scrollLeftClass = getDefaultValue(states, 'scrollLeftClass', "");
+    const oneTime = getDefaultValue(states, 'oneTime', false);
+    const visible = getDefaultValue(states, 'visible', 10 / 100);
+    const visibleClass = getDefaultValue(states, 'visibleClass', "");
+    const inVisibleClass = getDefaultValue(states, 'inVisibleClass', "");
+
+    useEffect(() => handleVisibility(onVisible, visible, visibleClass, inVisibleClass, setVisibleClasses, oneTime, ref), [visibleClass, onVisible, visible, ref.current, oneTime]);
+    useEffect(() => handleScroll(onScroll, scrollTop, scrollLeft, scrollTopClass, scrollLeftClass, setTopClasses, setLeftClasses), [onScroll, scrollLeft, scrollTop, scrollTopClass, scrollLeftClass]);
+
+    const getClasses = () => {
+        let classes = node.classes || {};
+        if (topClass?.name)
+            classes['topClass'] = topClass;
+        else
+            delete classes['topClass']
+        if (leftClass?.name)
+            classes['leftClass'] = leftClass;
+        else
+            delete classes['leftClass']
+        if (visibleCls?.name)
+            classes['visibleCls'] = visibleCls;
+        else
+            delete classes['visibleCls']
+        return classes;
+    }
+
+    const observableItem = useMemo(() => element({ ...node, tagName, classes: getClasses(), state: undefined, map: undefined }, children), [children, topClass, tagName, leftClass, visibleCls]);
+
+    return <span style={{ display: 'inline' }} ref={ref}>{observableItem}</span>;
+};
 
 export default Observable;

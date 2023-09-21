@@ -1,88 +1,70 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 
-const Gallery = ({ children,
-    states,
-    nodes,
-    element,
-    node,
-    updateStates
-}) => {
+// Function to get default value from states
+const getDefaultValue = (states, key, defaultValue) => states[key] ? states[key].defaultValue : defaultValue;
+
+
+const Gallery = ({ children, states, nodes, element, node, updateStates }) => {
     
-    const total = states['total'] ? states['total'].defaultValue : 0;
+    // Get default values from states
+    const total = getDefaultValue(states, 'total', 0);
+    const activeIndex = getDefaultValue(states, 'currentIndex', -1);
+    const activeItem = getDefaultValue(states, 'activeItem', null);
+    const openModal = getDefaultValue(states, 'openModal', 0);
+    const modal = getDefaultValue(states, 'modal', false);
 
-    const activeIndex = states['currentIndex'] ? states['currentIndex'].defaultValue : -1;
-    const activeItem = states['activeItem'] ? states['activeItem'].defaultValue : null;
-    const openModal = states['openModal'] ? states['openModal'].defaultValue : 0;
-
-    const modal = states['modal'] ? states['modal'].defaultValue : false;
-
+    // Flatten children nodes
     const flattenedChildren = useMemo(() => {
-        const flattenedChildren =
-            nodes.length > 0
-                ? nodes.map((mapValue, mapIndex) =>
-                    element({ tagName: 'div', state: node.state }, children, mapValue, mapIndex)
-                )
-                : React.Children.toArray(children);
+        const flattenedChildren = nodes.length > 0
+            ? nodes.map((mapValue, mapIndex) =>
+                element({ tagName: 'div', state: node.state }, children, mapValue, mapIndex)
+            )
+            : React.Children.toArray(children);
 
+        // Update total items if length is different
         const length = flattenedChildren.length;
         if (length !== total) {
-            updateStates('items', length, 'states');
+            updateStates('items', length);
         }
 
         return flattenedChildren;
     }, [children.length, nodes]);
 
+    // Update active item on active index change
     useEffect(() => {
-
         updateStates('activeItem', flattenedChildren[activeIndex]);
-      
-
     }, [activeIndex]);
 
+    // Open modal on active item or modal change
     useEffect(() => {
-        if (modal)
-            updateStates('openModal', 1);
+        if (modal) {
+            updateStates('openModal', 1, 'states');
+
+        }
     }, [activeItem, modal]);
 
+    // Reset current index on modal close
     useEffect(() => {
+        if(openModal === 0) {
+            updateStates('currentIndex', -1);
 
-        if(openModal === 0)
-        updateStates('currentIndex', -1);
-
+        }
     }, [openModal]);
 
-
-
+    // Render gallery items
     const renderGallery = useMemo(() => {
-        const items = [];
-
-        const totalItems = flattenedChildren.length;
-
-        for (let i = 0; i < totalItems; i++) {
+        return flattenedChildren.map((child, i) => {
             const isActive = activeIndex === i;
-            items.push(
-                    React.cloneElement(flattenedChildren[i], { mapIndex: i, isActive })
-                  
+            return React.cloneElement(child, { mapIndex: i, isActive });
+        });
+    }, [flattenedChildren, activeIndex]);
 
-            );
-        }
-
-
-        return items;
-    }, [flattenedChildren])
-
-    const galleryItems = useMemo(
-        () =>
-            element(
-                { ...node, state: undefined, map: undefined },
-                    renderGallery
-               
-            ),
-        [renderGallery]
-    );
+    // Render gallery
+    const galleryItems = useMemo(() => {
+        return element({ ...node, state: undefined, map: undefined }, renderGallery);
+    }, [renderGallery, node]);
 
     return galleryItems;
 };
-
 
 export default Gallery;

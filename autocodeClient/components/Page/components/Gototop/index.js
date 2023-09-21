@@ -1,66 +1,70 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Transition } from 'react-transition-group';
 
-const GoToTopButton =
-    (props) => {
-        const {
-            children,
-            states,
-            element,
-            node,
-        } = props;
+// Function to get default value from states
+const getDefaultValue = (states, key, defaultValue) => states[key] ? states[key].defaultValue : defaultValue;
 
-        const [isVisible, setIsVisible] = useState(false);
-        const nodeRef = useRef(null);
+// Function to handle scroll
+const handleScroll = (window, setIsVisible) => {
+    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+    setIsVisible(scrollTop > 0);
+};
 
-        const iframe = document.querySelector("#ac-editor-iframe-doc");
-        const window = iframe.contentWindow;
+// Function to scroll to top
+const scrollToTop = (window) => {
+    window.scrollTo({
+        top: 0,
+        behavior: 'smooth',
+    });
+};
 
-        const duration = states['duration'] ? states['duration'].defaultValue : 300;
-        const type = states['type'] ? states['type'].defaultValue : 'fade';
+// Function to get transition
+const getTransition = (transitions, type, duration) => transitions[type].getTransition(duration);
 
-        const buttonTransition = transitions[type].getTransition(duration);
+const GoToTopButton = (props) => {
+    const {
+        children,
+        states,
+        element,
+        node,
+    } = props;
 
-        const handleScroll = () => {
+    const [isVisible, setIsVisible] = useState(false);
+    const nodeRef = useRef(null);
 
-            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-            setIsVisible(scrollTop > 0);
+    const iframe = document.querySelector("#ac-editor-iframe-doc");
+    const window = iframe.contentWindow;
+
+    const duration = getDefaultValue(states, 'duration', 300);
+    const type = getDefaultValue(states, 'type', 'fade');
+
+    const buttonTransition = getTransition(transitions, type, duration);
+
+    const handleScrollCallback = useCallback(() => handleScroll(window, setIsVisible), [window, setIsVisible]);
+    const scrollToTopCallback = useCallback(() => scrollToTop(window), [window]);
+
+    useEffect(() => {
+        window.addEventListener('scroll', handleScrollCallback);
+        return () => {
+            window.removeEventListener('scroll', handleScrollCallback);
         };
+    }, [handleScrollCallback]);
 
-        const scrollToTop = () => {
-
-
-            window.scrollTo({
-                top: 0,
-                behavior: 'smooth',
-            });
-        };
-
-        useEffect(() => {
-            window.addEventListener('scroll', handleScroll);
-            return () => {
-                window.removeEventListener('scroll', handleScroll);
+    return <Transition nodeRef={nodeRef} in={isVisible} timeout={duration}>
+        {state => {
+            const baseStyle = {
+                display: 'inline-block',
+                ...buttonTransition.defaultStyles,
             };
-        }, []);
+            const transitionStyles = buttonTransition[state];
+            return <div ref={nodeRef} style={{ ...baseStyle, ...transitionStyles }}
+             onClick={scrollToTopCallback}>
+                {element(node, children)}
+            </div>;
 
-        return <Transition nodeRef={nodeRef} in={isVisible} timeout={duration}>
-            {state => {
-                const baseStyle = {
-                    display: 'inline-block',
-                    ...buttonTransition.defaultStyles,
-                };
-                const transitionStyles = buttonTransition[state];
-                return <div ref={nodeRef} style={{ ...baseStyle, ...transitionStyles }}
-                 onClick={scrollToTop}>
-                    {element(node, children)}
-                </div>;
-
-            }}
-        </Transition>
-
-    };
-
-
+        }}
+    </Transition>
+};
 
 const transitions = {
     slide: {

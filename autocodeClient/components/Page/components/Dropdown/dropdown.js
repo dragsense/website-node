@@ -1,16 +1,20 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+const React = require("react");
+
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { Transition } from 'react-transition-group';
 
+// Define the possible sides for the dropdown
 const SIDES = [
     'topRight',
     'topLeft',
     'bottomLeft',
     'bottomRight',
-  ];
+];
 
+// Dropdown component
 const Dropdown = ({ 
     children, 
-     type,
+    type,
     duration,
     openSide,
     openDropdown,
@@ -18,34 +22,36 @@ const Dropdown = ({
     expandable,
     leftOffset,
     topOffset,
-    intialValue, expandValue }) => {
+    initialValue, expandValue }) => {
+
   const nodeRef = useRef(null);
 
-  const transitionType = expandable ? type : 'fade';
+// Determine the transition type based on whether the dropdown is expandable
+  const transitionType = useMemo(() => expandable ? type : 'fade', [expandable, type]);
 
+// Get the transition for the dropdown
+  const dropdownTransition = useMemo(() => transitions[transitionType].getTransition(duration, initialValue, expandValue), [transitionType, duration, initialValue, expandValue]);
 
-  const dropdownTransition = transitions[transitionType].getTransition(duration, intialValue, expandValue);
+// Get the iframe and window for event listeners
+  const iframe = useMemo(() => document.querySelector("#ac-editor-iframe-doc"), []);
+  const window = useMemo(() => iframe.contentWindow, [iframe]);
 
-  const iframe = document.querySelector("#ac-editor-iframe-doc");
-  const window = iframe.contentWindow;
+// Handle click outside of dropdown to close it
+  const handleClickOutside = (event) => {
+    if (nodeRef.current && !nodeRef.current.contains(event.target)) {
+      closeDropdown();
+    }
+  };
 
- 
-
-
+// Add event listener for clicks outside of dropdown
   useEffect(() => {
-    const handleClickOutside = (event) => {
-     
-      if (nodeRef.current && !nodeRef.current.contains(event.target)) {
-        closeDropdown();
-      }
-    };
-   // window.addEventListener('click', handleClickOutside);
-  
+    window.addEventListener('click', handleClickOutside);
     return () => {
-      //window.removeEventListener('click', handleClickOutside);
+      window.removeEventListener('click', handleClickOutside);
     };
-  }, [openDropdown]);
+  }, [openDropdown, window, handleClickOutside]);
 
+// Render the dropdown with the appropriate transition and styles
   return (
     <Transition nodeRef={expandable} in={openDropdown} timeout={duration}>
       {state => {
@@ -72,6 +78,7 @@ const Dropdown = ({
   );
 };
 
+// Define the transitions for the dropdown
 const transitions = {
 
     fade: {
@@ -91,156 +98,37 @@ const transitions = {
   },
 
   expandRight: {
-    getTransition: (duration = 300, intialValue, expandValue) => {
+    getTransition: (duration = 300, initialValue, expandValue) => {
       const defaultStyles = {
         transition: `width ${duration}ms ease-in-out, opacity ${duration}ms ease-in-out`,
-        width: intialValue,
+        width: initialValue,
         opacity: 0,
       };
 
       const entering = { width: expandValue, opacity: 1 };
       const entered = { width: expandValue, opacity: 1 };
-      const exiting = { width: intialValue, opacity: 0 };
-      const exited = { width: intialValue, opacity: 0 };
+      const exiting = { width: initialValue, opacity: 0 };
+      const exited = { width: initialValue, opacity: 0 };
 
       return { defaultStyles, entering, entered, exiting, exited };
     },
   },
  
   expandBottom: {
-    getTransition: (duration = 300, intialValue, expandValue) => {
+    getTransition: (duration = 300, initialValue, expandValue) => {
       const defaultStyles = {
         transition: `height ${duration}ms ease-in-out,  opacity ${duration}ms ease-in-out`,
-        height: intialValue
+        height: initialValue
       };
 
       const entering = { height: expandValue, opacity: 1 };
       const entered = { height: expandValue, opacity: 1 };
-      const exiting = { height: intialValue, opacity: 0 };
-      const exited = { height: intialValue, opacity: 0 };
+      const exiting = { height: initialValue, opacity: 0 };
+      const exited = { height: initialValue, opacity: 0 };
 
       return { defaultStyles, entering, entered, exiting, exited };
     },
   },
 };
 
-
 export default Dropdown;
-
-
-
-// import React, { useState, useEffect, useMemo, useRef } from 'react';
-// import { Transition } from 'react-transition-group';
-
-// const Slide = ({ children, activeIndex, lastIndex, moveOffset, duration, type, index }) => {
-//   const nodeRef = useRef(null);
-
-//   const sliderTransition = transitions[type].getTransition(duration, index);
-//   const isActive = activeIndex === index;
-
-//   let lastActiveIndex = activeIndex;
-
-//   useEffect(() => {
-//     lastActiveIndex = activeIndex;
-//   }, [activeIndex]);
-
-//   const slideCount = lastIndex + 1;
-//   const prevIndex = (index - 1 + slideCount) % slideCount;
-//   const nextIndex = (index + 1) % slideCount;
-
-//   const isPrevSlide = activeIndex === prevIndex;
-//   const isNextSlide = activeIndex === nextIndex;
-
-//   const isSingleSlide = slideCount === 1;
-
-//   return (
-//     <Transition nodeRef={nodeRef} in={isActive || type === 'slide'} timeout={duration}>
-//       {state => {
-//         const baseStyle = {
-//           position: 'absolute',
-//           top: 0,
-//           left: type === 'slide'
-//             ? isActive || isSingleSlide
-//               ? '0%'
-//               : isPrevSlide
-//                 ? '100%'
-//                 : isNextSlide
-//                   ? '-100%'
-//                   : '0%'
-//             : 0,
-//           width: '100%',
-//           height: '100%',
-          
-//           ...sliderTransition.defaultStyles,
-//         };
-
-//         const transitionStyles = type === 'slide'
-//           ? {
-//             transform: isActive || isSingleSlide
-//               ? 'translateX(0%)'
-//               : isPrevSlide
-//                 ? 'translateX(100%)'
-//                 : isNextSlide
-//                   ? 'translateX(-100%)'
-//                   : '0%'
-//           }
-//           : sliderTransition[state];
-
-
-
-//         return (
-//           <div ref={nodeRef} style={{ ...baseStyle, ...transitionStyles }}>
-
-//             {children}
-//           </div>
-//         );
-//       }}
-//     </Transition>
-//   );
-// };
-
-// const transitions = {
-//   slide: {
-//     getTransition: (duration = 300, index) => {
-//       const defaultStyles = {
-//         transition: `transform ${duration}ms ease-in-out`,
-//       };
-
-//       const entering = {
-//         transform: 'translateX(0%)',
-//       };
-
-//       const entered = {
-//         transform: 'translateX(0%)',
-//       };
-
-//       const exiting = {
-//         transform: index === 0 ? 'translateX(100%)' : 'translateX(-100%)',
-//       };
-
-//       const exited = {
-//         transform: index === 0 ? 'translateX(100%)' : 'translateX(-100%)',
-//       };
-
-//       return { defaultStyles, entering, entered, exiting, exited };
-//     },
-//   },
-//   fade: {
-//     getTransition: (duration = 300) => {
-//       const defaultStyles = {
-//         transition: `opacity ${duration}ms ease-in-out`,
-//         opacity: 0,
-//       };
-
-//       const entering = { opacity: 1 };
-//       const entered = { opacity: 1 };
-//       const exiting = { opacity: 0 };
-//       const exited = { opacity: 0 };
-
-//       return { defaultStyles, entering, entered, exiting, exited };
-//     },
-//   },
-// };
-
-
-// export default Slide;

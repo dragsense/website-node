@@ -1,72 +1,41 @@
-// import React, { useState, useEffect, useMemo } from 'react';
+const React = require("react");
 
-// import { getStateValue } from '@/lib/utils/elementNode';
+import  { useState, useEffect, useMemo, useRef } from 'react';
 
+// Function to flatten children
+const flattenChildren = (nodes, element, node, children, total, updateStates) => {
+  const flattenedChildren = nodes.length > 0 ? nodes.map((mapValue, mapIndex) => element(
+    node,
+    children[0],
+    mapValue,
+    mapIndex,
+  ))
+    :
+    React.Children.toArray(children);
+  const length = flattenedChildren.length;
+  if (length !== total)
+    updateStates('items', length, 'states');
 
+  return flattenedChildren;
+}
 
+// Function to render accordion
+const renderAccordion = (flattenedChildren, activeIndex) => {
+  const accordions = [];
 
-// const Accordion = ({ children, states, index }) => {
+  const totalAccordion = flattenedChildren.length;
 
-//   const [opacity, setOpacity] = useState(0);
+  for (let i = 0; i < totalAccordion; i++) {
+    const isActive = activeIndex === i;
+    accordions.push(flattenedChildren[i].props?.children ?
+        React.Children.map(flattenedChildren[i].props.children, child =>
+          React.cloneElement(
+            child, { mapIndex: i, isActive, key: child.props?._uid })) :
+        React.cloneElement(flattenedChildren[i], { mapIndex: i, isActive, key: flattenedChildren[i].props?._uid  }));
+  }
 
-//   const slideHeight = useMemo(() => {
-//     return getStateValue(['slideHeight'], states);
-
-// }, [states]);
-
-//   const activeIndex = useMemo(() => {
-//     setOpacity(0);
-//     return getStateValue(['slideIndex'], states);
-
-// }, [states]);
-
-//   useEffect(() => {
-//     setTimeout(() => {
-//       setOpacity(1);
-//     }, 200);
-//   }, [states]);
-
-
-//   const button = children[0];
-//   const content = children[1];
-
-//   if (!button || !content) {
-//     return 'Please add two children: one button and one content';
-//   }
-
-
-//   return (
-//     <>
-//       {React.cloneElement(<div>{button}</div>, {
-//       })}
-//       {React.cloneElement(<div>{content}</div>, {
-//         style: {
-//           width: '100%',
-//           height: activeIndex === index ? slideHeight || 'auto' : 0,
-//           opacity: activeIndex === index ? opacity : 0,
-//           transition: 'height 0.5s ease-in-out, opacity 0.5s ease-in-out',
-//           overflow: 'hidden',
-
-//         }
-//       })}
-//     </>
-//   );
-// };
-
-// export default Accordion;
-
-
-import React, { useState, useEffect, useMemo, useRef } from 'react';
-
-// function flattenChildren(children) {
-//   return React.Children.toArray(children).reduce((acc, child) => {
-//     if (React.isValidElement(child) && child.props.children) {
-//       return acc.concat(flattenChildren(child.props.children));
-//     }
-//     return acc.concat(child);
-//   }, []);
-// }
-
+  return accordions;
+}
 
 const AccordionItems = (props) => {
   const { children,
@@ -79,51 +48,20 @@ const AccordionItems = (props) => {
   const total = states['total'] ? states['total'].defaultValue : 0;
   const activeIndex = states['currentIndex'] ? states['currentIndex'].defaultValue : -1;
 
+  // Use useMemo for performance optimization
+  const flattenedChildren = useMemo(() => flattenChildren(nodes, element, node, children, total, updateStates), [children.length, nodes]);
 
-  const flattenedChildren = useMemo(() => {
-    const flattenedChildren = nodes.length > 0 ? nodes.map((mapValue, mapIndex) => element(
-      node,
-      children[0],
-      mapValue,
-      mapIndex,
-    ))
-      :
-      React.Children.toArray(children);
-    const length = flattenedChildren.length;
-    if (length !== total)
-      updateStates('items', length, 'states');
-
-    return flattenedChildren;
-
-  }, [children.length, nodes]);
-
-  const renderAccordion = useMemo(() => {
-    const accordions = [];
-
-    const totalAccordion = flattenedChildren.length;
-
-    for (let i = 0; i < totalAccordion; i++) {
-      const isActive = activeIndex === i;
-      accordions.push(flattenedChildren[i].props?.children ?
-          React.Children.map(flattenedChildren[i].props.children, child =>
-            React.cloneElement(
-              child, { mapIndex: i, isActive, key: child.props?._uid })) :
-          React.cloneElement(flattenedChildren[i], { mapIndex: i, isActive, key: flattenedChildren[i].props?._uid  }));
-    }
-
-
-    return accordions;
-  }, [flattenedChildren])
+  const accordions = useMemo(() => renderAccordion(flattenedChildren, activeIndex), [flattenedChildren, activeIndex])
 
   const accordionItems = useMemo(
     () =>
       element(
         { ...node, state: undefined, map: undefined },
         <div style={{ position: 'relative', overflow: 'hidden' }}>
-          {renderAccordion}
+          {accordions}
         </div>
       ),
-    [renderAccordion]
+    [accordions]
   );
 
   return accordionItems;

@@ -1,23 +1,22 @@
-
-const React = require("react");
-
-import { useMemo } from "react";
+import React, { useMemo, useCallback } from "react";
 
 import ElementType from "./ElementType";
 
 import { getStateValue, getPageValue } from '../../utils/element-value';
 
-
+// Main component for handling Element Value
 const ElementValue = (props) => {
 
-
-    const { state,
+    // Destructuring props for easier access
+    const { 
+        state,
         nodeValue,
         mapValue,
         mapIndex,
         _states,
         colStates,
         _props,
+        disabled,
         fun,
         _cstates,
         attributes,
@@ -25,60 +24,61 @@ const ElementValue = (props) => {
         classes,
         conds,
         node,
-        children } = props;
+        children 
+    } = props;
 
+   
+    // Function to handle global type
+    const handleGlobalType = (key) => {
+        if (key[0] === "WEBSITE") {
+            const global = setting.global || [];
+            if (key[1] === 'images') {
+                const images = global[key[1]] || {};
+                const image = images[key[2]] || {}
+                return {
+                    value: image?.src ? image.src : '/images/default/default-img.png',
+                    label: image === undefined ? `[${key[2]}]` : image?.alt || "Global Image"
+                }
+            }
+            return {
+                value: global[key[1]],
+                label: global[key[1]] || `[global ${key[1]}]`
+            }
+        }
+    }
 
+    // Function to handle colStates type
+    const handleColStatesType = (key, value) => {
+        if (!colStates)
+            return value;
 
+        if (key[0] === 'PAGES')
+            return mapIndex + 1;
+        else
+            if (key[0] === 'docsLength' && colStates.documents)
+                return colStates.documents.length || '0';
+            else
+                return getPageValue(key, colStates);
+    }
+
+    // Main function to get value based on type
     const getValue = (elem, value = '') => {
         const type = elem.type;
         const key = elem.key;
 
         switch (type) {
             case 'GLOBAL':
-
-                if (key[0] === "WEBSITE") {
-                    const global = setting.global || [];
-                    if (key[1] === 'images') {
-                        const images = global[key[1]] || {};
-                        const image = images[key[2]] || {}
-                        return {
-                            value: image?.src ? image.src : '/images/default/default-img.png',
-                            label: image === undefined ? `[${key[2]}]` : image?.alt || "Global Image"
-                        }
-
-                    }
-
-                    return {
-                        value: global[key[1]],
-                        label: global[key[1]] || `[global ${key[1]}]`
-                    }
-                }
-
+                return handleGlobalType(key);
             case 'PROPS':
                 return getStateValue(key, _props) || `[props.${key}]`;
             case 'STATES':
                 return getStateValue(key, _states);
             case 'PAGE':
-                console.log(setting['name'])
                 return getPageValue(key, setting);
             case 'COLSTATES':
-
-                if (!colStates)
-                    return value;
-
-                if (key[0] === 'PAGES')
-                    return mapIndex + 1;
-                else
-                    if (key[0] === 'docsLength' && colStates.documents)
-                        return colStates.documents.length || '0';
-                    else
-                        return getPageValue(key, colStates);
-
-
+                return handleColStatesType(key, value);
             case 'FORMSTATES':
-                if (_states && _states[key[0]])
-                    return _states[key[0]][key[1]] || '[form state]'
-
+                return _states && _states[key[0]] ? _states[key[0]][key[1]] || '[form state]' : value;
             case 'MAPVALUE':
                 return mapValue;
             case 'MAPINDEX':
@@ -87,66 +87,158 @@ const ElementValue = (props) => {
             case 'Grid': case 'Container': case 'Slider': case 'Gallery': case 'Dropdown':
             case 'Dropdown': case 'Observable': case 'Modal': case 'GoToTop':
                 return getStateValue(key, _cstates);
-
             default:
                 return value;
-
         }
-
     }
 
+   ;
 
-    const value = useMemo(() => {
 
-        if (!state)
-            return nodeValue;
+    // Function to get value based on state
+    const getValueBasedOnState = useCallback(() => {
+    
+        if (!state) return nodeValue;
         const value = getValue(state, nodeValue);
         return value || nodeValue;
 
-    }, [state, colStates, _cstates, _states, _props, mapValue, nodeValue]);
+    }, [state, nodeValue, _states, _props]);
+
+    // useMemo hook to optimize performance by memoizing the value
+    // It will only recompute the memoized value when one of the dependencies has changed
+    // This optimization helps to avoid expensive calculations on every render
+    const value = useMemo(getValueBasedOnState, [getValueBasedOnState]);
+
+    // Extract values from onClick event
+    const extractOnClickValues = (onclick) => {
+        const withType = onclick.withtype;
+        const withkey = onclick.withkey;
+        let withValue = getValue({ type: withType, key: withkey });
+        withValue = withValue?.value ? withValue.value : withValue
+
+        const stateType = onclick.statetype;
+        const stateKey = onclick.statekey;
+        let stateValue = getValue({ type: stateType, key: stateKey }, '');
+        stateValue = stateValue?.value ? stateValue.value : stateValue;
+
+        return { withValue, stateValue };
+    }
+
+    // Handle onClick event
+    const handleOnClick = (node, fun, withValue, stateValue) => {
+        if (withValue?.notClickable)
+            return;
+
+        if (fun?.onClick)
+            fun.onClick(node, stateValue, withValue);
+    }
 
     const onClickNode = (e) => {
-
+        // Prevent default action for anchor tags
         if (node.tagName === 'a')
             e.preventDefault();
+
         try {
             if (node.onClick) {
-                const onclick = node.onClick;
-
-                const withType = onclick.withtype;
-                const withkey = onclick.withkey;
-                let withValue = getValue({ type: withType, key: withkey });
-                withValue = withValue?.value ? withValue.value : withValue
-
-                const stateType = onclick.statetype;
-                const stateKey = onclick.statekey;
-                let stateValue = getValue({ type: stateType, key: stateKey }, '');
-                stateValue = stateValue?.value ? stateValue.value : stateValue;
-
-                if (withValue?.notClickable)
-                    return;
-
-
-                if (fun?.onClick)
-                    fun.onClick(node, stateValue, withValue);
+                const { withValue, stateValue } = extractOnClickValues(node.onClick);
+                handleOnClick(node, fun, withValue, stateValue);
             }
         } catch (e) {
-
+            console.error(e);
         }
+    }
+
+    // Function to handle onChange event
+    const handleOnChange = (onChangeEvent, value, node, all) => {
+
+
+        // Check if onChange function exists in fun object
+        if (fun?.onChange) {
+            // Call the onChange function with the required parameters
+
+            fun.onChange([{ elem: onChangeEvent, value }], node, all);
+        }
+    }
+
+    // Function to validate onChange event
+    const validateOnChange = (onChangeEvent) => {
+        // Check if onChangeEvent has a value or if it doesn't exist
+        return onChangeEvent?.value;
     }
 
     const onChangeNode = (value, all) => {
 
-        const onChangeEvent = node.onChange;
-        try {
-            if (onChangeEvent?.value || !onChangeEvent) {
 
-                if (fun?.onChange)
-                    fun.onChange([{ elem: onChangeEvent, value }], node, all);
+
+        // Extract onChange event from node
+        const onChangeEvent = node.onChange;
+
+
+        try {
+            // Validate onChange event
+            if (validateOnChange(onChangeEvent)) {
+                // Handle onChange event
+                handleOnChange(onChangeEvent, value, node, all);
             }
         } catch (e) {
+            // Log any errors
+            console.error(e);
+        }
+    }
+
+    // Function to handle mouse move event
+    const handleMouseMove = (e, onMouseMove) => {
+        let pageX, pageY, scrollLeft, scrollTop;
+
+        // Determine mouse type and set pageX and pageY accordingly
+        if (onMouseMove.mouseType === 'page') {
+            pageX = e.pageX;
+            pageY = e.pageY;
+        } else {
+            pageX = e.clientX;
+            pageY = e.clientY;
         }
 
+        // Determine scroll type and set scrollLeft and scrollTop accordingly
+        if (onMouseMove.scrollType === 'pageScroll') {
+            const iframe = document.querySelector("#ac-editor-iframe-doc");
+
+            if (iframe) {
+                const iframeWindow = iframe.contentWindow;
+                scrollLeft = iframeWindow.pageYOffset;
+                scrollTop = iframeWindow.pageYOffset;
+            }
+        } else {
+            scrollLeft = e.target.scrollLeft;
+            scrollTop = e.target.scrollTop;
+        }
+
+        return { pageX, pageY, scrollLeft, scrollTop, delta: onMouseMove.delta };
+    }
+
+    // Function to calculate valueX and valueY based on mouse move
+    const calculateMouseMoveValues = (onMouseMove, pageX, pageY, scrollLeft, scrollTop, delta) => {
+        let valueX = '', valueY = '';
+
+        // Calculate valueX if it exists
+        if (onMouseMove.valueX) {
+            valueX = onMouseMove.valueX.replace(/\[X]/g, pageX);
+            valueX = valueX.replace(/\[Y]/g, pageY);
+            valueX = valueX.replace(/\[left]/g, scrollLeft);
+            valueX = valueX.replace(/\[top]/g, scrollTop);
+            valueX = valueX.replace(/\[delta]/g, delta);
+        }
+
+        // Calculate valueY if it exists
+        if (onMouseMove.valueY) {
+            valueY = onMouseMove.valueY.replace(/\[Y]/g, pageY);
+            valueY = valueY.replace(/\[X]/g, pageX);
+            valueY = valueY.replace(/\[left]/g, scrollLeft);
+            valueY = valueY.replace(/\[top]/g, scrollTop);
+            valueY = valueY.replace(/\[delta]/g, delta);
+        }
+
+        return { valueX, valueY };
     }
 
     const onMouseMove = (e) => {
@@ -154,68 +246,19 @@ const ElementValue = (props) => {
 
         const onMouseMove = node.onMouseMove;
 
-
         if (!onMouseMove)
             return;
+
         try {
-            let pageX;
-            let pageY;
+            const { pageX, pageY, scrollLeft, scrollTop, delta } = handleMouseMove(e, onMouseMove);
+            const { valueX, valueY } = calculateMouseMoveValues(onMouseMove, pageX, pageY, scrollLeft, scrollTop, delta);
 
-            let scrollLeft;
-            let scrollTop;
-
-            if (onMouseMove.mouseType === 'page') {
-                pageX = e.pageX;
-                pageY = e.pageY;
-            } else {
-                pageX = e.clientX;
-                pageY = e.clientY;
-            }
-
-
-            if (onMouseMove.scrollType === 'pageScroll') {
-                const iframe = document.querySelector("#ac-editor-iframe-doc");
-
-                if (iframe) {
-                    const iframeWindow = iframe.contentWindow;
-                    scrollLeft = iframeWindow.pageYOffset;
-                    scrollTop = iframeWindow.pageYOffset;
-                }
-            } else {
-
-                scrollLeft = e.target.scrollLeft;
-                scrollTop = e.target.scrollTop;
-            }
-
-
-            const delta = onMouseMove.delta;
-
-            if (onMouseMove.valueX || onMouseMove.valueY) {
-
-                let valueX = '';
-                if (onMouseMove.valueX) {
-                    valueX = onMouseMove.valueX.replace(/\[X]/g, pageX);
-                    valueX = valueX.replace(/\[Y]/g, pageY);
-                    valueX = valueX.replace(/\[left]/g, scrollLeft);
-                    valueX = valueX.replace(/\[top]/g, scrollTop);
-                    valueX = valueX.replace(/\[delta]/g, delta);
-                }
-
-                let valueY = ''
-                if (onMouseMove.valueY) {
-                    valueY = onMouseMove.valueY.replace(/\[Y]/g, pageY);
-                    valueY = valueY.replace(/\[X]/g, pageX);
-                    valueY = valueY.replace(/\[left]/g, scrollLeft);
-                    valueY = valueY.replace(/\[top]/g, scrollTop);
-                    valueY = valueY.replace(/\[delta]/g, delta);
-                }
+            if (valueX || valueY) {
                 try {
                     valueX = eval(valueX);
                     valueY = eval(valueY);
-
                 } catch (e) {
                     console.error("Invalid expression:", e);
-
                 }
 
                 if (fun?.onChange)
@@ -223,13 +266,41 @@ const ElementValue = (props) => {
             }
         }
         catch (e) {
+            console.error(e);
         }
     }
 
+    // Function to handle scroll event
+    const handleScroll = (e, onScroll) => {
+        const scrollLeft = e.target.scrollLeft;
+        const scrollTop = e.target.scrollTop;
+        const delta = onScroll.delta;
+
+        return { scrollLeft, scrollTop, delta };
+    }
+
+    // Function to calculate valueX and valueY based on scroll
+    const calculateScrollValues = (onScroll, scrollLeft, scrollTop, delta) => {
+        let valueX = '', valueY = '';
+
+        // Calculate valueX if it exists
+        if (onScroll?.valueX) {
+            valueX = onScroll.valueX.replace(/\[left]/g, scrollLeft);
+            valueX = valueX.replace(/\[top]/g, scrollTop);
+            valueX = valueX.replace(/\[delta]/g, delta);
+        }
+
+        // Calculate valueY if it exists
+        if (onScroll?.valueY) {
+            valueY = onScroll.valueY.replace(/\[top]/g, scrollTop);
+            valueY = valueY.replace(/\[left]/g, scrollLeft);
+            valueY = valueY.replace(/\[delta]/g, delta);
+        }
+
+        return { valueX, valueY };
+    }
 
     const onScroll = (e) => {
-
-
         e.preventDefault();
 
         const onScroll = node.onScroll;
@@ -238,36 +309,15 @@ const ElementValue = (props) => {
             return;
 
         try {
-            const scrollLeft = e.target.scrollLeft;
-            const scrollTop = e.target.scrollTop;
+            const { scrollLeft, scrollTop, delta } = handleScroll(e, onScroll);
+            const { valueX, valueY } = calculateScrollValues(onScroll, scrollLeft, scrollTop, delta);
 
-
-            const delta = onScroll.delta;
-
-
-            if (onScroll?.valueX || onScroll?.valueY) {
-
-                let valueX = '';
-                if (onScroll?.valueX) {
-                    valueX = onScroll.valueX.replace(/\[left]/g, scrollLeft);
-                    valueX = valueX.replace(/\[top]/g, scrollTop);
-                    valueX = valueX.replace(/\[delta]/g, delta);
-                }
-
-                let valueY = ''
-                if (onScroll?.valueY) {
-                    valueY = onScroll.valueY.replace(/\[top]/g, scrollTop);
-                    valueY = valueY.replace(/\[left]/g, scrollLeft);
-                    valueY = valueY.replace(/\[delta]/g, delta);
-                }
-
+            if (valueX || valueY) {
                 try {
                     valueX = eval(valueX);
                     valueY = eval(valueY);
-
                 } catch (e) {
-                    message.error("Invalid expression:" + e?.message);
-
+                    console.error("Invalid expression:" + e?.message);
                 }
 
                 if (fun?.onChange)
@@ -278,24 +328,38 @@ const ElementValue = (props) => {
             }
         }
         catch (e) {
+            console.error(e?.message);
         }
     }
 
-    return <ElementType
-        {...props}
-        value={value}
-        attributes={attributes}
-        classes={classes}
-        node={node}
-        conds={conds}
-        mapValue={mapValue}
-        mapIndex={mapIndex}
-        onChange={node.onChange ? onChangeNode : undefined}
-        onMouseMove={node.onMouseMove ? onMouseMove : undefined}
-        onClick={node.onClick ? onClickNode : undefined}
-        onScroll={node.onScroll ? onScroll : undefined}
-    >{children}</ElementType>
+    // Check if the event handlers are defined in the node
+    const hasOnChange = useMemo(() => Boolean(node.onChange), [node.onChange]);
+    const hasOnMouseMove = useMemo(() => Boolean(node.onMouseMove), [node.onMouseMove]);
+    const hasOnClick = useMemo(() => Boolean(node.onClick), [node.onClick]);
+    const hasOnScroll = useMemo(() => Boolean(node.onScroll), [node.onScroll]);
 
+
+    return (
+        <ElementType
+            {...props}
+            value={value}
+            attributes={attributes}
+            classes={classes}
+            node={node}
+            conds={conds}
+            mapValue={mapValue}
+            mapIndex={mapIndex}
+            // Assign event handlers only if they are defined in the node
+            onChange={hasOnChange ? onChangeNode : undefined}
+            onMouseMove={hasOnMouseMove ? onMouseMove : undefined}
+            onClick={hasOnClick ? onClickNode : undefined}
+            onScroll={hasOnScroll ? onScroll : undefined}
+            // Disable the button if no input change
+            disabled={disabled}
+        >
+            {children}
+        </ElementType>
+    );
 
 
 };

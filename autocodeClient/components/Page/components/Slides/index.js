@@ -1,6 +1,45 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import Slide from './Slide';
 
+// Function to get the default value of a state
+const getDefaultValue = (state, defaultValue) => state ? state.defaultValue : defaultValue;
+
+// Function to handle slide transition
+const handleSlideTransition = (flattenedChildren, numColumns, activeIndex, updateStates) => {
+  const totalSlides = Math.ceil(flattenedChildren.length / numColumns);
+  let newIndex = activeIndex + 1; // Increment the active index by 1
+
+  if (newIndex >= totalSlides * numColumns) {
+    newIndex = 0; // Reset to the first slide if reached the end
+  }
+
+  updateStates('currentIndex', newIndex);
+  updateStates('activeItem', flattenedChildren[newIndex]);
+};
+
+// Function to set loop index
+const setLoopIndex = (flattenedChildren, type, numColumns, moveColumns, activeIndex, updateStates) => {
+  const isSlide = type === 'slide';
+  const cols = isSlide ? numColumns : 1;
+  let moves = isSlide ? moveColumns : 1;
+
+  if (moves > cols)
+    moves = cols;
+
+  let totalSlides = Math.ceil(flattenedChildren.length / moves);
+  let newIndex = activeIndex;
+
+  if (newIndex >= totalSlides) {
+    newIndex = 0;
+  } else if (newIndex < 0) {
+    newIndex = totalSlides - 1;
+  }
+
+  updateStates('currentIndex', newIndex);
+  updateStates('activeItem', flattenedChildren[newIndex]);
+};
+
+// Main Slides component
 const Slides = (props) => {
   const {
     children,
@@ -14,22 +53,21 @@ const Slides = (props) => {
   const nodeRef = useRef(null);
   const [isHovered, setIsHovered] = useState(false);
 
-  const total = states['total'] ? states['total'].defaultValue : 0;
-  const activeIndex = states['currentIndex'] ? states['currentIndex'].defaultValue : -1;
-  const numColumns = states['numColumns'] ? states['numColumns'].defaultValue : 1;
-  const moveColumns = states['moveColumns'] ? states['moveColumns'].defaultValue : 1;
-  const space = states['space'] ? states['space'].defaultValue : 0.1;
-  const centered = states['centered'] ? states['centered'].defaultValue : false;
+// Using getDefaultValue function to get the default values of states
+  const total = getDefaultValue(states['total'], 0);
+  const activeIndex = getDefaultValue(states['currentIndex'], -1);
+  const numColumns = getDefaultValue(states['numColumns'], 1);
+  const moveColumns = getDefaultValue(states['moveColumns'], 1);
+  const space = getDefaultValue(states['space'], 0.1);
+  const centered = getDefaultValue(states['centered'], false);
+  const type = getDefaultValue(states['type'], 'slide');
+  const autoPlay = getDefaultValue(states['autoPlay'], false);
+  const duration = getDefaultValue(states['duration'], 300);
+  const loop = getDefaultValue(states['loop'], false);
+  const hoverStop = getDefaultValue(states['hoverStop'], 1);
+  const interval = getDefaultValue(states['interval'], 3000);
 
-  const type = states['type'] ? states['type'].defaultValue : 'slide';
-
-  const autoPlay = states['autoPlay'] ? states['autoPlay'].defaultValue : false;
-  const duration = states['duration'] ? states['duration'].defaultValue : 300;
-  const loop = states['loop'] ? states['loop'].defaultValue : false;
-  const hoverStop = states['hoverStop'] ? states['hoverStop'].defaultValue : 1;
-
-  const interval = states['interval'] ? states['interval'].defaultValue : 3000;
-
+// Using useMemo for performance optimization
   const flattenedChildren = useMemo(() => {
     const flattenedChildren =
       nodes.length > 0
@@ -56,27 +94,16 @@ const Slides = (props) => {
     return flattenedChildren;
   }, [children.length, nodes,]);
 
+// Using useEffect to handle slide transition and loop index
   useEffect(() => {
     let timer;
-
-    const handleSlideTransition = () => {
-      const totalSlides = Math.ceil(flattenedChildren.length / numColumns);
-      let newIndex = activeIndex + 1; // Increment the active index by 1
-
-      if (newIndex >= totalSlides * numColumns) {
-        newIndex = 0; // Reset to the first slide if reached the end
-      }
-
-      updateStates('currentIndex', newIndex);
-      updateStates('activeItem', flattenedChildren[newIndex]);
-    };
 
     if (autoPlay && !isHovered) {
       if (!loop && activeIndex === total - 1) {
         clearInterval(timer);
       } else {
         timer = setInterval(() => {
-          handleSlideTransition();
+          handleSlideTransition(flattenedChildren, numColumns, activeIndex, updateStates);
         }, interval);
       }
     }
@@ -86,38 +113,16 @@ const Slides = (props) => {
     };
   }, [autoPlay, interval, loop, activeIndex, total, isHovered]);
 
-  const setLoopIndex = () => {
-
-    const isSlide = type === 'slide';
-    const cols = isSlide ? numColumns : 1;
-    let moves = isSlide ? moveColumns : 1;
-
-    if (moves > cols)
-      moves = cols;
-
-    let totalSlides = Math.ceil(flattenedChildren.length / moves);
-    // totalSlides += 2;
-    let newIndex = activeIndex;
-
-    if (newIndex >= totalSlides) {
-      newIndex = 0;
-    } else if (newIndex < 0) {
-      newIndex = totalSlides - 1;
-    }
-
-    updateStates('currentIndex', newIndex);
-    updateStates('activeItem', flattenedChildren[newIndex]);
-  };
-
   useEffect(() => {
 
     if (loop)
-      setLoopIndex()
+      setLoopIndex(flattenedChildren, type, numColumns, moveColumns, activeIndex, updateStates);
     else
       updateStates('activeItem', flattenedChildren[activeIndex]);
 
   }, [activeIndex]);
 
+// Event handlers for mouse enter and leave
   const handleMouseEnter = () => {
     setIsHovered(hoverStop);
   };
@@ -126,6 +131,7 @@ const Slides = (props) => {
     setIsHovered(false);
   };
 
+// Render slides
   const renderSlides = useMemo(() => {
 
     let slides = [];
@@ -229,6 +235,7 @@ const Slides = (props) => {
 
   }, [flattenedChildren, numColumns, moveColumns, activeIndex]);
 
+// Render the main slides component
   const slides = useMemo(
     () =>
       element(

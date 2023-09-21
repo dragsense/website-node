@@ -92,6 +92,8 @@ const GetForms = catchAsync(async (req, res) => {
 
 
 const Submit = catchAsync(async (req, res) => {
+
+
     // Extract files from the request
     let files = req.files;
 
@@ -110,6 +112,7 @@ const Submit = catchAsync(async (req, res) => {
         });
     }
 
+    
     // Submit the updated files to the form service
     await formService.submit(updatedFiles, req.params.id, req.body);
 

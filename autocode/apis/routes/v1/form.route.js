@@ -3,7 +3,6 @@ const express = require('express')
 const { formController } = require('../../controllers');
 const { sharedValidation, formValidation } = require('../../validations');
 const validate = require('../../../middlewares/validate');
-const uploadFile = require('../../../middlewares/file-upload');
 
 
 const router = express.Router()
@@ -20,10 +19,12 @@ router.get('/:id',  formController.GetForm);
 router.put('/:id', validate(formValidation.formSchema), formController.UpdateForm);
 router.post('/elements/:id', validate(formValidation.elementsSchema), formController.UpdateElements);
 router.post('/styles/:id', validate(formValidation.styleSchema), formController.UpdateStyle);
-router.post('/submit/:id',  uploadFile.array('files[]', 10), formController.Submit);
 router.post('/publish/:id', formController.PublishForm);
 
 router.delete('/:id', formController.DeleteForm);
 
-module.exports = router
+module.exports = {
+    formRoute: router,
+    formSubmit: formController.Submit
+}
 

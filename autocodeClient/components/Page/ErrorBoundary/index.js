@@ -24,10 +24,10 @@ class ErrorBoundary extends React.Component {
     if (this.state.hasError) {
       // You can render any custom fallback UI
       return (
-        <div>
+        <>
           <span style={{ color: "red" }}>An Error Has Occured</span>
           <details>{this.state.error && this.state.error.toString()}</details>
-        </div>
+        </>
       );
     }
 

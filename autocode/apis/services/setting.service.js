@@ -25,22 +25,6 @@ const publicDir = path.resolve(process.cwd(), 'public');
 
 
 
-const getValue = (elem, value = '', states, props) => {
-    const type = elem.type;
-    const key = elem.key;
-
-    switch (type) {
-        case 'STATES':
-            return getStateValue(key, states);
-        case 'PROPS':
-            return getStateValue(key, props);
-        default:
-            return value;
-    }
-
-}
-
-
 /**
  * Create a setting
  * @param {Object} settingBody
@@ -78,7 +62,7 @@ const getSettings = async () => {
  * @param {String} id
  * @returns {Promise<Collection>}
  */
-const getPageData = async (id, type, withCss = false, document) => {
+const getPageData = async (id, type, host, withCss = false, document) => {
 
 
 
@@ -90,12 +74,10 @@ const getPageData = async (id, type, withCss = false, document) => {
         states: 1,
         relationships: 1,
         styles: 1,
-
+        parent: 1,
         collStates: 1,
         events: 1,
         published: 1,
-
-
         attached: 1,
         type: 1,
         setting: 1,
@@ -185,10 +167,11 @@ const getPageData = async (id, type, withCss = false, document) => {
                 name: document?.name || page.name,
                 slug: document?.slug || page.slug,
                 relationships: relationships,
-                populatedRelationships: document.populatedRelationships,
+                populatedRelationships: document?.populatedRelationships,
                 creator: document?.creator || page.creator,
                 createdAt: document?.createdAt || page.createdAt,
                 url: document?.url || page.url,
+                host,
                 ...settingData
             }
 
@@ -558,11 +541,11 @@ const getPageData = async (id, type, withCss = false, document) => {
         }
 
         // Return the css, pages, layout and states
+
         return {
             css,
             pages,
             layout: { top: LayoutComponents[0], bottom: LayoutComponents[1] },
-            states: page.states || {}
         };
     } catch (error) {
         // Log the error and rethrow it
@@ -571,11 +554,11 @@ const getPageData = async (id, type, withCss = false, document) => {
     }
 };
 
-const generatePages = async (_pages, pagesFolder, setting, fontCssString, AutoCode, AutocodeCustom) => {
+const generatePages = async (_pages, pagesFolder, setting, host, fontCssString, AutoCode, AutocodeCustom) => {
     // Iterate over each page
     for (const page of _pages) {
         // Fetch page data
-        const pagesResults = await getPageData(page._id, page.type, true, null);
+        const pagesResults = await getPageData(page._id, page.type, host, true, null);
 
         // Prepare setting data
         const settingData = prepareSettingData(setting);
@@ -661,7 +644,7 @@ const writeFilesToFolder = (pagesFolder, pagesResults, page, html) => {
  * @param
  * @returns {Promise<download>}
  */
-const download = async (query, res, AutoCode, AutocodeCustom) => {
+const download = async (query, res, host, AutoCode, AutocodeCustom) => {
     try {
         // Destructure the query parameters
         const { name, isPage, isComponent, isForm, isCollection, projectId } = query;
@@ -697,19 +680,19 @@ const download = async (query, res, AutoCode, AutocodeCustom) => {
 
         // Generate pages, components, forms and collections based on the query parameters
         if (Boolean(isPage == 'true')) {
-            await generateEntities(Page, pagesFolder, setting, fontCssString, AutoCode, AutocodeCustom);
+            await generateEntities(Page, pagesFolder, setting, host, fontCssString, AutoCode, AutocodeCustom);
         }
 
         if (Boolean(isComponent == 'true')) {
-            await generateEntities(Component, compsFolder, setting, fontCssString, AutoCode, AutocodeCustom);
+            await generateEntities(Component, compsFolder, setting, host, fontCssString, AutoCode, AutocodeCustom);
         }
 
         if (Boolean(isForm == 'true')) {
-            await generateEntities(Form, formsFolder, setting, fontCssString, AutoCode, AutocodeCustom);
+            await generateEntities(Form, formsFolder, setting, host, fontCssString, AutoCode, AutocodeCustom);
         }
 
         if (Boolean(isCollection == 'true')) {
-            await generateEntities(Collection, collsFolder, setting, fontCssString, AutoCode, AutocodeCustom);
+            await generateEntities(Collection, collsFolder, setting, host, fontCssString, AutoCode, AutocodeCustom);
         }
 
         // Fetch colors and variables
@@ -850,10 +833,19 @@ const getElements = async (id, stream, type, host) => {
         throw new ApiError(httpStatus.NOT_FOUND, 'Elements not found');
     }
 
+
+
+
     // Prepare the document to be sent to the client
     const doc = prepareDocument(page);
 
     doc.host = host;
+
+    if (page.parent) {
+        const parent = await Component.findById(page.parent).select({ states: 1 });
+        doc.props = parent.states;
+    }
+
 
     // Convert the document to a string and push it to the stream
     const chunkStr = JSON.stringify(doc) + '\n';
@@ -866,8 +858,14 @@ const getElements = async (id, stream, type, host) => {
     const components = doc.components || [];
     const forms = doc.forms || [];
 
-    await loadComponents(components, projection, loaded);
-    await loadForms(forms, projection, loaded)
+    const collection = page.attached;
+    if (collection)
+        await loadCollection(collection, projection, loaded, stream);
+
+
+
+    await loadComponents(components, projection, loaded, stream);
+    await loadForms(forms, projection, loaded, stream)
 
     stream.push(null);
 
@@ -891,6 +889,7 @@ const getProjection = () => {
         _states: 1,
         _events: 1,
         attached: 1,
+        parent: 1,
         type: 1,
         setting: 1,
         createdAt: 1,
@@ -933,24 +932,31 @@ const prepareDocument = (collection) => {
         name: collection.name,
         slug: collection.slug,
         url: collection.url,
-        _id: collection._id
+        _id: collection._id,
+        attached: collection.attached,
+        parent: collection.parent
+
     }
     if (!collection.published) {
         doc.elements = collection._elements;
         doc.components = collection._components;
         doc.forms = collection._forms;
         doc.states = collection._states;
+        doc.collStates = collection._collStates;
+
     } else {
         doc.elements = collection.elements;
         doc.components = collection.components;
         doc.forms = collection.forms;
         doc.states = collection.states;
+        doc.collStates = collection.collStates;
+
     }
     return doc;
 };
 
 // Function to load the components of a document
-const loadComponents = async (components, projection, loaded) => {
+const loadComponents = async (components, projection, loaded, stream) => {
     for (let i = 0; i < components.length; i++) {
         const component = await Component.findById(components[i]).select(projection);
         if (component && !loaded[components[i]]) {
@@ -960,15 +966,15 @@ const loadComponents = async (components, projection, loaded) => {
             stream.push(chunkStr);
             const collection = component.attached;
             if (collection)
-                await loadCollection(collection, projection, loaded);
+                await loadCollection(collection, projection, loaded, stream);
             const innerComponents = doc.components || [];
-            await loadComponents(innerComponents, projection, loaded);
+            await loadComponents(innerComponents, projection, loaded, stream);
         }
     }
 };
 
 // Function to load the forms of a document
-const loadForms = async (forms, projection, loaded) => {
+const loadForms = async (forms, projection, loaded, stream) => {
     for (let i = 0; i < forms.length; i++) {
         const form = await Form.findById(forms[i]).select(projection);
         if (form && !loaded[forms[i]]) {
@@ -977,13 +983,13 @@ const loadForms = async (forms, projection, loaded) => {
             const chunkStr = JSON.stringify(doc) + '\n';
             stream.push(chunkStr);
             const innerComponents = doc.components || [];
-            await loadComponents(innerComponents, projection, loaded);
+            await loadComponents(innerComponents, projection, loaded, stream);
         }
     }
 };
 
 // Function to load a collection
-const loadCollection = async (collectionId, projection, loaded) => {
+const loadCollection = async (collectionId, projection, loaded, stream) => {
     if (collectionId && !loaded[collectionId]) {
         loaded[collectionId] = true;
         const collections = getCollectionsToPopulate();
@@ -1005,7 +1011,6 @@ const getCss = async (id, type) => {
     // Define the fields to be returned
     const projection = {
         styles: 1,
-        elements: 1,
         components: 1,
         forms: 1,
         _id: 1,
@@ -1028,8 +1033,6 @@ const getCss = async (id, type) => {
         page = await Page.findById(id).select(projection);
 
 
-    // Fetch the collection by id
-    page = await Collection.findById(id).select(projection);
     if (!page) {
         return { css };
     }
@@ -1037,14 +1040,19 @@ const getCss = async (id, type) => {
     // Prepare the document object
     const doc = prepareDocument(page);
 
+    if (!page.published) {
+        doc.styles = page._styles;
+    } else
+        doc.styles = page.styles;
+
     // Generate CSS for the styles
     css = generateCssForStyles(doc, css);
 
     // Load CSS for forms
-    await loadFormsCSS(doc.forms, projection, css);
+    await loadFormsCSS(doc.forms || [], projection, css);
 
     // Load CSS for components
-    await loadComponentsCSS(doc.components, projection, css);
+    await loadComponentsCSS(doc.components || [], projection, css);
 
     return { css }
 };
@@ -1063,6 +1071,12 @@ const loadFormsCSS = async (forms, projection, css) => {
         const form = await Form.findById(forms[i]).select(projection);
         if (form) {
             const doc = prepareDocument(form);
+
+            if (!form.published) {
+                doc.styles = form._styles;
+            } else
+                doc.styles = form.styles;
+
             css = generateCssForStyles(doc, css);
             await loadComponentsCSS(doc.components, projection, css);
         }
@@ -1075,6 +1089,12 @@ const loadComponentsCSS = async (components, projection, css) => {
         const component = await Component.findById(components[i]).select(projection);
         if (component) {
             const doc = prepareDocument(component);
+
+            if (!component.published) {
+                doc.styles = component._styles;
+            } else
+                doc.styles = component.styles;
+
             css = generateCssForStyles(doc, css);
             await loadComponentsCSS(doc.components, projection, css);
             await loadFormsCSS(doc.forms, projection, css);
@@ -1087,6 +1107,7 @@ const loadComponentsCSS = async (components, projection, css) => {
 module.exports = {
     getSettings,
     saveSetting,
+    getPageData,
     download,
     getElements,
     getCss

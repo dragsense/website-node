@@ -1,4 +1,6 @@
-import React, { useMemo } from "react";
+const React = require("react");
+
+import { useMemo } from "react";
 import { hydrateRoot } from 'react-dom/client';
 import { PageComponent } from './components';
 import PageServices from './libs/services/page';

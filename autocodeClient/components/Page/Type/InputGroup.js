@@ -1,105 +1,102 @@
+const React = require("react");
 
-import React, { useEffect, useMemo, useState } from 'react';
-import { debounce } from '../../../utils/utils'
+import { useEffect, useMemo, useState, useCallback } from 'react';
 
+// InputGroup component
 const InputGroup = (props) => {
     const { labelPos, onChange, conds,
-        attributes, type, mapValue, disabled, onClick, value, _uid, pos, children } = props;
+        attributes, type, mapValue, value } = props;
 
-    const option = mapValue ? { value: mapValue.value, label: mapValue.label || mapValue.value } : { value: '' };
+    // Option value and label
+    const option = useMemo(() => mapValue ? { value: mapValue.value, label: mapValue.label || mapValue.value } : { value: '' }, [mapValue]);
 
+    // State for checked status
     const [checked, setChecked] = useState(false);
 
-    const onChangeValue = (e) => {
+    // Function to handle value change
+    const handleValueChange = useCallback((e) => {
         e.preventDefault();
         const optionValue = e.target.value;
         let newValue = '';
 
+        // Logic for checked status
         if (checked) {
-            if (type === 'radio' || !value)
-                newValue = "''"
-            else {
-                const valuesArray = String(value).split(",");
-                newValue = valuesArray.filter(v => v !== optionValue).join(",");
-                if (newValue === 'all')
-                    newValue = '';
-            }
+            newValue = handleCheckedStatus(type, value, optionValue);
         }
         else {
-            if (type === 'radio' || !value)
-                newValue = optionValue;
-            else {
-                newValue = value + "," + optionValue;
-                if(optionValue === 'all')
-                newValue = 'all';
-
-            }
+            newValue = handleUncheckedStatus(type, value, optionValue);
         }
 
+        // Debounce onChange function
         if (onChange) {
-            debounce(onChange(newValue, optionValue === 'all'), 500)
+           onChange(newValue, optionValue === 'all')
         }
+
+        // Toggle checked status
         setChecked(!checked);
+    }, [checked, onChange]);
 
+    // Function to handle checked status
+    const handleCheckedStatus = (type, value, optionValue) => {
+        let newValue = '';
+        if (type === 'radio' || !value)
+            newValue = "''"
+        else {
+            const valuesArray = String(value).split(",");
+            newValue = valuesArray.filter(v => v !== optionValue).join(",");
+            if (newValue === 'all')
+                newValue = '';
+        }
+        return newValue;
+    };
 
-    }
+    // Function to handle unchecked status
+    const handleUncheckedStatus = (type, value, optionValue) => {
+        let newValue = '';
+        if (type === 'radio' || !value)
+            newValue = optionValue;
+        else {
+            newValue = value + "," + optionValue;
+            if(optionValue === 'all')
+            newValue = 'all';
+        }
+        return newValue;
+    };
 
-
+    // Effect to handle checked status
     useEffect(() => {
         let isChecked = false;
 
+        isChecked = handleIsChecked(value, type, option);
+
+        setChecked(isChecked);
+    }, [value, type, option]);
+
+    // Function to handle isChecked status
+    const handleIsChecked = (value, type, option) => {
+        let isChecked = false;
         if (typeof value === 'string') {
             isChecked = type === 'radio'
                 ? value === option.value || (option.value === 'all' && value.includes('all'))
                 : value.split(',').some(v => v === option.value);
-
-
         } else if (typeof value === 'boolean') {
             isChecked = value === (option.value.toLowerCase() === 'true'); // Convert string to boolean
         } else if (!isNaN(Number(value))) { // Check if value is a number
             isChecked = Number(value) === Number(option.value); // Convert string to number
         }
+        return isChecked;
+    };
 
-        setChecked(isChecked);
-    }, [value]);
-
+    // Input element
     const input = <>{labelPos == 0 && option.label}<input key={checked} type={type} {...attributes}
-
-        onClick={onChangeValue}
+        onClick={handleValueChange}
         value={option.value}
         checked={checked === true} />  {labelPos == 1 && option.label}</>
 
-    const disabledStyles = {
-        opacity: 0.2,
-        border: '1px dashed #ccc',
-    };
-
-    const clonedElement = React.cloneElement(children, {
-        customAttributes: {
-            onClick: onClick,
-
-            "data-id": _uid,
-            "data-pos": pos,
-            "draggable": false,
-            style: { ...(conds ? {} : disabledStyles), outline: '1px dotted #bdbdbd', cursor: 'pointer', paddingInline: '1%', }
-        }
-    }, input);
 
 
-
-
-    const disabledElement = React.cloneElement(children, {
-        customAttributes: {
-
-            onClick: onClick,
-            style: conds ? {} : disabledStyles
-        }
-    });
-
-
-    return disabled ? disabledElement : clonedElement;
-
-
+    // Return disabled or cloned element based on disabled state
+    return conds ? input : null;
 };
 
 export default InputGroup;

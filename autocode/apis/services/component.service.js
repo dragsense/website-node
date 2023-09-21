@@ -52,6 +52,11 @@ const updateComponent = async (id, componentBody) => {
         throw new ApiError(httpStatus.NOT_FOUND, 'Component not found');
     }
 
+    if (componentBody.states) {
+        component._states = componentBody.states;
+    }
+
+
     Object.assign(component, componentBody);
     await component.save();
     return component;

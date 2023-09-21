@@ -1,6 +1,16 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import Dropdown from './dropdown';
 
+// Function to get default value from states
+const getDefaultValue = (states, key, defaultValue) => states[key] ? states[key].defaultValue : defaultValue;
+
+// Function to update states
+const updateState = (key, value, states, updateStates) => {
+    if(value !== states[key].defaultValue) {
+        updateStates(key, value);
+    }
+};
+
 const DropdownItem = (props) => {
   const {
     children,
@@ -10,23 +20,25 @@ const DropdownItem = (props) => {
     node,
   } = props;
 
+// Using useMemo for performance optimization
+  const openDropdown = useMemo(() => getDefaultValue(states, 'openDropdown', 0), [states]);
+  const type = useMemo(() => getDefaultValue(states, 'type', 'fade'), [states]);
+  const expandable = useMemo(() => getDefaultValue(states, 'expandable', false), [states]);
 
-  const openDropdown = states['openDropdown'] ? states['openDropdown'].defaultValue : 0;
-  const type = states['type'] ? states['type'].defaultValue : 'fade';
-  const expandable = states['expandable'] ? states['expandable'].defaultValue : false;
+  const initialValue = useMemo(() => getDefaultValue(states, 'initialValue', '200px'), [states]);
+  const expandValue = useMemo(() => getDefaultValue(states, 'expandValue', '400px'), [states]);
 
-  const intialValue = states['intialValue'] ? states['intialValue'].defaultValue : '200px';
-  const expandValue = states['expandValue'] ? states['expandValue'].defaultValue : '400px';
+  const openSide = useMemo(() => getDefaultValue(states, 'openSide', 'topLeft'), [states]);
+  const leftOffset = useMemo(() => getDefaultValue(states, 'leftOffset', '15px'), [states]);
+  const topOffset = useMemo(() => getDefaultValue(states, 'topOffset', '50px'), [states]);
+  const duration = useMemo(() => getDefaultValue(states, 'duration', 300), [states]);
 
-  const openSide = states['openSide'] ? states['openSide'].defaultValue : "topLeft";
-  const leftOffset = states['leftOffset'] ? states['leftOffset'].defaultValue : '15px';
-  const topOffset = states['topOffset'] ? states['topOffset'].defaultValue : '50px';
-  const duration = states['duration'] ? states['duration'].defaultValue : 300;
-
+// Close dropdown function
   const closeDropdown = () => {
     if(openDropdown === 1)
-    updateStates('openDropdown', 0)
+    updateState('openDropdown', 0, states, updateStates)
   };
+
 
 
   return <Dropdown
@@ -36,10 +48,11 @@ const DropdownItem = (props) => {
     closeDropdown={closeDropdown}
     openSide={openSide}
     expandable={expandable}
-    intialValue={intialValue} 
-  expandValue={expandValue}
+    initialValue={initialValue} 
+    expandValue={expandValue}
     leftOffset={leftOffset}
-    topOffset={topOffset}>{element({ ...node, state: undefined, map: undefined }, children)}</Dropdown>
+    topOffset={topOffset}
+    >{element({ ...node, state: undefined, map: undefined }, children)}</Dropdown>
 };
 
 export default DropdownItem;

@@ -5,8 +5,13 @@ const catchAsync = require('../../utils/catch-async')
 const { documentService } = require('../services')
 
 const GetDocument = catchAsync(async (req, res) => {
+
     const document = await documentService.getDocument(req.params.collectionId, req.params.id, req.query.form === 'true');
-    res.status(httpStatus.OK).send({ document });
+
+    const protocol = req.protocol || 'http';
+    const host = `${protocol}://${req.headers.host}`;
+
+    res.status(httpStatus.OK).send({ document, host });
 });
 
 const CreateDocument = catchAsync(async (req, res) => {
@@ -33,12 +38,18 @@ const GetDocuments = catchAsync(async (req, res) => {
     const filter = pickKeys(req.query, ['name']);
     const options = pickKeys(req.query, ['sortBy', 'limit', 'page']);
     const documents = await documentService.getDocuments(req.params.collectionId, req.query.form === 'true', filter, options);
+
+    
+   
+
     res.status(httpStatus.OK).send({documents});
 });
 
 const GetAllFilteredDocuments = catchAsync(async (req, res) => {
     const filter = pickKeys(req.query, ['name']);
     const options = pickKeys(req.query, ['sortBy', 'limit', 'page', 'status']);
+
+
     const results = await documentService.getAllFilteredDocuments(req.params.collectionId, req.body, filter, options);
     res.status(httpStatus.OK).send(results);
 });

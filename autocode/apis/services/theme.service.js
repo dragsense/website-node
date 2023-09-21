@@ -503,7 +503,7 @@ const getStyle = async (_id, stream) => {
   const style = JSON.parse(data || '{}');
 
   if (Object.keys(style || {}).length > 0) {
-    const chunkStr = JSON.stringify({_id, elements: style}) + '\n';
+    const chunkStr = JSON.stringify({ _id, elements: style }) + '\n';
     stream.push(chunkStr);
   }
 
@@ -536,7 +536,7 @@ const getAnimations = async (_id, stream) => {
   const data = await fsUtils.read(path.join(dataDir, 'animation.json'));
   const style = JSON.parse(data || '{}');
   if (Object.keys(style || {}).length > 0) {
-    const chunkStr = JSON.stringify({_id, elements: style}) + '\n';
+    const chunkStr = JSON.stringify({ _id, elements: style }) + '\n';
     stream.push(chunkStr);
   }
 
@@ -591,10 +591,13 @@ const getCsutomCss = async () => {
  */
 const getAnimationsCss = async () => {
   const data = await fsUtils.read(path.join(dataDir, 'animation.json'));
+  const setting = await fsUtils.read(path.join(dataDir, 'setting.json'));
 
   const animation = JSON.parse(data || '{}');
   const css = generateAnimations(animation)
-  return { css }
+  const settingData = JSON.parse(setting || '{}');
+
+  return { css, _id: settingData._id }
 
 }
 

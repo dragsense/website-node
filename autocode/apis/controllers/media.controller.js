@@ -10,7 +10,11 @@ const CreateMedia = catchAsync(async (req, res) => {
     const file = req.file;
     const type = req.query.type;
     const media = await mediaService.createMedia(file, type);
-    res.status(httpStatus.CREATED).send({ media });
+
+    const protocol = req.protocol || 'http';
+    const host = `${protocol}://${req.headers.host}`;
+
+    res.status(httpStatus.CREATED).send({ media, host });
 });
 
 const UpdateMedia = catchAsync(async (req, res) => {

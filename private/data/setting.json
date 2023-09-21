@@ -5,24 +5,7 @@
     "lang": "en",
     "author": "Rana Awais",
     "keywords": "Easy, Effortless, Rapid",
-    "images": {
-        "favicon": {
-            "_id": "64b7897e0e62eb66579605d9",
-            "src": "http://localhost:3001/static/uploads/images/file-1689749886301.png",
-            "alt": "logo.png",
-            "mimetype": "image/png",
-            "name": "logo.png"
-        },
-        "logo": {
-            "_id": "64b7897e0e62eb66579605d9",
-            "src": "http://localhost:3001/static/uploads/images/file-1689749886301.png",
-            "alt": "logo.png",
-            "mimetype": "image/png",
-            "name": "logo.png"
-        },
-        "mobileLogo": {},
-        "placeholder": {}
-    },
+    "images": {},
     "email": {
         "host": "localhost",
         "port": "1025",
@@ -43,9 +26,9 @@
         "head": "<link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">\n<link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin>\n<link href=\"https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap\" rel=\"stylesheet\">\n<link rel=\"stylesheet\" href=\"https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.2.1/css/fontawesome.min.css\" integrity=\"sha384-QYIZto+st3yW+o8+5OHfT6S482Zsvz2WfOzpFSXMF9zqeLcFV0/wlZpMtyFcZALm\" crossorigin=\"anonymous\">",
         "footer": ""
     },
-    "_id": "64f458c4a459bfd838be4d87",
+    "_id": "650aeb656dc7b0dfed256d6f",
     "homePage": {
-        "_id": "650746c01d775f1a1dd10fbd",
-        "name": "Home"
+        "_id": "650c54e5fe68a00e7d15cca7",
+        "name": "Home Page"
     }
 }

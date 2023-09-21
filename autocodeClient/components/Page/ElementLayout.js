@@ -1,42 +1,24 @@
 const React = require("react");
 
-import { useState, useEffect, useMemo } from 'react';
+import  { useMemo } from 'react';
 
 import {
     Slides, Tabs, TabsButton, TabsContent, Accordion, AccordionItems, Modal, Gallery,
     Sider,
-    Dropdown, Gototop, Menu, Observable, Searchable
+    Dropdown, Gototop, Menu, Observable
 } from './components';
 
 import ElementSetting from './ElementSetting';
 
+// Destructuring props for better readability and performance
 const ElementLayout = (props) => {
 
-    const {
-        _states,
-        _cstates,
-        updateStates,
-        nodes,
-        layout,
-        pos,
-        mapNodes,
-        options,
-        mapIndex,
-        mapValue,
-        isActive,
-        node,
-        children } = props;
+    const { _states, _cstates, updateStates, nodes, layout, pos,
+        mapNodes, options, mapIndex, mapValue, isActive, node, children } = props;
 
-
-
-
-
-    const element = (node, children,
-        mapValue,
-        mapIndex) => {
-
+    // Function to handle element setting
+    const handleElementSetting = (node, children, mapValue, mapIndex) => {
         return <ElementSetting
-
             {...props}
             node={node}
             _states={_states}
@@ -65,129 +47,120 @@ const ElementLayout = (props) => {
         </ElementSetting>
     }
 
-
-
+    // useMemo for performance optimization
     const elements = useMemo(() => {
-
-
         return nodes.length > 0 ?
-            nodes.map((mapValue, mapIndex) => element(node, children, mapValue, mapIndex)) :
-            element(node, children, mapValue, mapIndex);
+            nodes.map((mapValue, mapIndex) => handleElementSetting(node, children, mapValue, mapIndex)) :
+            handleElementSetting(node, children, mapValue, mapIndex);
 
     }, [nodes])
 
+    // Switch case for different layout types
     switch (layout) {
         case 'slides':
             return <Slides
                 states={_cstates}
                 node={node}
                 nodes={nodes}
-                element={element}
+                element={handleElementSetting}
                 updateStates={updateStates}>{children}</Slides>
 
         case 'tabs':
             return <Tabs
                 node={node}
                 nodes={nodes}
-                element={element}
+                element={handleElementSetting}
             >{children}</Tabs>
-            break;
+
         case 'tabs-btn':
             return <TabsButton
                 states={_cstates}
                 node={node}
                 nodes={mapNodes}
-                element={element}
+                element={handleElementSetting}
                 updateStates={updateStates}
             >{children}</TabsButton>
-            break;
+
         case 'tabs-content':
             return <TabsContent
                 states={_cstates}
                 node={node}
                 nodes={nodes}
-                element={element}
+                element={handleElementSetting}
                 updateStates={updateStates}
             >{children}</TabsContent>
-            break;
+
         case 'accordions':
 
             return <AccordionItems
                 states={_cstates}
                 node={node}
                 nodes={nodes}
-                element={element}
+                element={handleElementSetting}
                 updateStates={updateStates}>{children}</AccordionItems>
-            break;
+
         case 'accordion':
             const duration = _cstates['duration'] ? _cstates['duration'].defaultValue : 300;
 
-            return element(node, <Accordion
+            return handleElementSetting(node, <Accordion
                 isActive={isActive}
                 duration={duration}
             >{children}</Accordion>)
-            break;
+
         case 'modal':
             return <Modal
                 states={_cstates}
                 node={node}
                 nodes={nodes}
-                element={element}
+                element={handleElementSetting}
                 updateStates={updateStates}>{children}</Modal>
-            break;
+
         case 'gallery':
             return <Gallery
                 states={_cstates}
                 node={node}
                 nodes={nodes}
-                element={element}
+                element={handleElementSetting}
                 updateStates={updateStates}>{children}</Gallery>
         case 'sider':
             return <Sider
                 states={_cstates}
                 node={node}
                 nodes={nodes}
-                element={element}
+                element={handleElementSetting}
                 updateStates={updateStates}>{children}</Sider>
-            break;
+
         case 'dropdown':
             return <Dropdown
                 states={_cstates}
                 node={node}
-                element={element}
+                element={handleElementSetting}
                 updateStates={updateStates}>{children}</Dropdown>;
-            break;
+
         case 'gototop':
             return <Gototop
                 states={_cstates}
                 node={node}
-                element={element}
+                element={handleElementSetting}
                 updateStates={updateStates}>{children}</Gototop>;
         case 'observable':
             return <Observable
                 states={_cstates}
                 node={node}
-                element={element}
+                element={handleElementSetting}
                 updateStates={updateStates}>{children}
             </Observable>;
-        case 'searchable':
-            return <Searchable
-                states={_cstates}
-                node={node}
-                element={element}
-                updateStates={updateStates}>{children}
-            </Searchable>;
         case 'menu':
             return <Menu states={_cstates}
                 node={node}
                 nodes={nodes}
-                element={element}
+                element={handleElementSetting}
                 updateStates={updateStates}>{children}</Menu>;
-            break;
+
         case 'select':
         case 'multiselect':
 
-            return element(node, nodes.length > 0 ?
+            return handleElementSetting(node, nodes.length > 0 ?
                 nodes.map((mapValue, mapIndex) =>
                     <ElementSetting
                         key={mapValue.key || mapIndex}
@@ -203,7 +176,7 @@ const ElementLayout = (props) => {
 
 
 
-            break;
+
         default:
             return elements;
     }

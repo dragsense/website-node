@@ -1,55 +1,55 @@
-const React = require("react");
 
-import { useEffect, useMemo } from "react";
+import React, { useEffect } from "react";
 
 import ElementSetting from "./ElementSetting";
-import { getStates,} from '../../utils/element-value';
+import { getStates } from '../../utils/element-value';
 
+// CustomComponent is a component that loads a custom component from a given path and manages its states and props
 const CustomComponent = (props) => {
 
-    const { children, customPath, 
-        node, 
-        _states, _props, 
-        AutocodeCustom, 
-        onSetStates, mapValue, mapIndex } = props;
+    const { children, customPath, node, _states, _props, onSetStates, mapValue, mapIndex } = props;
 
-
+    // Function to load the custom component
     const loadComponent = async (path) => {
-    }; <div>This component is Loading...</div>,
-
-        useEffect(() => {
-            loadComponent(customPath);
-        }, [])
-
-    const getStateValue = (key) => {
-        if (!_states || !key) {
-            return null;
-        }
-
-        return getStates(key, _states)
-
+        // logic to load component
     };
 
+    // useEffect to load the component when the component mounts
+    useEffect(() => {
+        loadComponent(customPath);
+    }, [])
+
+    // Function to get the state value for a given key
+    const getStateValue = (key) => {
+        if (!_states || key) {
+            return null;
+        }
+        return getStates(key, _states)
+    };
+
+    // Function to get the prop value for a given key
     const getPropValue = (key) => {
-        if (!_states || !key) {
+        if (!_states || key) {
             return null;
         }
         return getStates(key, _props)
-
     };
 
-
+    // Function to update the state for a given key and value
     const updateState = (key, value) => {
-        if (onSetStates)
+        if (onSetStates) {
             onSetStates(key, value, 'STATES')
+        }
     }
 
+    // Function to update the prop for a given key and value
     const updateProp = (key, value) => {
-        if (onSetStates)
+        if (onSetStates) {
             onSetStates(key, value, "PROPS")
+        }
     }
+
     return (
-        <div id="custom-component">
             <ElementSetting
                 {...props}
                 attributes={node.attributes}
@@ -64,7 +64,6 @@ const CustomComponent = (props) => {
                 updateProp={updateProp}
                 updateState={updateState}>{children}</AutocodeCustom></> : children}</ElementSetting>
 
-        </div>
     );
 
 

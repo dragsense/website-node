@@ -7,7 +7,12 @@ const { collectionService, settingService } = require('../services')
 
 const GetCollection = catchAsync(async (req, res) => {
     const collection = await collectionService.getCollection(req.params.id);
-    res.status(httpStatus.OK).send({ collection });
+
+    
+    const protocol = req.protocol || 'http';
+    const host = `${protocol}://${req.headers.host}`;
+
+    res.status(httpStatus.OK).send({ collection, host });
 });
 
 

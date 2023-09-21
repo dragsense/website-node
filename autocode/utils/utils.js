@@ -175,16 +175,15 @@ const generateAnimations = (elements) => {
 }
 
 // Function to generate CSS for a single animation
-const generateAnimationCss = (name, style) => {
+const generateAnimationCss = (name, s) => {
   let css = '';
 
   css += `@keyframes ${name}` + ' {\n';
 
-  Object.keys(style).map((key) => {
-    if (style[key]) {
-      const s = style[key];
-      css += generateStyleCss(s, s.selectorText);
-    }
+
+  Object.keys(s).map((key) => {
+    let properties = Object.entries(s[key].properties || {}).map(([key, property]) => `${key}: ${property.value} ${property.priority ? "!important" : ""}`).join(';');
+    css += `${key} {\n  ${properties}\n}\n\n`;
   });
   css += ' }\n';
 

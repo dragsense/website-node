@@ -60,6 +60,10 @@ const updateForm = async (id, formBody) => {
     if (formBody.emailbody)
         formBody.emailbody.footer = he.decode(formBody.emailbody.footer)
 
+    if (formBody.states) {
+        form._states = formBody.states;
+    }
+
 
 
     Object.assign(form, formBody);
@@ -115,7 +119,7 @@ const publishForm = async (id, formBody) => {
     form.published = true;
 
     form.updater = updater
-    
+
     Object.assign(form, formBody);
     await form.save();
     return form;
@@ -287,7 +291,6 @@ const submit = async (files, id, states) => {
     // Validate form and states
     const form = await validateForm(id);
     const formStates = validateStates(form, states);
-
     // Handle files if any
     let attachments = [];
     if (files) {
@@ -481,6 +484,7 @@ async function sendEmail(form, formStates, attachments) {
 // Record form
 async function recordForm(form, formStates) {
     const modelName = form.slug;
+
     const DocumentModel = Document(modelName)
 
     const uniqueId = uuidv4().substring(0, 6);
@@ -488,8 +492,14 @@ async function recordForm(form, formStates) {
     const body = {
         name: form.name + " " + getCurrentDate(),
         slug: 'form' + `_${uniqueId}`,
-        states: formStates
+        states: formStates,
+        coll: {
+            _id: form._id,
+            slug: form.slug
+        }
     }
+    console.log(body)
+
     await DocumentModel.create(body)
 }
 

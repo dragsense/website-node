@@ -1,10 +1,28 @@
+const React = require("react");
 
-import React, { Children, useMemo } from 'react';
+import { Children, useMemo, useCallback } from 'react';
 
 
+
+// Function to create custom attributes for the element
+const createCustomAttributes = ( onMouseMove,  onClick, onScroll) => {
+    return {
+        onMouseMove,
+        onScroll,
+        onClick: onClick ? onClick : (e) => {
+            const currentElement = e.target;  
+            if (currentElement.tagName.toLowerCase() === 'a' ||
+            currentElement.parentNode.tagName.toLowerCase() === 'a') {
+            // Prevent the default behavior for anchor links
+            e.preventDefault();
+            }
+        },
+
+    }
+}
 
 const Component = ({
-  
+
     onMouseMove,
     conds,
     onScroll,
@@ -12,38 +30,20 @@ const Component = ({
     innerWraaper,
     value,
     children,
-    }) => {
+     }) => {
+
+    // Create a span element if innerWraaper is not provided
+    const spanElement = useMemo(() => {
+        return innerWraaper.length > 0 && innerWraaper ? innerWraaper : null;
+    }, [innerWraaper, value]);
+
+    const customAttributes = createCustomAttributes(onMouseMove,onClick, onScroll);
+
+    const clonedElement = useMemo(() => React.cloneElement(children, { customAttributes }, spanElement), [children, customAttributes, spanElement]);
 
 
- 
-
-    const spanElement = innerWraaper ? (<>
-        {React.isValidElement(value) ? value : <div
-            dangerouslySetInnerHTML={{ __html: value }}
-         
-        />
-        }
-        {innerWraaper}</>
-    ) : <span style={{ userSelect: 'none', color: "#cccccc" }}></span>;
-
-
-
-    const clonedElement = React.cloneElement(children, {
-        customAttributes: {
-            onMouseMove: onMouseMove,
-            onScroll: onScroll,
-            onClick: onClick
-        }
-    }, spanElement);
-
-
-
-
-   
-
-
+    // Return disabled element if disabled, else return clonedElement
     return conds ? clonedElement : null;
-
 
 };
 

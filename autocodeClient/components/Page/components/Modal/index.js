@@ -1,52 +1,54 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { Transition } from 'react-transition-group';
 
-const Modal = ({ children,
-    states,
-    element,
-    node,
-}) => {
+// Function to get default value from states
+const getDefaultValue = (states, key, defaultValue) => states[key] ? states[key].defaultValue : defaultValue;
 
+// Function to get transition styles
+const getTransitionStyles = (type, duration) => transitions[type].getTransition(duration);
+
+// Function to render modal content
+const renderModalContent = (nodeRef, baseStyle, transitionStyles, node, element, children) => {
+    return <div ref={nodeRef} style={{ ...baseStyle, ...transitionStyles }}>{element(
+        { ...node, state: undefined, map: undefined }, children)}</div>;
+};
+
+const Modal = ({ children, states, element, node }) => {
     const nodeRef = useRef(null);
 
-    const openModal = states['openModal'] ? states['openModal'].defaultValue : 'close';
-console.log(openModal)
+    // Get default values from states
+    const openModal = getDefaultValue(states, 'openModal', 'close');
+    const type = getDefaultValue(states, 'type', 'fade');
+    const duration = getDefaultValue(states, 'duration', 300);
+    const zIndex = getDefaultValue(states, 'zIndex', 1000);
 
-    const type = states['type'] ? states['type'].defaultValue : 'fade';
-    const duration = states['duration'] ? states['duration'].defaultValue : 300;
-    const zIndex = states['zIndex'] ? states['zIndex'].defaultValue : 1000;
+    // Get transition styles
+    const modalTransition = getTransitionStyles(type, duration);
 
-    const modalTransition = transitions[type].getTransition(duration);
-
+    // Base style for modal
+    const baseStyle = useMemo(() => ({
+        position: 'fixed',
+        left: 0,
+        top: 0,
+        bottom: 0,
+        right: 0,
+        zIndex: zIndex,
+        width: '100%',
+        height: '100%',
+        ...modalTransition.defaultStyles,
+    }), [zIndex, modalTransition]);
 
     return <Transition nodeRef={nodeRef} in={openModal === 'open'} timeout={duration}>
         {state => {
-            const baseStyle = {
-                position: 'fixed',
-                left: 0,
-                top: 0,
-                bottom: 0,
-                right: 0,
-                zIndex: zIndex,
-                width: '100%',
-                height: '100%',
-                ...modalTransition.defaultStyles,
-            };
             const transitionStyles = modalTransition[state];
-            return <div ref={nodeRef} style={{ ...baseStyle, ...transitionStyles }}>{element(
-                { ...node, state: undefined, map: undefined }, children)}</div>;
-
+            return renderModalContent(nodeRef, baseStyle, transitionStyles, node, element, children);
         }}
     </Transition>
-
 };
 
-export default Modal;
-
-
+export default React.memo(Modal);
 
 const transitions = {
-
     fade: {
         getTransition: (duration = 300) => {
             const defaultStyles = {
@@ -128,4 +130,6 @@ const transitions = {
         },
       },
 };
+
+
 

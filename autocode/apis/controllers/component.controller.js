@@ -9,7 +9,11 @@ const { Readable } = require('stream');
 
 const GetComponent = catchAsync(async (req, res) => {
     const component = await componentService.getComponent(req.params.id);
-    res.status(httpStatus.OK).send({ component });
+
+    const protocol = req.protocol || 'http';
+    const host = `${protocol}://${req.headers.host}`;
+
+    res.status(httpStatus.OK).send({ component, host });
 });
 
 const GetPaths = catchAsync(async (req, res) => {

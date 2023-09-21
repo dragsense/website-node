@@ -1,35 +1,44 @@
+const React = require("react");
 
-import React, { useMemo } from 'react';
+import  { useMemo } from 'react';
+
+// Function to create image object
+const createImageObject = (value) => {
+    
+    return value.value ?
+        { src: value.value, alt: value.label || "image" } :
+        { src: value || value, alt: "image" };
+}
+
+// Function to create custom attributes for image element
+const createCustomAttributes = (_uid, onMouseMove, onClick, image) => {
+    return {
+        onMouseMove: onMouseMove,
+        onClick: onClick,
+        src: image.src, alt: image.alt,
+    }
+}
 
 const Image = (props) => {
-    const { conds,
-        onMouseMove,
-        onClick, value, children } = props;
+    const { _uid, conds,  onMouseMove, onClick, value, children } = props;
 
+    // Styles for disabled image
+    const disabledStyles = useMemo(() => ({
+        opacity: 0.2,
+        border: '1px dashed #ccc',
+    }), []);
 
-    const image =
-        value.value ?
-            { src: value.value, alt: value.label || "image" } :
-            { src: value || value, alt: "image" };
+    // Create image object
+    const image = useMemo(() => createImageObject(value), [value]);
+   
+    // Create custom attributes for image element
+    const customAttributes = useMemo(() => createCustomAttributes(_uid, onMouseMove, onClick, image), [_uid,onMouseMove, onClick, image]);
 
-    const ImageElement = React.cloneElement(children, {
-        customAttributes: {
-            onMouseMove: onMouseMove,
-            onClick: onClick,
+    // Clone children and add custom attributes
+    const ImageElement = useMemo(() => React.cloneElement(children, { customAttributes }), [children, customAttributes]);
 
-            src: image.src, alt: image.alt,
-
-
-        }
-
-    })
-
-
-
-
+    // Return disabled element if disabled, else return ImageElement
     return conds ? ImageElement : null;
-
-
 };
 
 export default Image;
