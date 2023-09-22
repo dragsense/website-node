@@ -86,7 +86,7 @@ const ElementComponent = (props) => {
     const [states, setStates] = useState(node.states);
     const [state, setState] = useState(null);
 
-    const setValue = useCallback((elem, value, withValue) => {
+    const setValue = (elem, value, withValue) => {
         const type = elem.type;
         const key = elem.key;
 
@@ -109,7 +109,7 @@ const ElementComponent = (props) => {
             default:
                 return;
         }
-    }, [states]);
+    };
 
     useEffect(() => {
         if (!node)
@@ -123,7 +123,7 @@ const ElementComponent = (props) => {
             return;
         const { elem, stateValue, withValue } = state;
         setValue(elem, stateValue, withValue);
-    }, [state, setValue]);
+    }, [state]);
 
     const onClick = useCallback((node, stateValue, withValue) => {
         handleOnClick(node, stateValue, withValue, fun, setState);

@@ -12,7 +12,6 @@ function TreeNode(props) {
   const node = pages[_id].elements[_uid];
 
 
-
   if (!node)
     return null;
 

@@ -22,13 +22,17 @@ const GetSettings = catchAsync(async (req, res) => {
 
 
 const GetPageData = catchAsync(async (req, res) => {
-    const setting = await settingService.GetPageData(req.params.id, 'page')
-    res.status(httpStatus.OK).send({ setting })
+    const protocol = req.protocol || 'http';
+    const host = `${protocol}://${req.headers.host}`;
+    const results = await settingService.getPageData(req.params.id, 'page', host)
+    res.status(httpStatus.OK).send(results)
 })
 
 const GetCollectionData = catchAsync(async (req, res) => {
-    const setting = await settingService.GetPageData(req.params.id, 'collection')
-    res.status(httpStatus.OK).send({ setting })
+    const protocol = req.protocol || 'http';
+    const host = `${protocol}://${req.headers.host}`;
+    const results = await settingService.getPageData(req.params.id, 'collection', host)
+    res.status(httpStatus.OK).send(results)
 })
 
 

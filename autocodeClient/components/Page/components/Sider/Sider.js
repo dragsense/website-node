@@ -20,7 +20,7 @@ const Slider = ({ children, openSider, duration, type, initialValue, expandValue
   const [prevType, setPrevType] = useState(type);
 
   // Memoize transition styles for performance
-  const sliderTransition = useMemo(() => getTransitionStyles(type, duration, initialValue, expandValue), [type, duration, initialValue, expandValue]);
+  let sliderTransition = useMemo(() => getTransitionStyles(type, duration, initialValue, expandValue), [type, duration, initialValue, expandValue]);
 
   // Update transition styles if type changes
   useEffect(() => {

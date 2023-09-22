@@ -19,7 +19,7 @@ const handlePageNotFound = (res) => {
         <title>404</title>
       </head>
       <body>
-        <div id="root">Page Not Found.</div>
+        <div id="root">Something went wrong.</div>
       </body>
     </html>
   `);
@@ -37,8 +37,12 @@ module.exports = (app, AutoCode, AutocodeCustom, libraryName) => {
 
   app.get('*', async (req, res) => {
     try {
+
+   
+
       const dynamicSlugs = req.params[0].replace(/^\//, '');
       const slugParts = dynamicSlugs.split('/');
+
 
       const projection = {
         _id: 1,
@@ -60,6 +64,7 @@ module.exports = (app, AutoCode, AutocodeCustom, libraryName) => {
         }).select(projection);
       }
       else {
+
         // Check if home page is set
         if (setting.homePage && (slugParts.length <= 0 || dynamicSlugs === '')) {
           page = await Page.findOne({ _id: setting.homePage._id, 'setting.status': "PUBLIC" }
@@ -79,6 +84,8 @@ module.exports = (app, AutoCode, AutocodeCustom, libraryName) => {
             },
             ).select(projection);
 
+            
+
             if (page) {
               const modelName = page.slug;
               DocumentModel = Document(modelName);
@@ -92,6 +99,7 @@ module.exports = (app, AutoCode, AutocodeCustom, libraryName) => {
           }
       }
 
+
       // If page not found, check if error page is set
       if (!page && setting.errorPage) {
         page = await Page.findOne({ _id: setting.errorPage._id, 'setting.status': "PUBLIC" },
@@ -104,9 +112,10 @@ module.exports = (app, AutoCode, AutocodeCustom, libraryName) => {
         return;
       }
 
+
       const protocol = req.protocol || 'http';
       const host = `${protocol}://${req.headers.host}`;
-
+     
       const pagesResults = await fetchPageData(page, host, document);
 
       const settingData = {
@@ -119,7 +128,7 @@ module.exports = (app, AutoCode, AutocodeCustom, libraryName) => {
         }
       };
 
-      const htmlString = AutoCode === undefined ? '' :
+      const htmlString =  AutoCode === undefined ? '' :
         ReactDOMServer.renderToString(<AutoCode
           _id={page._id}
           pages={pagesResults.pages}
@@ -129,6 +138,7 @@ module.exports = (app, AutoCode, AutocodeCustom, libraryName) => {
           type={page.type || 'page'}
           AutocodeCustom={AutocodeCustom}
         />);
+
 
       const pageData = {
         type: page.type || 'page',
@@ -177,6 +187,7 @@ module.exports = (app, AutoCode, AutocodeCustom, libraryName) => {
         return cssString;
       }, '');
 
+      
       res.send(`
         <!DOCTYPE html>
         <html>
@@ -185,7 +196,7 @@ module.exports = (app, AutoCode, AutocodeCustom, libraryName) => {
           page.setting.title :
           setting.webtitle ?
             setting.webtitle : 'Page'}</title>
-    <meta name="description" content="${page.setting?.desc ?
+          <meta name="description" content="${page.setting?.desc ?
           page.setting.desc :
           setting.desc ?
             setting.desc :
@@ -193,7 +204,7 @@ module.exports = (app, AutoCode, AutocodeCustom, libraryName) => {
 
           <meta name="author" content="${setting.author}" />
           <meta name="keywords" content="${setting.keywords}" />
-          <link rel="icon" href="${setting.images?.favicon?.src}" />
+          <link rel="icon" href="${host}${setting.images?.favicon?.src || `/images/default/favicon.ico`}" />
           <meta httpEquiv="Content-Language" content="${setting.lang}" />
 
             ${setting.scripts?.head}
@@ -216,6 +227,8 @@ module.exports = (app, AutoCode, AutocodeCustom, libraryName) => {
           </body>
         </html>
       `);
+
+
     } catch (error) {
       console.error(`Error in fetchData: ${error}`);
       handlePageNotFound(res);

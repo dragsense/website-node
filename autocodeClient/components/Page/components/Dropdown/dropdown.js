@@ -32,9 +32,6 @@ const Dropdown = ({
 // Get the transition for the dropdown
   const dropdownTransition = useMemo(() => transitions[transitionType].getTransition(duration, initialValue, expandValue), [transitionType, duration, initialValue, expandValue]);
 
-// Get the iframe and window for event listeners
-  const iframe = useMemo(() => document.querySelector("#ac-editor-iframe-doc"), []);
-  const window = useMemo(() => iframe.contentWindow, [iframe]);
 
 // Handle click outside of dropdown to close it
   const handleClickOutside = (event) => {
@@ -45,11 +42,15 @@ const Dropdown = ({
 
 // Add event listener for clicks outside of dropdown
   useEffect(() => {
+
+    if (typeof window === 'undefined') return;
+
+
     window.addEventListener('click', handleClickOutside);
     return () => {
       window.removeEventListener('click', handleClickOutside);
     };
-  }, [openDropdown, window, handleClickOutside]);
+  }, [openDropdown, handleClickOutside]);
 
 // Render the dropdown with the appropriate transition and styles
   return (

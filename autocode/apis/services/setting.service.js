@@ -23,7 +23,7 @@ const ApiError = require('../../utils/api-error')
 const dataDir = path.resolve(process.cwd(), 'private', 'data');
 const publicDir = path.resolve(process.cwd(), 'public');
 
-
+const { ObjectId } = require('mongodb');
 
 /**
  * Create a setting
@@ -80,6 +80,7 @@ const getPageData = async (id, type, host, withCss = false, document) => {
         published: 1,
         attached: 1,
         type: 1,
+        layout: 1,
         setting: 1,
         createdAt: 1,
         creator: 1,
@@ -100,7 +101,14 @@ const getPageData = async (id, type, host, withCss = false, document) => {
             as: 'populatedRelationships',
             projection: { name: 1, slug: 1, _id: 1, }
         },
+        {
+            collectionName: 'ac_layouts',
+            localField: 'layout',
+            foreignField: '_id',
+            as: 'populatedLayout',
+            projection: { name: 1, _id: 1, components: 1 }
 
+        },
         {
             collectionName: 'ac_medias',
             localField: 'setting.image',
@@ -123,12 +131,11 @@ const getPageData = async (id, type, host, withCss = false, document) => {
 
 
 
-
         // Initialize the pages object
         const pages = {}
 
         // Initialize the css array
-        let css = [];
+        let style = {css: []};
         // If page does not exist, return the pages object, layout object, states object and css array
         if (!page) {
             return { pages, layout: {}, states: {}, css };
@@ -137,10 +144,10 @@ const getPageData = async (id, type, host, withCss = false, document) => {
         // If withCss is true, generate the css for the page styles and add it to the css array
         if (withCss) {
             const styles = page.styles || {};
-            css = [...css, generateElementsCss(styles, page._id)];
+            style.css = [...style.css, generateElementsCss(styles, page._id)];
         }
 
-        const settingData = {};
+        let settingData = {};
 
         // Reduce the populatedRelationships to a relationships object
         const relationships = page.populatedRelationships.reduce((result, rel) => {
@@ -148,34 +155,7 @@ const getPageData = async (id, type, host, withCss = false, document) => {
             return result;
         }, {});
 
-        // If document exists, populate the document with its relationships and setting data
-        if (document) {
-            document = await populateDocument(page, document, projection);
-            if (document) {
-                settingData = await getSettingData(page, document);
-            }
-        }
 
-        // Add the page elements to the pages object
-        pages[page._id] = {
-            elements: page.elements || {},
-
-            pageSetting: {
-                _id: page._id,
-                setting: document?.setting || page.setting,
-                states: document?.states || page.states,
-                name: document?.name || page.name,
-                slug: document?.slug || page.slug,
-                relationships: relationships,
-                populatedRelationships: document?.populatedRelationships,
-                creator: document?.creator || page.creator,
-                createdAt: document?.createdAt || page.createdAt,
-                url: document?.url || page.url,
-                host,
-                ...settingData
-            }
-
-        }
 
         // Function to populate a document with its relationships and setting data
         const populateDocument = async (page, document, projection) => {
@@ -207,6 +187,17 @@ const getPageData = async (id, type, host, withCss = false, document) => {
             return await DocumentModel.document(document._id, relationships, projection);
         }
 
+        // Function to get an adjacent document (next or previous)
+        const getAdjacentDocument = async (page, document, proj, condition, sortDirection) => {
+            const DocumentModel = Document(page.slug);
+            return await DocumentModel.
+                findOne({ _id: condition, 'setting.status': 'PUBLIC' }).sort({ _id: sortDirection })
+                .select(proj).populate({
+                    path: 'setting.image',
+                    select: 'src alt'
+                }).exec();
+        }
+
         // Function to get setting data for a document
         const getSettingData = async (page, document) => {
             const proj = {
@@ -218,7 +209,7 @@ const getPageData = async (id, type, host, withCss = false, document) => {
             const nextDoc = await getAdjacentDocument(page, document, proj, { $gt: new ObjectId(document._id) }, -1);
             const prevDoc = await getAdjacentDocument(page, document, proj, { $lt: new ObjectId(document._id) }, 1);
 
-            const settingData = {};
+            let settingData = {};
             if (nextDoc)
                 settingData.NEXTDOCUMNET = {
                     _id: nextDoc._id,
@@ -242,22 +233,43 @@ const getPageData = async (id, type, host, withCss = false, document) => {
             return settingData;
         }
 
-        // Function to get an adjacent document (next or previous)
-        const getAdjacentDocument = async (page, document, proj, condition, sortDirection) => {
-            const DocumentModel = Document(page.slug);
-            return await DocumentModel.
-                findOne({ _id: condition, 'setting.status': 'PUBLIC' }).sort({ _id: sortDirection })
-                .select(proj).populate({
-                    path: 'setting.image',
-                    select: 'src alt'
-                }).exec();
+        // If document exists, populate the document with its relationships and setting data
+        if (document) {
+            document = await populateDocument(page, document, projection);
+            if (document) {
+                settingData = await getSettingData(page, document);
+            }
         }
+
+        // Add the page elements to the pages object
+        pages[page._id] = {
+            elements: page.elements || {},
+
+            pageSetting: {
+                _id: page._id,
+                setting: document?.setting || page.setting,
+                states: document?.states || page.states,
+                name: document?.name || page.name,
+                slug: document?.slug || page.slug,
+                relationships: relationships,
+                populatedRelationships: document?.populatedRelationships,
+                creator: document?.creator || page.creator,
+                createdAt: document?.createdAt || page.createdAt,
+                url: document?.url || page.url,
+                host,
+                ...settingData
+            }
+
+        }
+
+
+
 
         // Get the components of the page
         const components = page.components || [];
 
         // Function to get default value based on type and key
-        const getDefaultValue = (type, key, states, props) => {
+        const getDefaultValue = (type, key, states, props, value) => {
             switch (type) {
                 case 'STATES':
                     return getStateValue(key, states);
@@ -275,7 +287,7 @@ const getPageData = async (id, type, host, withCss = false, document) => {
             const value = filter.defaultValue;
 
             // Get the default value based on the type and key
-            let defaultValue = getDefaultValue(type, key, states, props);
+            let defaultValue = getDefaultValue(type, key, states, props, value);
             return { filterKey: [filter.type, ...filter.filterKey], defaultValue: defaultValue || '' }
         }
 
@@ -413,7 +425,7 @@ const getPageData = async (id, type, host, withCss = false, document) => {
 
             if (withCss) {
                 let styles = component.styles || {};
-                css = [...css, generateElementsCss(styles, component._id)];
+                style.css = [...style.css, generateElementsCss(styles, component._id)];
             }
 
             let parent = await getParent(component, projection);
@@ -451,7 +463,7 @@ const getPageData = async (id, type, host, withCss = false, document) => {
             if (pages[collection]) {
                 const pageSetting = pages[collection].pageSetting;
                 if (pageSetting?.populatedRelationships && component.collStates?.related) {
-                    await handleRelatedComponent(component, pageSetting);
+                    await handleRelatedComponent(component, pageSetting.populatedRelationships);
                 }
                 let collStates = {
                     ...component.collStates,
@@ -469,18 +481,20 @@ const getPageData = async (id, type, host, withCss = false, document) => {
         }
 
         // Function to handle related component
-        const handleRelatedComponent = async (component, pageSetting) => {
+        const handleRelatedComponent = async (component, populatedRelationships) => {
             if (!component.collStates.filters) {
                 component.collStates.filters = {};
             }
-            for (let i = 0; i <= pageSetting.populatedRelationships?.length; i++) {
-                const rel = pageSetting.populatedRelationships[i];
+            for (let i = 0; i <= page.populatedRelationships?.length; i++) {
+                const rel = page.populatedRelationships[i];
+
+
                 if (rel) {
                     component.collStates.filters[`__related_${i}__`] = {
                         name: 'Related',
                         type: 'RELATIONSHIPS',
                         filterKey: [rel._id],
-                        defaultValue: pageSetting.populatedRelationships[rel._id] ? pageSetting.populatedRelationships[rel._id].map(v => v._id) : []
+                        defaultValue: populatedRelationships[rel._id] ? populatedRelationships[rel._id].map(v => v._id) : []
                     }
                 }
             }
@@ -502,7 +516,7 @@ const getPageData = async (id, type, host, withCss = false, document) => {
                 // If withCss is true, generate the css for the form styles and add it to the css array
                 if (withCss) {
                     const styles = form.styles || {};
-                    css = [...css, generateElementsCss(styles, form._id)];
+                    style.css = [...style.css, generateElementsCss(styles, form._id)];
                 }
                 // Load the components of the form
                 const innerComponents = form.components || [];
@@ -523,7 +537,7 @@ const getPageData = async (id, type, host, withCss = false, document) => {
         await Promise.all([loadForms(forms, projection), loadComponents(components, projection)]);
 
         // Initialize layout components
-        const layout = page.layout?.components;
+        const layout = page.populatedLayout?.[0].components;
         const LayoutComponents = [];
 
         // Check if layout exists
@@ -536,6 +550,8 @@ const getPageData = async (id, type, host, withCss = false, document) => {
             if (layout.bottom) {
                 LayoutComponents[1] = (layout.bottom.toString())
             }
+
+
             // Load layout components
             await loadComponents(LayoutComponents, projection)
         }
@@ -543,7 +559,7 @@ const getPageData = async (id, type, host, withCss = false, document) => {
         // Return the css, pages, layout and states
 
         return {
-            css,
+            ...style,
             pages,
             layout: { top: LayoutComponents[0], bottom: LayoutComponents[1] },
         };
@@ -1019,7 +1035,7 @@ const getCss = async (id, type) => {
         _styles: 1,
     };
 
-    let css = [];
+    let style = { css: [] };
 
 
     let page = null;
@@ -1037,8 +1053,13 @@ const getCss = async (id, type) => {
         return { css };
     }
 
+
+
     // Prepare the document object
     const doc = prepareDocument(page);
+
+
+
 
     if (!page.published) {
         doc.styles = page._styles;
@@ -1046,15 +1067,19 @@ const getCss = async (id, type) => {
         doc.styles = page.styles;
 
     // Generate CSS for the styles
-    css = generateCssForStyles(doc, css);
+    style.css = generateCssForStyles(doc, style.css);
+
 
     // Load CSS for forms
-    await loadFormsCSS(doc.forms || [], projection, css);
+    await loadFormsCSS(doc.forms || [], projection, style);
+
 
     // Load CSS for components
-    await loadComponentsCSS(doc.components || [], projection, css);
+    await loadComponentsCSS(doc.components || [], projection, style);
 
-    return { css }
+
+
+    return style;
 };
 
 
@@ -1066,7 +1091,7 @@ const generateCssForStyles = (doc, css) => {
 }
 
 // Function to load CSS for forms
-const loadFormsCSS = async (forms, projection, css) => {
+const loadFormsCSS = async (forms, projection, style) => {
     for (let i = 0; i < forms.length; i++) {
         const form = await Form.findById(forms[i]).select(projection);
         if (form) {
@@ -1077,14 +1102,16 @@ const loadFormsCSS = async (forms, projection, css) => {
             } else
                 doc.styles = form.styles;
 
-            css = generateCssForStyles(doc, css);
-            await loadComponentsCSS(doc.components, projection, css);
+
+            
+            style.css = generateCssForStyles(doc, style.css);
+            await loadComponentsCSS(doc.components, projection, style);
         }
     }
 }
 
 // Function to load CSS for components
-const loadComponentsCSS = async (components, projection, css) => {
+const loadComponentsCSS = async (components, projection, style) => {
     for (let i = 0; i < components.length; i++) {
         const component = await Component.findById(components[i]).select(projection);
         if (component) {
@@ -1095,9 +1122,14 @@ const loadComponentsCSS = async (components, projection, css) => {
             } else
                 doc.styles = component.styles;
 
-            css = generateCssForStyles(doc, css);
-            await loadComponentsCSS(doc.components, projection, css);
-            await loadFormsCSS(doc.forms, projection, css);
+
+
+            style.css = generateCssForStyles(doc, style.css);
+
+
+
+            await loadComponentsCSS(doc.components, projection, style);
+            await loadFormsCSS(doc.forms, projection, style);
         }
     }
 }

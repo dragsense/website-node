@@ -114,17 +114,17 @@ const ElementSetting = (props) => {
         const images = global[key[1]] || {};
         const image = images[key[2]] || {};
         return {
-            value: image?.src ? image.src : '/images/default/default-img.png',
+            value: image?.src ? setting?.host + image.src : '/images/default/default-img.png',
             label: image === undefined ? `[${key[2]}]` : image?.alt || "Global Image"
         };
     };
 
     // Handle 'COLSTATES' type
-    const handleColStatesType = (key, value) => {
+    const handleColStatesType = (key, value, host) => {
         if (!colStates) return value;
         if (key[0] === 'PAGES') return mapIndex + 1;
         else if (key[0] === 'docsLength' && colStates.documents) return colStates.documents.length || '0';
-        else return getPageValue(key, colStates);
+        else return getPageValue(key, colStates, host);
     };
 
     // Handle 'FORMSTATES' type
@@ -325,7 +325,7 @@ const ElementSetting = (props) => {
     const withFallBackNodeValue = useMemo(() => {
         switch (node.tagName) {
             case 'img':
-                return { value: node.src ? node.src.src : fallbackImage, label: node.src?.alt };
+                return { value: node.src ? setting?.host +node.src.src : fallbackImage, label: node.src?.alt };
             case 'video':
                 return {
                     value: node.src ? node.src.src : fallbackPoster,

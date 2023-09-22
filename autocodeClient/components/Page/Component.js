@@ -15,7 +15,7 @@ import { debounce } from "../../utils/utils";
 const Component = (props) => {
 
     // Destructuring props
-    const { component, node, _states, _setStates, children } = props;
+    const { component, node, pages, _states, _setStates, children } = props;
 
     const comp = pages[component._id];
 
@@ -48,7 +48,7 @@ const Component = (props) => {
     }, [_states, states]);
 
     // Function to generate filters
-    const generateFilters = useCallback(() => {
+    const generateFilters = () => {
         if (!colStates.filters)
             return [];
 
@@ -64,10 +64,10 @@ const Component = (props) => {
 
             return { name: filter.name, filterKey: [filter.type, ...filter.filterKey], defaultValue: defaultValue || '' }
         });
-    }, [colStates.filters, getValue]);
+    };
 
     // Use useMemo to optimize performance by avoiding unnecessary re-renders
-    const filters = useMemo(generateFilters, [colStates.filters, states, _states]);
+    const filters = useMemo(generateFilters, [colStates.filters]);
 
     // Function to load documents from the server
     const loadDocumentsFromServer = async (collectionId, filters, selectedRelationships, withRelationship, page, limit, sortBy, sort) => {
@@ -147,10 +147,7 @@ const Component = (props) => {
     }
 
 
-    // Function to handle component loading
-    const handleLoadComponent = useCallback(() => {
-        loadComponent();
-    }, []);
+
 
     // Function to handle document loading
     const handleLoadDocuments = useCallback(() => {
@@ -166,17 +163,14 @@ const Component = (props) => {
 
         // Reset filter change flag
         setFilters(false);
-    }, [states, _states, filters, isFilterChange, colStates]);
+    }, [states, _states, filters, isFilterChange]);
 
-    // Use useEffect to call handleLoadComponent on component mount
-    useEffect(() => {
-        handleLoadComponent();
-    }, [handleLoadComponent]);
+  
 
     // Use useEffect to call handleLoadDocuments when states, _states, filters, isFilterChange, or colStates change
     useEffect(() => {
         handleLoadDocuments();
-    }, [handleLoadDocuments]);
+    }, [states]);
 
     // Function to evaluate expressions
     const evaluateExpression = (expression, scrollTop, scrollLeft, delta) => {
@@ -244,7 +238,7 @@ const Component = (props) => {
 
     useEffect(() => {
         // If there are no events, return
-        if (!events) return;
+        if (!events || typeof window === 'undefined') return;
 
         const iframe = document.querySelector("#ac-editor-iframe-doc");
 
@@ -256,6 +250,10 @@ const Component = (props) => {
 
         // Cleanup function to remove event listener when component unmounts
         return () => {
+
+            if (!events || typeof window === 'undefined') return;
+
+
             const iframe = document.querySelector("#ac-editor-iframe-doc");
             if (iframe) {
                 const iframeDocument = iframe.contentDocument || iframe.contentWindow.document;
@@ -490,6 +488,7 @@ const Component = (props) => {
             return <ElementMapping {...props} map={node.map}
                 _states={states}
                 _props={_states}
+                
             >
                 {renderChildren()}
             </ElementMapping>

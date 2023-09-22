@@ -347,6 +347,7 @@ const getAllFilteredDocuments = async (collectionId, documentBody, filter, optio
     ] : [];
 
 
+
     let projection = {
         slug: 1,
         _id: 1,
@@ -387,6 +388,7 @@ const getAllFilteredDocuments = async (collectionId, documentBody, filter, optio
             }
         })
     }
+
 
     const modelName = collection.slug;
     const DocumentModel = Document(modelName);

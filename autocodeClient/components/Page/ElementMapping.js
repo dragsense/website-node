@@ -11,8 +11,8 @@ const ElementMapping = (props) => {
     const { map, node, _states, _props, setting, _cstates, colStates, children, mapValue } = props;
 
     // Function to handle 'STATES' type
-    const handleStates = useCallback((key, states) => {
-        return getStateStates(key, states);
+    const handleStates = useCallback((key, states, host) => {
+        return getStateStates(key, states, host);
     }, []);
 
     // Function to handle 'PAGE' type
@@ -80,21 +80,13 @@ const ElementMapping = (props) => {
         if (!_cstates) return;
 
         if (key[0] === 'items') {
-            const currentPage = _cstates['currentIndex'] ? _cstates['currentIndex'].defaultValue : 1;
-            const limit = _cstates['limit'] ? _cstates['limit'].defaultValue || 1 : 1;
-            const total = _cstates['total'] ? _cstates['total'].defaultValue : 1;
-            const totalPages = Math.ceil(total / limit);
-            const pagination = { leftRange: 1, rightRange: 1, nearRange: 4, dots: '...' }
-            const pages = getPaginationRange(currentPage, totalPages, pagination).map((value, index) => {
-                const val = parseInt(value);
-                const isNan = isNaN(val);
-                return {
-                    label: value,
-                    value: val,
-                    key: val,
-                    notClickable: isNan,
-                }
+            const items = _cstates['items']?.states || {}
+
+            const pages = Object.values(items || {}).map((value, index) => {
+                const val = value.value.split(":");
+                return { label: val[1], value: val[0], key: val[0] }
             });
+
             return pages;
         }
         else {
@@ -109,9 +101,9 @@ const ElementMapping = (props) => {
 
         switch (type) {
             case 'STATES':
-                return handleStates(key, _states);
+                return handleStates(key, _states, setting?.host);
             case 'PROPS':
-                return handleStates(key, _props);
+                return handleStates(key, _props, setting?.host);
             case 'PAGE':
                 return handlePage(key);
             case 'COLSTATES':

@@ -44,7 +44,6 @@ const loadData = async (initialData) => {
                 top={res.layout?.top}
                 bottom={res.layout?.bottom} 
                 setting={setting} 
-                states={res.states}
                 type={type}
                 AutocodeCustom={AppClient} 
             />

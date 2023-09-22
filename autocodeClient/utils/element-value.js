@@ -94,7 +94,7 @@ export const getStateValue = (key, states, host) => {
  * @param {object} states - The states object.
  * @returns {Array} - An array of values.
  */
-export const getStateStates = (key, states) => {
+export const getStateStates = (key, states, host) => {
   let values = [];
 
   try {
@@ -113,15 +113,16 @@ export const getStateStates = (key, states) => {
 
     // Depending on the type of the value, populate the values array
     if (value.type === 'array') {
-      values = Object.values(value.states).flatMap((state) => {
+      values = Object.values(value.states || {}).flatMap((state) => {
         const val = state.value.split(":");
         return { label: val[0], value: val[1] || state.idx, key: val[1] || state.id };
       });
     }
 
     if (value.type === 'images') {
-      values = Object.values(value.states).map((state) => {
-        return { label: state.alt, value: state.src, key: state._id };
+     
+      values = Object.values(value.states || {}).map((state) => {
+        return { label: state.alt, value: host+state.src, key: state._id };
       });
     }
 
@@ -129,7 +130,7 @@ export const getStateStates = (key, states) => {
 
   } catch (e) {
     // If an error occurs, display an error message
-    console.error("Something went wrong.");
+    console.error("Something went wrong, " + e?.message);
   }
 
   // Return the values array
@@ -280,7 +281,7 @@ export const getStates = (key, states) => {
         return stateRef.defaultValue !== undefined ? stateRef.defaultValue : "";
     }
   } catch (e) {
-    console.error("Something went wrong.", e);
+    console.error("Something went wrong.", e?.message);
     return "";
   }
 };
@@ -592,7 +593,7 @@ export const getPaginationRange = (currentPage, totalPages, pagination) => {
  * @param {object} setting - The settings object.
  * @returns {object|null} - The value based on the key or null if not found.
  */
-export const getSettingValue = (key, setting) => {
+export const getSettingValue = (key, setting, host) => {
   // Extract the setting object
   const _setting = setting.setting;
   // If the setting object is not defined, return null
@@ -602,7 +603,7 @@ export const getSettingValue = (key, setting) => {
   if (key[1] === 'image') {
     const image = _setting["populatedImage"];
     return {
-      value: setting.host+image?.src || '/images/default/default-img.png',
+      value: host+image?.src || '/images/default/default-img.png',
       label: image?.alt || '[featured image]'
     }
   }
@@ -666,18 +667,19 @@ const getDocumentValue = (key, setting) => {
  * @param {object} setting - The settings object.
  * @returns {object|null} - The value based on the key or null if not found.
  */
-export const getPageValue = (key, setting) => {
+export const getPageValue = (key, setting, host) => {
   // Remove 'POPULATED' if it's the first element in the key array
   if (key[0] === 'POPULATED') key.shift();
+
 
   if (key[0] === 'states') {
     const modifiedKey = [...key];
     modifiedKey.shift();
-    return getStateValue(modifiedKey, setting.states, setting.host);
+    return getStateValue(modifiedKey, setting.states, setting.host || host);
   } else if (key[0] === 'RELATIONSHIPS' && setting.relationships) {
     return setting.relationships[key[1]] || null;
   } else if (key[0] === 'SETTING') {
-    return getSettingValue(key, setting);
+    return getSettingValue(key, setting, setting.host || host);
   } else if (key[0] === 'creator') {
     const creator = setting[key[0]] || {};
 

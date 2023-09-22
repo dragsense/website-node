@@ -106,7 +106,7 @@ const publishForm = async (id, formBody) => {
         throw new ApiError(httpStatus.NOT_FOUND, 'Form not found.');
     }
 
-    const { updater } = pageBody;
+    const { updater } = formBody;
 
     if (form.published) {
         throw new ApiError(httpStatus.NOT_FOUND, 'Form is already published.');

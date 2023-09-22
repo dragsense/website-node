@@ -5,7 +5,7 @@ import { useEffect, useState, useCallback } from 'react';
 // Input component
 const Input = (props) => {
 
-    const {  onChange, value, type, onClick, children, disabled } = props;
+    const {  onChange, value, type, onClick, children, conds } = props;
 
     // State for input value
     const [v, setV] = useState(value);
@@ -40,7 +40,7 @@ const Input = (props) => {
 
 
     // Return disabled or cloned element based on disabled state
-    return disabled ? InputElement : null;
+    return conds ? InputElement : null;
 
 };
 

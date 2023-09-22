@@ -13,7 +13,7 @@ export default function Page({ _id,
 
 
     return <>
-         {pages[top] && <Elements
+         {top && pages[top] && <Elements
             _uid={'0'}
             _id={top}
             pages={pages}
@@ -21,7 +21,7 @@ export default function Page({ _id,
             setting={setting}
             AutocodeCustom={AutocodeCustom}
         />} 
-
+        
         {pages[_id] && <Elements
             _uid={'0'}
             _id={_id}
@@ -30,7 +30,7 @@ export default function Page({ _id,
             setting={setting}
             AutocodeCustom={AutocodeCustom}
         />}
-        {pages[bottom] && <Elements
+        {bottom && pages[bottom] && <Elements
             _uid={'0'}
             _id={bottom}
             pages={pages}

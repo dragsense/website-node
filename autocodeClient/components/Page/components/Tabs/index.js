@@ -36,23 +36,11 @@ const Tabs = (props) => {
         [flattenedChildren, node, element, cloneChildren]
     );
 
-    // If no changes in props, disable the button
-    const [prevProps, setPrevProps] = useState(props);
-    const [isButtonDisabled, setIsButtonDisabled] = useState(false);
 
-    useEffect(() => {
-        if (prevProps === props) {
-            setIsButtonDisabled(true);
-        } else {
-            setIsButtonDisabled(false);
-            setPrevProps(props);
-        }
-    }, [props, prevProps]);
 
     return (
         <>
             {tabs}
-            <button disabled={isButtonDisabled}>Submit</button>
         </>
     );
 };
