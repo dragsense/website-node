@@ -1,15 +1,124 @@
 {
-    "lG2AqQ49": {
-        "_uid": "lG2AqQ49",
-        "selectorText": ".body",
-        "type": "root",
+    "ksCglcuf": {
+        "_uid": "ksCglcuf",
+        "selectorText": ".button",
+        "type": "button",
         "style": {
             "normal": {
                 "root": {
                     "properties": {
+                        "padding": {
+                            "value": "10",
+                            "unit": "px 20"
+                        },
+                        "border": {
+                            "value": "none"
+                        },
+                        "border-radius": {
+                            "value": "4",
+                            "unit": "px"
+                        },
+                        "cursor": {
+                            "value": "pointer"
+                        },
+                        "font-size": {
+                            "value": "16",
+                            "unit": "px"
+                        },
+                        "transition": {
+                            "value": "background-color 0.3",
+                            "unit": "s, transform 0.2"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "CmdDzQ7U": {
+        "_uid": "CmdDzQ7U",
+        "selectorText": ".button-primary",
+        "type": "button",
+        "style": {
+            "normal": {
+                "root": {
+                    "properties": {
+                        "background-color": {
+                            "value": "#007",
+                            "unit": "BFF"
+                        },
                         "color": {
-                            "value": "rgba(202.2405, 17.291562750000008, 17.291562750000008, 1)",
-                            "color": "rgba(202.2405, 17.291562750000008, 17.291562750000008, 1)"
+                            "value": "white"
+                        }
+                    }
+                },
+                ":hover": {
+                    "properties": {
+                        "background-color": {
+                            "value": "#0056",
+                            "unit": "b3"
+                        },
+                        "transform": {
+                            "value": "scale(1.05)"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "Kmx3BoEi": {
+        "_uid": "Kmx3BoEi",
+        "selectorText": ".button-secondary",
+        "type": "button",
+        "style": {
+            "normal": {
+                "root": {
+                    "properties": {
+                        "background-color": {
+                            "value": "#6",
+                            "unit": "C757"
+                        },
+                        "color": {
+                            "value": "white"
+                        }
+                    }
+                },
+                ":hover": {
+                    "properties": {
+                        "background-color": {
+                            "value": "#5",
+                            "unit": "a6268"
+                        },
+                        "transform": {
+                            "value": "scale(1.05)"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "JVUFNI6C": {
+        "_uid": "JVUFNI6C",
+        "selectorText": ".button-danger",
+        "type": "button",
+        "style": {
+            "normal": {
+                "root": {
+                    "properties": {
+                        "background-color": {
+                            "value": "#DC3545"
+                        },
+                        "color": {
+                            "value": "white"
+                        }
+                    }
+                },
+                ":hover": {
+                    "properties": {
+                        "background-color": {
+                            "value": "#c82333"
+                        },
+                        "transform": {
+                            "value": "scale(1.05)"
                         }
                     }
                 }

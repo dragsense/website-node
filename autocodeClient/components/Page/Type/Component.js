@@ -33,12 +33,8 @@ const Component = ({
 }) => {
 
     const spanElement = useMemo(() => {
-        return (value || innerWraaper) ? (<>
-            {React.isValidElement(value) ? value : <span
-                dangerouslySetInnerHTML={{ __html: value }}
-            />}
+        return <>{value}
             {innerWraaper}</>
-        ) : null;
     }, [innerWraaper, value]);
 
     const customAttributes = createCustomAttributes(onMouseMove, onClick, onScroll);
