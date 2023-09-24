@@ -124,5 +124,37 @@
                 }
             }
         }
+    },
+    "J3Lg79dz": {
+        "_uid": "J3Lg79dz",
+        "selectorText": ".body",
+        "type": "root",
+        "style": {
+            "normal": {
+                "root": {
+                    "properties": {
+                        "color": {
+                            "value": "red"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "OCC4H55z": {
+        "_uid": "OCC4H55z",
+        "selectorText": ".body",
+        "type": "root",
+        "style": {
+            "normal": {
+                "root": {
+                    "properties": {
+                        "color": {
+                            "value": "green"
+                        }
+                    }
+                }
+            }
+        }
     }
 }

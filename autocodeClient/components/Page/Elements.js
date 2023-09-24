@@ -1,6 +1,7 @@
 
 
 const React = require("react");
+import { useEffect } from 'react';
 import ElementWrapper from './ElementWrapper';
 
 import ErrorBoundary from './ErrorBoundary';
@@ -47,6 +48,7 @@ const MemoizedTreeNode = React.memo(TreeNode, (prevProps, nextProps) => {
     prevProps._props === nextProps._props &&
     prevProps.formStates === nextProps.formStates &&
     prevProps.colStates === nextProps.colStates &&
+    prevProps.setting?.resize === nextProps.setting?.resize &&
     prevProps._cstates === nextProps._cstates;
 
   return states;
@@ -57,6 +59,24 @@ export default function Elements({ setting, type, pages, states, _uid, _id, Auto
 
   const [pageSetting, setPageSetting] = React.useState(pages[_id].pageSetting || {});
 
+  useEffect(() => {
+
+    if(!setting || typeof window === 'undefined')
+    return;
+
+    const updateSize = () => {
+      setPageSetting({ ...pageSetting, resize: !pageSetting.resize });
+    };
+
+    window.addEventListener('resize', updateSize);
+
+    return () => {
+      if (window)
+        contentWindow.removeEventListener('resize', updateSize);
+    }
+
+
+  }, [pageSetting]);
 
   return <MemoizedTreeNode
     setting={{ ...setting, ...pageSetting }}

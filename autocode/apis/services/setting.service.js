@@ -135,7 +135,7 @@ const getPageData = async (id, type, host, withCss = false, document) => {
         const pages = {}
 
         // Initialize the css array
-        let style = {css: []};
+        let style = { css: [] };
         // If page does not exist, return the pages object, layout object, states object and css array
         if (!page) {
             return { pages, layout: {}, states: {}, css };
@@ -272,9 +272,9 @@ const getPageData = async (id, type, host, withCss = false, document) => {
         const getDefaultValue = (type, key, states, props, value) => {
             switch (type) {
                 case 'STATES':
-                    return getStateValue(key, states);
+                    return getStateValue(key, states, host);
                 case 'PROPS':
-                    return getStateValue(key, props);
+                    return getStateValue(key, props, host);
                 default:
                     return value;
             }
@@ -570,11 +570,11 @@ const getPageData = async (id, type, host, withCss = false, document) => {
     }
 };
 
-const generatePages = async (_pages, pagesFolder, setting, host, fontCssString, AutoCode, AutocodeCustom) => {
+const generatePages = async (_pages, pagesFolder, setting, AutoCode, AutocodeCustom) => {
     // Iterate over each page
     for (const page of _pages) {
         // Fetch page data
-        const pagesResults = await getPageData(page._id, page.type, host, true, null);
+        const pagesResults = await getPageData(page._id, page.type, '../public', true, null);
 
         // Prepare setting data
         const settingData = prepareSettingData(setting);
@@ -583,7 +583,7 @@ const generatePages = async (_pages, pagesFolder, setting, host, fontCssString, 
         const htmlString = generateHTMLString(AutoCode, page, pagesResults, settingData, AutocodeCustom);
 
         // Generate HTML
-        const html = generateHTML(page, setting, htmlString, fontCssString);
+        const html = generateHTML(page, setting, htmlString, '../public');
 
         // Write CSS and HTML to files
         writeFilesToFolder(pagesFolder, pagesResults, page, html);
@@ -620,21 +620,20 @@ const generateHTMLString = (AutoCode, page, pagesResults, settingData, AutocodeC
 }
 
 // Function to generate HTML
-const generateHTML = (page, setting, htmlString, fontCssString) => {
+const generateHTML = (page, setting, htmlString, host) => {
     return `
         <!DOCTYPE html>
         <html>
           <head>
-            <title>${page.setting?.title ? page.setting.title : setting.webtitle ? setting.webtitle : 'Page'}</title>
+            <title>${page.setting?.title ? page.setting.title : setting.webTitle ? setting.webTitle : 'Page'}${setting.tagLine ? " - " + setting.tagLine : ''}</title>
             <meta name="description" content="${page.setting?.desc ? page.setting.desc : setting.desc ? setting.desc : ''}" />
             <meta name="author" content="${setting.author}" />
             <meta name="keywords" content="${setting.keywords}" />
-            <link rel="icon" href="${setting.images?.favicon?.src}" />
+            <link rel="icon" href="${host}${setting.images?.favicon?.src || `/images/default/favicon.ico`}" />
             <meta httpEquiv="Content-Language" content="${setting.lang}" />
-            ${setting.scripts?.head}
-            ${fontCssString}
             <link rel="stylesheet" href="../assets/style.css">
-            <link rel="stylesheet" href="./assets/style.css">
+            <link rel="stylesheet" href="./styles/${page.slug}.css">
+            ${setting.scripts?.head}
           </head>
           <body>
             <div id="root">${htmlString}</div>
@@ -648,8 +647,8 @@ const generateHTML = (page, setting, htmlString, fontCssString) => {
 
 // Function to write CSS and HTML to files
 const writeFilesToFolder = (pagesFolder, pagesResults, page, html) => {
-    const assetsFolder = pagesFolder.folder("assets");
-    assetsFolder.file('style.css', pagesResults.css.join(" "));
+    const assetsFolder = pagesFolder.folder("styles");
+    assetsFolder.file(`${page.slug}.css`, pagesResults.css.join(" "));
     pagesFolder.file((page.name) + '.html', html);
 }
 
@@ -686,55 +685,62 @@ const download = async (query, res, host, AutoCode, AutocodeCustom) => {
         const rootFolder = zip.folder("");
         const assetsFolder = rootFolder.folder("public");
 
-        // Define filter and options for fetching fonts, colors and variables
-        const filter = {};
-        const options = { limit: 100 };
 
-        // Fetch fonts and generate font CSS string
-        const fonts = await themeService.getFonts(filter, options);
-        const fontCssString = generateFontCssString(fonts);
+
+
 
         // Generate pages, components, forms and collections based on the query parameters
         if (Boolean(isPage == 'true')) {
-            await generateEntities(Page, pagesFolder, setting, host, fontCssString, AutoCode, AutocodeCustom);
+            await generateEntities(Page, pagesFolder, setting, AutoCode, AutocodeCustom);
         }
 
         if (Boolean(isComponent == 'true')) {
-            await generateEntities(Component, compsFolder, setting, host, fontCssString, AutoCode, AutocodeCustom);
+            await generateEntities(Component, compsFolder, setting, AutoCode, AutocodeCustom);
         }
 
         if (Boolean(isForm == 'true')) {
-            await generateEntities(Form, formsFolder, setting, host, fontCssString, AutoCode, AutocodeCustom);
+            await generateEntities(Form, formsFolder, setting, AutoCode, AutocodeCustom);
         }
 
         if (Boolean(isCollection == 'true')) {
-            await generateEntities(Collection, collsFolder, setting, host, fontCssString, AutoCode, AutocodeCustom);
+            await generateEntities(Collection, collsFolder, setting, AutoCode, AutocodeCustom);
         }
+
+
+        // Define filter and options for fetching fonts, colors and variables
+        const filter = {};
+        const options = { limit: 100 };
 
         // Fetch colors and variables
         const colors = await themeService.getColors(filter, options);
         const variables = await themeService.getVariables(filter, options);
 
+           // Fetch fonts and generate font CSS string
+           const fonts = await themeService.getFonts(filter, options);
+           const fontCssString = generateFontCssString(fonts);
+
         // Generate global CSS
         const globalCss = await themeService.getCss();
         const rootCss = generateRootCss(fonts, colors, variables);
+
+     
 
         // Fetch JS code
         const jsCode = await themeService.getJs();
 
         // Add CSS and JS files to the zip
-        staticFolder.file('style.css', rootCss + globalCss.css);
+        staticFolder.file('style.css', rootCss + fontCssString + globalCss.css);
         staticFolder.file('index.js', jsCode.code);
 
         // Define the destination directory
-        var destinationDir = path.join(publicDir, 'static');
+        //var destinationDir = path.join(publicDir, 'static');
 
         // Add files to the zip
-        addFilesToZip(destinationDir, "", assetsFolder);
+        addFilesToZip(publicDir, "", assetsFolder);
 
         // Set headers and send the zip file
         res.setHeader('Content-Type', 'application/zip');
-        res.setHeader('Content-Disposition', `attachment; filename=${name || setting.webtitle || 'theme'}-${getCurrentDate()}.zip`);
+        res.setHeader('Content-Disposition', `attachment; filename=${name || setting.webTitle || 'theme'}-${getCurrentDate()}.zip`);
 
         zip.generateNodeStream({ type: 'nodebuffer', streamFiles: true })
             .pipe(res)
@@ -777,7 +783,7 @@ const generateFontCssString = (fonts) => {
 
 // Function to generate entities (pages, components, forms, collections)
 const generateEntities = async (Entity, folder, setting, fontCssString, AutoCode, AutocodeCustom) => {
-    const entities = await Entity.find({}).select("name _id type");
+    const entities = await Entity.find({}).select("name _id slug type");
     await generatePages(entities, folder, setting, fontCssString, AutoCode, AutocodeCustom);
 }
 
@@ -1103,7 +1109,7 @@ const loadFormsCSS = async (forms, projection, style) => {
                 doc.styles = form.styles;
 
 
-            
+
             style.css = generateCssForStyles(doc, style.css);
             await loadComponentsCSS(doc.components, projection, style);
         }

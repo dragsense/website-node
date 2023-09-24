@@ -4,7 +4,6 @@ import React, { useMemo } from "react";
 
 import { getStateValue, getPageValue } from '../../utils/element-value';
 import ElementValue from './ElementValue';
-
 /**
  * This is a React functional component called ElementSetting.
  * It renders an ElementValue component with certain props.
@@ -59,14 +58,14 @@ const ElementSetting = (props) => {
             case 'GLOBAL':
                 return handleGlobalType(key, value);
             case 'PROPS':
-                return getStateValue(key, _props) || `[props.${key}]`;
+                return getStateValue(key, _props, setting?.host) || `[props.${key}]`;
             case 'STATES':
-                return getStateValue(key, _states);
+                return getStateValue(key, _states, setting?.host);
             case 'PAGE':
 
-                return getPageValue(key, setting);
+                return getPageValue(key, setting, setting?.host);
             case 'COLSTATES':
-                return handleColStatesType(key, value);
+                return handleColStatesType(key, value, setting?.host);
             case 'FORMSTATES':
                 return handleFormStatesType(key);
             case 'MAPVALUE':
@@ -87,15 +86,18 @@ const ElementSetting = (props) => {
         }
         return value;
     };
+   // Handle 'WINDOW' type
+   const handleWindowType = (key) => {
 
-    // Handle 'WINDOW' type
-    const handleWindowType = (key) => {
-        if (key[1] === 'width') {
-            return window.innerWidth;
-        } else if (key[1] === 'height') {
-            return window.innerHeight;
-        }
-    };
+    if(typeof window === 'undefined')
+    return;
+
+    if (key[1] === 'width') {
+        return contentWindow.innerWidth;
+    } else if (key[1] === 'height') {
+        return contentWindow.innerHeight;
+    }
+};
 
     // Handle 'WEBSITE' type
     const handleWebsiteType = (key) => {
@@ -114,7 +116,7 @@ const ElementSetting = (props) => {
         const images = global[key[1]] || {};
         const image = images[key[2]] || {};
         return {
-            value: image?.src ? setting?.host + image.src : '/images/default/default-img.png',
+            value: image?.src ? setting?.host +image.src : '/images/default/default-img.png',
             label: image === undefined ? `[${key[2]}]` : image?.alt || "Global Image"
         };
     };
@@ -157,7 +159,7 @@ const ElementSetting = (props) => {
         try {
             return eval(original);
         } catch (e) {
-            console.error("Invalid expression:" + e?.message);
+            message.error("Invalid expression:" + e?.message);
             return true;
         }
     };
@@ -202,7 +204,7 @@ const ElementSetting = (props) => {
                 try {
                     attributeValue = eval(value);
                 } catch (e) {
-                    console.error("Invalid expression: " + e?.message);
+                    message.error("Invalid expression: " + e?.message);
                 }
             } else {
                 attributeValue = value;
@@ -305,18 +307,18 @@ const ElementSetting = (props) => {
         if (!node.nodeValue) return '';
         const inputString = node.nodeValue;
         return replacePlaceholders(inputString);
-    }, [classes, colStates, _cstates, _states, _props, mapIndex, mapValue, node.nodeValue]);
+    }, [classes, colStates, _cstates, _states, _props, mapIndex, mapValue, node.nodeValue, setting?.resize]);
 
     // useMemo to calculate fallback image only when setting changes
     const fallbackImage = useMemo(() => {
-        let defaultImage = './images/default/default-img.png';
+        let defaultImage = '/images/default/default-img.png';
         if (setting && setting['images']?.placeholder.src) return setting['images']?.placeholder.src;
         return defaultImage;
     }, [setting]);
 
     // useMemo to calculate fallback poster only when setting changes
     const fallbackPoster = useMemo(() => {
-        let defaultImage = './images/default/default-poster.png';
+        let defaultImage = '/images/default/default-poster.png';
         if (setting && setting['images']?.placeholder.src) return setting['images']?.placeholder.src;
         return defaultImage;
     }, [setting]);
@@ -325,15 +327,15 @@ const ElementSetting = (props) => {
     const withFallBackNodeValue = useMemo(() => {
         switch (node.tagName) {
             case 'img':
-                return { value: node.src ? setting?.host +node.src.src : fallbackImage, label: node.src?.alt };
+                return { value: node.src ? setting?.host + node.src.src : setting?.host + fallbackImage, label: node.src?.alt };
             case 'video':
                 return {
-                    value: node.src ? node.src.src : fallbackPoster,
+                    value: node.src ? node.src.src : setting?.host + fallbackPoster,
                     label: node.src?.alt,
                     srcs: node.srcs
                 };
             case 'audio':
-                return { value: './audios/default/sample.mp3', srcs: node.srcs };
+                return { value: setting?.host + '/audios/default/sample.mp3', srcs: node.srcs };
             case 'input':
             case 'textarea':
             case 'option':
@@ -341,7 +343,7 @@ const ElementSetting = (props) => {
             default:
                 return nodeValue;
         }
-    }, [nodeValue]);
+    }, [nodeValue, node.src,  node._uid]);
 
     // Render the ElementValue component with the calculated props
     const element = <ElementValue

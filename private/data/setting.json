@@ -5,7 +5,15 @@
     "lang": "en",
     "author": "Rana Awais",
     "keywords": "Easy, Effortless, Rapid",
-    "images": {},
+    "images": {
+        "logo": {
+            "_id": "650c9981dff7a63241098a86",
+            "src": "/static/uploads/images/react-192905.png",
+            "alt": "react.png",
+            "mimetype": "image/png",
+            "name": "react.png"
+        }
+    },
     "email": {
         "host": "localhost",
         "port": "1025",

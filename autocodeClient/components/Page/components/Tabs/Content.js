@@ -47,7 +47,7 @@ const TabsContent = (props) => {
         () =>
             element(
                 { ...node, state: undefined, map: undefined },
-                <div style={{ position: 'relative', height: '100%', overflow: 'hidden' }}>
+                <div _uid={node._uid} style={{ position: 'relative', height: '100%', overflow: 'hidden' }}>
                     {renderTabsContent}
                 </div>
 

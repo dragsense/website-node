@@ -27,7 +27,22 @@ const ElementValue = (props) => {
         children 
     } = props;
 
-   
+
+
+         // Handle 'WINDOW' type
+         const handleWindowType = (key) => {
+    
+            if(typeof window === 'undefined')
+            return;
+
+            if (key[1] === 'width') {
+                return window.innerWidth;
+            } else if (key[1] === 'height') {
+                return window.innerHeight;
+            }
+        };
+    
+
     // Function to handle global type
     const handleGlobalType = (key) => {
         if (key[0] === "WEBSITE") {
@@ -44,7 +59,9 @@ const ElementValue = (props) => {
                 value: global[key[1]],
                 label: global[key[1]] || `[global ${key[1]}]`
             }
-        }
+        }  else
+        if (key[0] === "WINDOW") 
+           return handleWindowType(key);
     }
 
     // Function to handle colStates type
@@ -70,7 +87,7 @@ const ElementValue = (props) => {
             case 'GLOBAL':
                 return handleGlobalType(key);
             case 'PROPS':
-                return getStateValue(key, _props) || `[props.${key}]`;
+                return getStateValue(key, _props, setting?.host) || `[props.${key}]`;
             case 'STATES':
                 return getStateValue(key, _states, setting?.host);
             case 'PAGE':
@@ -102,7 +119,7 @@ const ElementValue = (props) => {
         const value = getValue(state, nodeValue);
         return value || nodeValue;
 
-    }, [state, nodeValue, _states, _props, _cstates]);
+    }, [state, nodeValue, _states, _props, _cstates, setting?.resize]);
 
     // useMemo hook to optimize performance by memoizing the value
     // It will only recompute the memoized value when one of the dependencies has changed
@@ -317,7 +334,7 @@ const ElementValue = (props) => {
                     valueX = eval(valueX);
                     valueY = eval(valueY);
                 } catch (e) {
-                    console.error("Invalid expression:" + e?.message);
+                    message.error("Invalid expression:" + e?.message);
                 }
 
                 if (fun?.onChange)
@@ -328,7 +345,7 @@ const ElementValue = (props) => {
             }
         }
         catch (e) {
-            console.error(e?.message);
+            message.error(e?.message);
         }
     }
 

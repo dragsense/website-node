@@ -54,7 +54,7 @@ const Dropdown = ({
 
 // Render the dropdown with the appropriate transition and styles
   return (
-    <Transition nodeRef={expandable} in={openDropdown} timeout={duration}>
+    <Transition nodeRef={nodeRef} in={openDropdown} timeout={duration}>
       {state => {
         const baseStyle = {
           position: expandable ? 'relative' : 'absolute',

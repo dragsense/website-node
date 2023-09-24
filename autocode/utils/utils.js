@@ -122,6 +122,7 @@ const generateStyleCss = (s, selectorText) => {
     let properties = Object.entries(s[key].properties || {}).map(([key, property]) => `${key}: ${property.value} ${property.priority ? "!important" : ""}`).join(';');
 
     let selector = key !== 'root' ? selectorText + key : selectorText
+    if(properties.trim())
     css += `${selector} {\n  ${properties}\n}\n\n`;
   });
 

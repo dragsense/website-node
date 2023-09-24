@@ -8,6 +8,11 @@ const {
 }
   = require('../apis/services');
 
+const path = require('path');
+const fs = require('fs');
+
+const publicDir = path.resolve(process.cwd(), 'public');
+
 const { Download } = require('../apis/controllers/setting.controller');
 
 // Function to handle page not found
@@ -38,7 +43,7 @@ module.exports = (app, AutoCode, AutocodeCustom, libraryName) => {
   app.get('*', async (req, res) => {
     try {
 
-   
+
 
       const dynamicSlugs = req.params[0].replace(/^\//, '');
       const slugParts = dynamicSlugs.split('/');
@@ -84,7 +89,7 @@ module.exports = (app, AutoCode, AutocodeCustom, libraryName) => {
             },
             ).select(projection);
 
-            
+
 
             if (page) {
               const modelName = page.slug;
@@ -115,7 +120,7 @@ module.exports = (app, AutoCode, AutocodeCustom, libraryName) => {
 
       const protocol = req.protocol || 'http';
       const host = `${protocol}://${req.headers.host}`;
-     
+
       const pagesResults = await fetchPageData(page, host, document);
 
       const settingData = {
@@ -128,7 +133,7 @@ module.exports = (app, AutoCode, AutocodeCustom, libraryName) => {
         }
       };
 
-      const htmlString =  AutoCode === undefined ? '' :
+      const htmlString = AutoCode === undefined ? '' :
         ReactDOMServer.renderToString(<AutoCode
           _id={page._id}
           pages={pagesResults.pages}
@@ -151,6 +156,7 @@ module.exports = (app, AutoCode, AutocodeCustom, libraryName) => {
       const fonts = await themeService.getFonts(filter, options);
       const colors = await themeService.getColors(filter, options);
       const variables = await themeService.getVariables(filter, options);
+
 
       const globalCss = await themeService.getCss();
       const rootCss = `html {
@@ -187,39 +193,34 @@ module.exports = (app, AutoCode, AutocodeCustom, libraryName) => {
         return cssString;
       }, '');
 
-      
+      const globalJs = await themeService.getJs();
+
+
+      // Write CSS to temp file
+      fs.writeFileSync(path.join(publicDir, 'style.css'), `${rootCss}\n${fontCssString}\n${globalCss.css}\n${pagesResults.css.join(" ")}`);
+
+      // Write JS to temp file
+      fs.writeFileSync(path.join(publicDir, 'index.js'), `${globalJs.code}`);
+
       res.send(`
         <!DOCTYPE html>
         <html>
           <head>
-          <title>${page.setting?.title ?
-          page.setting.title :
-          setting.webtitle ?
-            setting.webtitle : 'Page'}</title>
-          <meta name="description" content="${page.setting?.desc ?
-          page.setting.desc :
-          setting.desc ?
-            setting.desc :
-            ''}" />
-
+          <title>${page.setting?.title ? page.setting.title : setting.webTitle ? setting.webTitle : 'Page'}${setting.tagLine ? " - " + setting.tagLine : ''}</title>
+          <meta name="description" content="${page.setting?.desc ?  page.setting.desc : setting.desc ?  setting.desc : ''}" />
           <meta name="author" content="${setting.author}" />
           <meta name="keywords" content="${setting.keywords}" />
           <link rel="icon" href="${host}${setting.images?.favicon?.src || `/images/default/favicon.ico`}" />
           <meta httpEquiv="Content-Language" content="${setting.lang}" />
-
-            ${setting.scripts?.head}
-            ${fontCssString}
-            <style>
-            ${rootCss}
-            ${globalCss.css}
-            </style>
-            <style>${pagesResults.css.join(" ")}</style>
+          <link rel="stylesheet" type="text/css" href="style.css">
+          ${setting.scripts?.head}
           </head>
           <body>
             <div id="root">${htmlString}</div>
             <script id="ac-data-script-${page._id}">
             window.__INITIAL_DATA__ = ${JSON.stringify(pageData)};
             </script>
+            <script src="index.js"></script>
             ${setting.scripts ? setting.scripts.foot || '' : ''}
             ${page.setting ? page.setting.scripts?.foot || '' : ''}
            <script src="${libraryName}.js"></script>

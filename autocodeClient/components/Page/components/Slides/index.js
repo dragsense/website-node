@@ -177,7 +177,7 @@ const Slides = (props) => {
       // sortDesc = activeIndex === 0 && i === total - 1;
       if (!isSlide) {
         slides.push(<Slide
-          key={0}
+          key={i}
           moveOffset={moves}
           index={i}
           activeIndex={activeIndex}
@@ -186,7 +186,7 @@ const Slides = (props) => {
           type={type}
           isSlide={false}
         ><div
-          key={i}
+      
           style={{
             display: 'block',
             width: '100%'
@@ -201,7 +201,7 @@ const Slides = (props) => {
 
         slides.push(slideItems.map((item, index) => (
           <div
-            key={startIndex + index}
+           key={startIndex + index}
             style={{
               cursor: 'pointer',
               userSelect: 'none',
@@ -219,7 +219,7 @@ const Slides = (props) => {
 
  
     return isSlide ? <Slide
-      key={0}
+    
       updateStates={updateStates}
       moveOffset={moves}
       index={0}
@@ -243,6 +243,7 @@ const Slides = (props) => {
       element(
         { ...node, state: undefined, map: undefined },
         <div
+         _uid={node._uid}
           ref={nodeRef}
           style={{ position: 'relative', height: '100%', overflow: 'hidden' }}
           onMouseEnter={handleMouseEnter}

@@ -1,1 +1,11 @@
-{}
+{
+    "vSVpbpRxl": {
+        "name": "Primary",
+        "fontFamily": "Poppins",
+        "src": "<link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">\n<link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin>\n<link href=\"https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Roboto:wght@400;500;700;900&display=swap\" rel=\"stylesheet\">",
+        "isGoogleFont": true,
+        "fontSrc": [],
+        "variable": "--var-primary-font",
+        "_uid": "vSVpbpRxl"
+    }
+}

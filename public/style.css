@@ -1,0 +1,163 @@
+html {
+        
+        
+      
+    }
+
+.button {
+  padding: 10 ;border: none ;border-radius: 4 ;cursor: pointer ;font-size: 16 ;transition: background-color 0.3 
+}
+
+.button-primary {
+  background-color: #007 ;color: white 
+}
+
+.button-primary:hover {
+  background-color: #0056 ;transform: scale(1.05) 
+}
+
+.button-secondary {
+  background-color: #6 ;color: white 
+}
+
+.button-secondary:hover {
+  background-color: #5 ;transform: scale(1.05) 
+}
+
+.button-danger {
+  background-color: #DC3545 ;color: white 
+}
+
+.button-danger:hover {
+  background-color: #c82333 ;transform: scale(1.05) 
+}
+
+.body {
+  color: red 
+}
+
+.body {
+  color: green 
+}
+
+
+.ac-elem-eaktlfbr {
+  display: flex ;width: 100% 
+}
+
+.ac-elem-Qjkz51Lo {
+  width: 50% 
+}
+
+.ac-elem-9Qxdnhmi {
+  width: 50% ;padding-top: 15px ;padding-right: 15px ;padding-bottom: 15px ;padding-left: 15px 
+}
+
+.ac-elem-e63FcBYY {
+  max-width: 100% ;height: auto 
+}
+
+.ac-elem-xVNBT5Ko {
+  max-width: 100% ;height: auto 
+}
+
+.ac-elem-Qo9l6wmU {
+  max-width: 100% ;height: auto 
+}
+
+.ac-elem-Gvyi0G0p {
+  max-width: 100% ;height: auto 
+}
+
+.ac-elem-vSlbvEvf {
+  max-width: 100% ;height: auto 
+}
+
+.ac-elem-L8zmagyE {
+  max-width: 100% ;height: auto 
+}
+
+.ac-elem-7fm48m_J {
+  max-width: 100% ;height: auto 
+}
+
+.ac-elem-VH5Yfc7M {
+  max-width: 100% ;height: auto 
+}
+
+ .ac-input-container-VHxCBvJD input {
+  padding: 5px ;border: 1px solid #ccc ;margin-right: 5px ;width: 100% 
+}
+
+.ac-form-group-VHxCBvJD label {
+  display: inline-block ;margin-right: 5px ;color: #333 
+}
+
+.ac-input-container-VHxCBvJD .error-message {
+  color: #ff0000 ;font-size: 12px 
+}
+
+.ac-input-container-VHxCBvJD {
+  display: flex ;justify-content: center ;flex-direction: column 
+}
+
+.ac-form-group-VHxCBvJD {
+  margin-right: 10px 
+}
+
+   .ac-menu-3zAni-Cu .menu .menu-link {
+  color: inherit ;text-decoration: none 
+}
+
+.ac-menu-3zAni-Cu .menu .menu-item {
+  margin: 0px ;padding: 5px 10px ;position: relative 
+}
+
+.ac-menu-3zAni-Cu .menu {
+  display: flex ;gap: 10px ;list-style-type: none 
+}
+
+.ac-menu-lrzcXOgh .menu .menu-link {
+  color: inherit ;text-decoration: none 
+}
+
+.ac-menu-lrzcXOgh .menu .menu-item {
+  margin: 0px ;padding: 5px 10px ;position: relative 
+}
+
+.ac-menu-lrzcXOgh .menu {
+  display: flex ;gap: 10px ;list-style-type: none 
+}
+
+.ac-menu-snUdSIVQ .menu .menu-link {
+  color: inherit ;text-decoration: none 
+}
+
+.ac-menu-snUdSIVQ .menu .menu-item {
+  margin: 0px ;padding: 5px 10px ;position: relative 
+}
+
+.ac-menu-VqHjfG7v .menu .menu-link {
+  color: inherit ;text-decoration: none 
+}
+
+.ac-menu-VqHjfG7v .menu .menu-item {
+  margin: 0px ;padding: 5px 10px ;position: relative 
+}
+
+.ac-menu-VqHjfG7v .menu {
+  display: flex ;gap: 10px ;list-style-type: none 
+}
+
+.ac-menu-ym-w6Uji .menu .menu-link {
+  color: inherit ;text-decoration: none 
+}
+
+.ac-menu-ym-w6Uji .menu .menu-item {
+  margin: 0px ;padding: 5px 10px ;position: relative 
+}
+
+.ac-menu-ym-w6Uji .menu {
+  display: flex ;gap: 10px ;list-style-type: none 
+}
+
