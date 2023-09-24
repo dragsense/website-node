@@ -106,6 +106,7 @@ const publishComponent = async (id, componentBody) => {
     component.forms = component._forms;
     component.styles = component._styles;
     component.states = component._states;
+    component.events = component._events;
     component.collStates = component._collStates;
 
     component.published = true;

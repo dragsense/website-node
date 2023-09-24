@@ -72,7 +72,7 @@ export default function Elements({ setting, type, pages, states, _uid, _id, Auto
 
     return () => {
       if (window)
-        contentWindow.removeEventListener('resize', updateSize);
+      window.removeEventListener('resize', updateSize);
     }
 
 

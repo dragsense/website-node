@@ -19,15 +19,15 @@ const Component = (props) => {
 
     const comp = pages[component._id];
 
-    if(!comp)
-    return null;
+    if (!comp)
+        return null;
 
 
     // Initializing states
     const [states, setStates] = useState(comp.states);
     const [events, setEvents] = useState(comp.events);
     const [loading, setLoading] = useState(false);
-    const [colStates, setColStates] = useState({ ...comp.collStates, loading: 0,  error: 0 });
+    const [colStates, setColStates] = useState({ ...comp.collStates, loading: 0, error: 0 });
     const [isFilterChange, setFilters] = useState(false);
 
 
@@ -165,7 +165,7 @@ const Component = (props) => {
         setFilters(false);
     }, [states, _states, filters, isFilterChange]);
 
-  
+
 
     // Use useEffect to call handleLoadDocuments when states, _states, filters, isFilterChange, or colStates change
     useEffect(() => {
@@ -187,15 +187,15 @@ const Component = (props) => {
     }
 
     // Function to handle scroll event
-    const onScroll = (onScroll, iframeDocument) => {
+    const onScroll = (onScroll) => {
 
         // If no onScroll input, return
         if (!onScroll)
             return;
 
         // Get scroll top and left values
-        const scrollTop = iframeDocument.pageYOffset;
-        const scrollLeft = iframeDocument.pageXOffset;
+        const scrollTop = window.pageYOffset;
+        const scrollLeft = window.pageXOffset;
         const delta = onScroll.delta;
 
         // If there are scroll values, evaluate expressions
@@ -218,48 +218,32 @@ const Component = (props) => {
         e.preventDefault();
         // Loop through each event and call onScroll function
         for (const key in events) {
-            const iframe = document.querySelector("#ac-editor-iframe-doc");
-            if (iframe) {
-                const iframeDocument = iframe.contentDocument || iframe.contentWindow.document;
-                onScroll(events[key], iframeDocument);
-            }
+            onScroll(events[key]);
         }
     }, [events]);
 
     // Function to add scroll event listener
-    const addScrollEventListener = useCallback((iframeDocument) => {
-        iframeDocument.addEventListener('scroll', handleScrollEvent);
+    const addScrollEventListener = useCallback(() => {
+        window.addEventListener('scroll', handleScrollEvent);
     }, [handleScrollEvent]);
 
     // Function to remove scroll event listener
-    const removeScrollEventListener = useCallback((iframeDocument) => {
-        iframeDocument.removeEventListener('scroll', handleScrollEvent);
+    const removeScrollEventListener = useCallback(() => {
+        window.removeEventListener('scroll', handleScrollEvent);
     }, [handleScrollEvent]);
 
     useEffect(() => {
         // If there are no events, return
         if (!events || typeof window === 'undefined') return;
 
-        const iframe = document.querySelector("#ac-editor-iframe-doc");
-
-        if (iframe) {
-            const iframeDocument = iframe.contentDocument || iframe.contentWindow.document;
-            // Add scroll event listener
-            addScrollEventListener(iframeDocument);
-        }
+        addScrollEventListener();
 
         // Cleanup function to remove event listener when component unmounts
         return () => {
 
             if (!events || typeof window === 'undefined') return;
+            removeScrollEventListener();
 
-
-            const iframe = document.querySelector("#ac-editor-iframe-doc");
-            if (iframe) {
-                const iframeDocument = iframe.contentDocument || iframe.contentWindow.document;
-                // Remove scroll event listener
-                removeScrollEventListener(iframeDocument);
-            }
         };
     }, [events, addScrollEventListener, removeScrollEventListener]);
 
@@ -438,19 +422,19 @@ const Component = (props) => {
             }
             allvalues = options;
         }
-        // Use a debounce function to limit the frequency of the loop
-        const debouncedSetValue = debounce((onChange, value) => {
-            setValue(onChange, value, '');
+          // Use a debounce function to limit the frequency of the loop
+          const debouncedSetValue = debounce((values, allvalues) => {
+            for (const elem of values) {
+                let value = elem.value;
+                const elemToChange = elem.elem;
+                if (value === 'all')
+                    value = allvalues.join(",");
+
+                    setValue(elemToChange, value, '');
+            }
         }, 100); // 300ms delay
-        for (const elem of values) {
-            let value = elem.value;
-            const onChange = elem.elem;
-            if (value === 'all')
-                value = allvalues.join(",");
 
-
-            debouncedSetValue(onChange, value);
-        }
+        debouncedSetValue(values, allvalues);
         return allvalues;
     }, [states, colStates, _states])
 
@@ -488,7 +472,7 @@ const Component = (props) => {
             return <ElementMapping {...props} map={node.map}
                 _states={states}
                 _props={_states}
-                
+
             >
                 {renderChildren()}
             </ElementMapping>

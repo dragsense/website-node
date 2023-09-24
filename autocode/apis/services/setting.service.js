@@ -965,14 +965,14 @@ const prepareDocument = (collection) => {
         doc.forms = collection._forms;
         doc.states = collection._states;
         doc.collStates = collection._collStates;
-
+        doc.events = collection._events;
     } else {
         doc.elements = collection.elements;
         doc.components = collection.components;
         doc.forms = collection.forms;
         doc.states = collection.states;
         doc.collStates = collection.collStates;
-
+        doc.events = collection.events;
     }
     return doc;
 };

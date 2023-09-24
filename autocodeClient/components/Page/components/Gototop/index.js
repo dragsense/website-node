@@ -5,13 +5,19 @@ import { Transition } from 'react-transition-group';
 const getDefaultValue = (states, key, defaultValue) => states[key] ? states[key].defaultValue : defaultValue;
 
 // Function to handle scroll
-const handleScroll = (window, setIsVisible) => {
+const handleScroll = (setIsVisible) => {
+
+
     const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
     setIsVisible(scrollTop > 0);
 };
 
 // Function to scroll to top
-const scrollToTop = (window) => {
+const scrollToTop = () => {
+
+    if (typeof window === 'undefined') return;
+
+
     window.scrollTo({
         top: 0,
         behavior: 'smooth',
@@ -32,18 +38,19 @@ const GoToTopButton = (props) => {
     const [isVisible, setIsVisible] = useState(false);
     const nodeRef = useRef(null);
 
-    const iframe = document.querySelector("#ac-editor-iframe-doc");
-    const window = iframe.contentWindow;
-
     const duration = getDefaultValue(states, 'duration', 300);
     const type = getDefaultValue(states, 'type', 'fade');
 
     const buttonTransition = getTransition(transitions, type, duration);
 
-    const handleScrollCallback = useCallback(() => handleScroll(window, setIsVisible), [window, setIsVisible]);
-    const scrollToTopCallback = useCallback(() => scrollToTop(window), [window]);
+    const handleScrollCallback = useCallback(() => handleScroll(setIsVisible), [setIsVisible]);
+    const scrollToTopCallback = useCallback(() => scrollToTop(), []);
 
     useEffect(() => {
+
+        if (typeof window === 'undefined') return;
+
+
         window.addEventListener('scroll', handleScrollCallback);
         return () => {
             window.removeEventListener('scroll', handleScrollCallback);
@@ -58,7 +65,7 @@ const GoToTopButton = (props) => {
             };
             const transitionStyles = buttonTransition[state];
             return <div ref={nodeRef} style={{ ...baseStyle, ...transitionStyles }}
-             onClick={scrollToTopCallback}>
+                onClick={scrollToTopCallback}>
                 {element(node, children)}
             </div>;
 

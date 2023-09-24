@@ -38,6 +38,8 @@ const elementObject= {
     Joi.string(),
     Joi.object()
   ),
+  _events: Joi.object().allow({}),
+
   _states: Joi.object().allow({}),
   _components: Joi.array().items(Joi.string().pattern(/^[0-9a-fA-F]{24}$/)),
   _forms: Joi.array().items(Joi.string().pattern(/^[0-9a-fA-F]{24}$/)),

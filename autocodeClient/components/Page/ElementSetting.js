@@ -93,9 +93,9 @@ const ElementSetting = (props) => {
     return;
 
     if (key[1] === 'width') {
-        return contentWindow.innerWidth;
+        return window.innerWidth;
     } else if (key[1] === 'height') {
-        return contentWindow.innerHeight;
+        return window.innerHeight;
     }
 };
 

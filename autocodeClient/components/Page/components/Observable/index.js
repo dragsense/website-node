@@ -7,21 +7,18 @@ const getDefaultValue = (states, key, defaultValue) => states[key] ? states[key]
 const handleScroll = (onScroll, scrollTop, scrollLeft, scrollTopClass, scrollLeftClass, setTopClasses, setLeftClasses) => {
     if (!onScroll || typeof window === 'undefined') return;
 
-    const iframe = document.querySelector("#ac-editor-iframe-doc");
-        if (iframe) {
-            const iframeWindow = iframe.contentWindow;
-            const iframeDocument = iframe.contentDocument || iframe.contentWindow.document;
-            const top = iframeWindow.pageYOffset || iframeDocument.documentElement.scrollTop;
-            const left = iframeWindow.pageXOffset || iframeDocument.documentElement.scrollLeft;
-            if (top > scrollTop)
-                setTopClasses({ name: scrollTopClass })
-            else
-                setTopClasses({})
-            if (left > scrollLeft)
-                setLeftClasses({ name: scrollLeftClass })
-            else
-                setLeftClasses({})
-    }
+
+    const top = window.pageYOffset || document.documentElement.scrollTop;
+    const left = window.pageXOffset || document.documentElement.scrollLeft;
+    if (top > scrollTop)
+        setTopClasses({ name: scrollTopClass })
+    else
+        setTopClasses({})
+    if (left > scrollLeft)
+        setLeftClasses({ name: scrollLeftClass })
+    else
+        setLeftClasses({})
+
 };
 
 // Function to handle visibility

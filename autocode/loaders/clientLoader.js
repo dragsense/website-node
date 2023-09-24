@@ -212,7 +212,7 @@ module.exports = (app, AutoCode, AutocodeCustom, libraryName) => {
           <meta name="keywords" content="${setting.keywords}" />
           <link rel="icon" href="${host}${setting.images?.favicon?.src || `/images/default/favicon.ico`}" />
           <meta httpEquiv="Content-Language" content="${setting.lang}" />
-          <link rel="stylesheet" type="text/css" href="style.css">
+          <link rel="stylesheet" type="text/css" href="/style.css">
           ${setting.scripts?.head}
           </head>
           <body>
@@ -220,11 +220,11 @@ module.exports = (app, AutoCode, AutocodeCustom, libraryName) => {
             <script id="ac-data-script-${page._id}">
             window.__INITIAL_DATA__ = ${JSON.stringify(pageData)};
             </script>
-            <script src="index.js"></script>
+            <script src="/index.js"></script>
             ${setting.scripts ? setting.scripts.foot || '' : ''}
             ${page.setting ? page.setting.scripts?.foot || '' : ''}
-           <script src="${libraryName}.js"></script>
-            <script src="autocode-client.js"></script> 
+           <script src="/${libraryName}.js"></script>
+            <script src="/autocode-client.js"></script> 
           </body>
         </html>
       `);

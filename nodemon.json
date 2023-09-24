@@ -1,3 +1,4 @@
 {
-    "ignore": ["/private/*"]
+  "ignore": ["public/*", "private/*"]
+   
   }

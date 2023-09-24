@@ -1,30 +1,24 @@
-const React = require("react");
-
-import { Children, useMemo, useCallback } from 'react';
+import React, { Children, useMemo, useCallback } from 'react';
 
 // Function to create custom attributes for the element
-const createCustomAttributes = (onMouseMove,  onClick, onScroll) => {
+const createCustomAttributes = (onMouseMove,  onClick, onScroll,  onMouseEnter, onMouseLeave) => {
     return {
         onMouseMove,
         onScroll,
-        onClick: onClick ? onClick : (e) => {
-            const currentElement = e.target;  
-            if (currentElement.tagName.toLowerCase() === 'a' ||
-            currentElement.parentNode.tagName.toLowerCase() === 'a') {
-            // Prevent the default behavior for anchor links
-            e.preventDefault();
-            }
-        },
+        onMouseEnter,
+        onMouseLeave,
+        onClick
 
     }
 }
 
-const General = ({  conds, onMouseMove, onClick, onScroll, innerWraaper, value, children }) => {
+const General = ({  conds, onMouseMove, onClick, onScroll,onMouseEnter,
+    onMouseExit, innerWraaper, value, children }) => {
 
 
 
     // Create custom attributes for the element
-    const customAttributes = createCustomAttributes(onMouseMove, onClick, onScroll);
+    const customAttributes = createCustomAttributes(onMouseMove, onClick, onScroll, onMouseEnter, onMouseExit);
 
     // Create span element based on the innerWrapper
     const spanElement = useMemo(() => {

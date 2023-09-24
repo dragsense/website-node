@@ -27,13 +27,14 @@ const ElementValue = (props) => {
         children 
     } = props;
 
-
+    
 
          // Handle 'WINDOW' type
          const handleWindowType = (key) => {
+
     
             if(typeof window === 'undefined')
-            return;
+            return; 
 
             if (key[1] === 'width') {
                 return window.innerWidth;
@@ -141,242 +142,289 @@ const ElementValue = (props) => {
         return { withValue, stateValue };
     }
 
-    // Handle onClick event
-    const handleOnClick = (node, fun, withValue, stateValue) => {
-        if (withValue?.notClickable)
-            return;
+// Handle onClick event
+const handleOnClick = (changeFun, fun, withValue, stateValue) => {
+    if (withValue?.notClickable)
+        return;
 
-        if (fun?.onClick)
-            fun.onClick(node, stateValue, withValue);
-    }
+    if (fun?.onClick)
+        fun.onClick(changeFun, stateValue, withValue);
+}
 
-    const onClickNode = (e) => {
-        // Prevent default action for anchor tags
-        if (node.tagName === 'a')
-            e.preventDefault();
-
-        try {
-            if (node.onClick) {
-                const { withValue, stateValue } = extractOnClickValues(node.onClick);
-                handleOnClick(node, fun, withValue, stateValue);
-            }
-        } catch (e) {
-            console.error(e);
-        }
-    }
-
-    // Function to handle onChange event
-    const handleOnChange = (onChangeEvent, value, node, all) => {
-
-
-        // Check if onChange function exists in fun object
-        if (fun?.onChange) {
-            // Call the onChange function with the required parameters
-
-            fun.onChange([{ elem: onChangeEvent, value }], node, all);
-        }
-    }
-
-    // Function to validate onChange event
-    const validateOnChange = (onChangeEvent) => {
-        // Check if onChangeEvent has a value or if it doesn't exist
-        return onChangeEvent?.value;
-    }
-
-    const onChangeNode = (value, all) => {
-
-
-
-        // Extract onChange event from node
-        const onChangeEvent = node.onChange;
-
-
-        try {
-            // Validate onChange event
-            if (validateOnChange(onChangeEvent)) {
-                // Handle onChange event
-                handleOnChange(onChangeEvent, value, node, all);
-            }
-        } catch (e) {
-            // Log any errors
-            console.error(e);
-        }
-    }
-
-    // Function to handle mouse move event
-    const handleMouseMove = (e, onMouseMove) => {
-        let pageX, pageY, scrollLeft, scrollTop;
-
-        // Determine mouse type and set pageX and pageY accordingly
-        if (onMouseMove.mouseType === 'page') {
-            pageX = e.pageX;
-            pageY = e.pageY;
-        } else {
-            pageX = e.clientX;
-            pageY = e.clientY;
-        }
-
-        // Determine scroll type and set scrollLeft and scrollTop accordingly
-        if (onMouseMove.scrollType === 'pageScroll') {
-            const iframe = document.querySelector("#ac-editor-iframe-doc");
-
-            if (iframe) {
-                const iframeWindow = iframe.contentWindow;
-                scrollLeft = iframeWindow.pageYOffset;
-                scrollTop = iframeWindow.pageYOffset;
-            }
-        } else {
-            scrollLeft = e.target.scrollLeft;
-            scrollTop = e.target.scrollTop;
-        }
-
-        return { pageX, pageY, scrollLeft, scrollTop, delta: onMouseMove.delta };
-    }
-
-    // Function to calculate valueX and valueY based on mouse move
-    const calculateMouseMoveValues = (onMouseMove, pageX, pageY, scrollLeft, scrollTop, delta) => {
-        let valueX = '', valueY = '';
-
-        // Calculate valueX if it exists
-        if (onMouseMove.valueX) {
-            valueX = onMouseMove.valueX.replace(/\[X]/g, pageX);
-            valueX = valueX.replace(/\[Y]/g, pageY);
-            valueX = valueX.replace(/\[left]/g, scrollLeft);
-            valueX = valueX.replace(/\[top]/g, scrollTop);
-            valueX = valueX.replace(/\[delta]/g, delta);
-        }
-
-        // Calculate valueY if it exists
-        if (onMouseMove.valueY) {
-            valueY = onMouseMove.valueY.replace(/\[Y]/g, pageY);
-            valueY = valueY.replace(/\[X]/g, pageX);
-            valueY = valueY.replace(/\[left]/g, scrollLeft);
-            valueY = valueY.replace(/\[top]/g, scrollTop);
-            valueY = valueY.replace(/\[delta]/g, delta);
-        }
-
-        return { valueX, valueY };
-    }
-
-    const onMouseMove = (e) => {
+const onClickNode = (e) => {
+    // Prevent default action for anchor tags
+    if (node.tagName === 'a')
         e.preventDefault();
 
-        const onMouseMove = node.onMouseMove;
+    try {
+        if (node.onClick) {
+            let { withValue, stateValue } = extractOnClickValues(node.onClick);
 
-        if (!onMouseMove)
-            return;
 
-        try {
-            const { pageX, pageY, scrollLeft, scrollTop, delta } = handleMouseMove(e, onMouseMove);
-            const { valueX, valueY } = calculateMouseMoveValues(onMouseMove, pageX, pageY, scrollLeft, scrollTop, delta);
-
-            if (valueX || valueY) {
-                try {
-                    valueX = eval(valueX);
-                    valueY = eval(valueY);
-                } catch (e) {
-                    console.error("Invalid expression:", e);
-                }
-
-                if (fun?.onChange)
-                    fun.onChange([{ elem: onMouseMove.stateValueX || {}, value: valueX }, { elem: onMouseMove.stateValueY || {}, value: valueY }], node, null);
-            }
+            handleOnClick(node.onClick, fun, withValue, stateValue, value);
         }
-        catch (e) {
-            console.error(e);
-        }
+    } catch (e) {
+        console.error(e);
     }
+}
 
-    // Function to handle scroll event
-    const handleScroll = (e, onScroll) => {
-        const scrollLeft = e.target.scrollLeft;
-        const scrollTop = e.target.scrollTop;
-        const delta = onScroll.delta;
-
-        return { scrollLeft, scrollTop, delta };
-    }
-
-    // Function to calculate valueX and valueY based on scroll
-    const calculateScrollValues = (onScroll, scrollLeft, scrollTop, delta) => {
-        let valueX = '', valueY = '';
-
-        // Calculate valueX if it exists
-        if (onScroll?.valueX) {
-            valueX = onScroll.valueX.replace(/\[left]/g, scrollLeft);
-            valueX = valueX.replace(/\[top]/g, scrollTop);
-            valueX = valueX.replace(/\[delta]/g, delta);
-        }
-
-        // Calculate valueY if it exists
-        if (onScroll?.valueY) {
-            valueY = onScroll.valueY.replace(/\[top]/g, scrollTop);
-            valueY = valueY.replace(/\[left]/g, scrollLeft);
-            valueY = valueY.replace(/\[delta]/g, delta);
-        }
-
-        return { valueX, valueY };
-    }
-
-    const onScroll = (e) => {
+const onMouseEnter = (e) => {
+    // Prevent default action for anchor tags
+    if (node.tagName === 'a')
         e.preventDefault();
 
-        const onScroll = node.onScroll;
+    try {
+        if (node.onMouseEnter) {
+            let { withValue, stateValue } = extractOnClickValues(node.onMouseEnter);
 
-        if (!onScroll || !fun?.onChange)
-            return;
 
-        try {
-            const { scrollLeft, scrollTop, delta } = handleScroll(e, onScroll);
-            const { valueX, valueY } = calculateScrollValues(onScroll, scrollLeft, scrollTop, delta);
-
-            if (valueX || valueY) {
-                try {
-                    valueX = eval(valueX);
-                    valueY = eval(valueY);
-                } catch (e) {
-                    message.error("Invalid expression:" + e?.message);
-                }
-
-                if (fun?.onChange)
-                    fun.onChange([
-                        { elem: onScroll.stateValueX || {}, value: valueX },
-                        { elem: onScroll.stateValueY || {}, value: valueY }],
-                        node, null);
-            }
+            handleOnClick(node.onMouseEnter, fun, withValue, stateValue, value);
         }
-        catch (e) {
-            message.error(e?.message);
+    } catch (e) {
+        console.error(e);
+    }
+}
+
+const onMouseExit = (e) => {
+    // Prevent default action for anchor tags
+    if (node.tagName === 'a')
+        e.preventDefault();
+
+    try {
+        if (node.onMouseEnter) {
+            let { withValue, stateValue } = extractOnClickValues(node.onMouseExit);
+
+
+            handleOnClick(node.onMouseExit, fun, withValue, stateValue, value);
         }
+    } catch (e) {
+        console.error(e);
+    }
+}
+
+
+// Function to handle onChange event
+const handleOnChange = (onChangeEvent, value, node, all) => {
+
+
+    // Check if onChange function exists in fun object
+    if (fun?.onChange) {
+        // Call the onChange function with the required parameters
+
+        fun.onChange([{ elem: onChangeEvent, value }], node, all);
+    }
+}
+
+// Function to validate onChange event
+const validateOnChange = (onChangeEvent) => {
+    // Check if onChangeEvent has a value or if it doesn't exist
+    return onChangeEvent?.value;
+}
+
+const onChangeNode = (value, all) => {
+
+
+
+    // Extract onChange event from node
+    const onChangeEvent = node.onChange;
+
+
+    try {
+        // Validate onChange event
+        if (validateOnChange(onChangeEvent)) {
+            // Handle onChange event
+            handleOnChange(onChangeEvent, value, node, all);
+        }
+    } catch (e) {
+        // Log any errors
+        console.error(e);
+    }
+}
+
+// Function to handle mouse move event
+const handleMouseMove = (e, onMouseMove) => {
+    let pageX, pageY, scrollLeft, scrollTop;
+
+    // Determine mouse type and set pageX and pageY accordingly
+    if (onMouseMove.mouseType === 'page') {
+        pageX = e.pageX;
+        pageY = e.pageY;
+    } else {
+        pageX = e.clientX;
+        pageY = e.clientY;
     }
 
-    // Check if the event handlers are defined in the node
-    const hasOnChange = useMemo(() => Boolean(node.onChange), [node.onChange]);
-    const hasOnMouseMove = useMemo(() => Boolean(node.onMouseMove), [node.onMouseMove]);
-    const hasOnClick = useMemo(() => Boolean(node.onClick), [node.onClick]);
-    const hasOnScroll = useMemo(() => Boolean(node.onScroll), [node.onScroll]);
+    // Determine scroll type and set scrollLeft and scrollTop accordingly
+    if (onMouseMove.scrollType === 'pageScroll') {
+        if (iframe) {
+            scrollLeft = window.pageYOffset;
+            scrollTop = window.pageYOffset;
+        }
+    } else {
+        scrollLeft = e.target.scrollLeft;
+        scrollTop = e.target.scrollTop;
+    }
+
+    return { pageX, pageY, scrollLeft, scrollTop, delta: onMouseMove.delta };
+}
+
+// Function to calculate valueX and valueY based on mouse move
+const calculateMouseMoveValues = (onMouseMove, pageX, pageY, scrollLeft, scrollTop, delta) => {
+    let valueX = '', valueY = '';
+
+    // Calculate valueX if it exists
+    if (onMouseMove.valueX) {
+        valueX = onMouseMove.valueX.replace(/\[X]/g, pageX);
+        valueX = valueX.replace(/\[Y]/g, pageY);
+        valueX = valueX.replace(/\[left]/g, scrollLeft);
+        valueX = valueX.replace(/\[top]/g, scrollTop);
+        valueX = valueX.replace(/\[delta]/g, delta);
+    }
+
+    // Calculate valueY if it exists
+    if (onMouseMove.valueY) {
+        valueY = onMouseMove.valueY.replace(/\[Y]/g, pageY);
+        valueY = valueY.replace(/\[X]/g, pageX);
+        valueY = valueY.replace(/\[left]/g, scrollLeft);
+        valueY = valueY.replace(/\[top]/g, scrollTop);
+        valueY = valueY.replace(/\[delta]/g, delta);
+    }
+
+    return { valueX, valueY };
+}
+
+const onMouseMove = (e) => {
+    e.preventDefault();
+
+    const onMouseMove = node.onMouseMove;
 
 
-    return (
-        <ElementType
-            {...props}
-            value={value}
-            attributes={attributes}
-            classes={classes}
-            node={node}
-            conds={conds}
-            mapValue={mapValue}
-            mapIndex={mapIndex}
-            // Assign event handlers only if they are defined in the node
-            onChange={hasOnChange ? onChangeNode : undefined}
-            onMouseMove={hasOnMouseMove ? onMouseMove : undefined}
-            onClick={hasOnClick ? onClickNode : undefined}
-            onScroll={hasOnScroll ? onScroll : undefined}
-            // Disable the button if no input change
-            disabled={disabled}
-        >
-            {children}
-        </ElementType>
-    );
+    if (!onMouseMove)
+        return;
+
+    try {
+        const { pageX, pageY, scrollLeft, scrollTop, delta } = handleMouseMove(e, onMouseMove);
+        let { valueX, valueY } = calculateMouseMoveValues(onMouseMove, pageX, pageY, scrollLeft, scrollTop, delta);
+
+        if (valueX || valueY) {
+            try {
+                valueX = eval(valueX);
+                valueY = eval(valueY);
+            } catch (e) {
+                console.error("Invalid expression:", e);
+            }
+
+
+            if (fun?.onChange)
+                fun.onChange([{ elem: onMouseMove.stateValueX || null, value: valueX }, { elem: onMouseMove.stateValueY || null, value: valueY }], node, null);
+        }
+    }
+    catch (e) {
+        console.error(e);
+    }
+}
+
+// Function to handle scroll event
+const handleScroll = (e, onScroll) => {
+    const scrollLeft = e.target.scrollLeft;
+    const scrollTop = e.target.scrollTop;
+    const delta = onScroll.delta;
+
+
+
+    return { scrollLeft, scrollTop, delta };
+}
+
+// Function to calculate valueX and valueY based on scroll
+const calculateScrollValues = (onScroll, scrollLeft, scrollTop, delta) => {
+    let valueX = '', valueY = '';
+
+    // Calculate valueX if it exists
+    if (onScroll?.valueX) {
+        valueX = onScroll.valueX.replace(/\[left]/g, scrollLeft);
+        valueX = valueX.replace(/\[top]/g, scrollTop);
+        valueX = valueX.replace(/\[delta]/g, delta);
+    }
+
+    // Calculate valueY if it exists
+    if (onScroll?.valueY) {
+        valueY = onScroll.valueY.replace(/\[top]/g, scrollTop);
+        valueY = valueY.replace(/\[left]/g, scrollLeft);
+        valueY = valueY.replace(/\[delta]/g, delta);
+    }
+
+    return { valueX, valueY };
+}
+
+const onScroll = (e) => {
+
+
+    e.preventDefault();
+
+    const onScroll = node.onScroll;
+
+   
+
+    if (!onScroll || !fun?.onChange)
+        return;
+
+    try {
+        const { scrollLeft, scrollTop, delta } = handleScroll(e, onScroll);
+        let { valueX, valueY } = calculateScrollValues(onScroll, scrollLeft, scrollTop, delta);
+
+        if (valueX || valueY) {
+            try {
+                valueX = eval(valueX);
+                valueY = eval(valueY);
+            } catch (e) {
+                message.error("Invalid expression:" + e?.message);
+            }
+
+            if (fun?.onChange)
+                fun.onChange([
+                    { elem: onScroll.stateValueX || {}, value: valueX },
+                    { elem: onScroll.stateValueY || {}, value: valueY }],
+                    node, null);
+        }
+    }
+    catch (e) {
+        message.error(e?.message);
+    }
+}
+
+// Check if the event handlers are defined in the node
+const hasOnChange = useMemo(() => Boolean(node.onChange), [node.onChange]);
+const hasOnMouseMove = useMemo(() => Boolean(node.onMouseMove), [node.onMouseMove]);
+const hasOnEnter = useMemo(() => Boolean(node.onMouseEnter), [node.onMouseEnter]);
+const hasOnLeave = useMemo(() => Boolean(node.onMouseExit), [node.onMouseExit]);
+const hasOnClick = useMemo(() => Boolean(node.onClick), [node.onClick]);
+const hasOnScroll = useMemo(() => Boolean(node.onScroll), [node.onScroll]);
+
+
+return (
+    <ElementType
+        {...props}
+        value={value}
+        attributes={attributes}
+        classes={classes}
+        node={node}
+        conds={conds}
+        mapValue={mapValue}
+        mapIndex={mapIndex}
+        // Assign event handlers only if they are defined in the node
+        onChange={hasOnChange ? onChangeNode : undefined}
+        onMouseMove={hasOnMouseMove ? onMouseMove : undefined}
+        onClick={hasOnClick ? onClickNode : undefined}
+        onMouseEnter={hasOnEnter ? onMouseEnter : undefined}
+        onMouseExit={hasOnLeave ? onMouseExit : undefined}
+
+        onScroll={hasOnScroll ? onScroll : undefined}
+        // Disable the button if no input change
+        disabled={disabled}
+    >
+        {children}
+    </ElementType>
+);
 
 
 };
