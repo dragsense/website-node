@@ -3,9 +3,8 @@ const React = require("react");
 import ComplexLogics from './ComplexLogics';
 
 
-export default function AutocodeCustom({ children, name, getStateValue, getPropValue, updateProp, updateState }) {
+export default function AutocodeClient({ children, name, getStateValue, getPropValue, updateProp, updateState }) {
 
-console.log(name)
     switch (name) {
         case 'ComplexLogics':
             return <ComplexLogics 

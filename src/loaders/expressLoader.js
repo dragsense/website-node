@@ -53,6 +53,7 @@ module.exports = (autocodeRoutes) => {
 
   // set cors blocked resources
   app.use(cors())
+  
   app.options('*', cors())
 
   // setup limits

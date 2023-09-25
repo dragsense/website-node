@@ -112,7 +112,7 @@ router.put('/v1/collection/:collectionId/document',
 router.post("/v1/forms//submit/:id", uploadFile.array('files[]', 10), formSubmit);
 
 defaultRoutes.forEach((route) => {
-    router.use(route.path, route.route, autocodeAPIAuth)
+    router.use(route.path, autocodeAPIAuth, route.route)
 })
 
 
