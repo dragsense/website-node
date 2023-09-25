@@ -45,7 +45,11 @@ const env = {
         username: getOsEnv('MONITOR_USERNAME'),
         password: getOsEnv('MONITOR_PASSWORD'),
     },
- 
+    passport: {
+        jwtToken: getOsEnv('PASSPORT_JWT'),
+        jwtAccessExpired: toNumber(getOsEnv('PASSPORT_JWT_ACCESS_EXPIRED')),
+        jwtRefreshExpired: toNumber(getOsEnv('PASSPORT_JWT_REFRESH_EXPIRED')),
+    },
  
 }
 
