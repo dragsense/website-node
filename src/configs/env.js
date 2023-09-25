@@ -38,21 +38,14 @@ const env = {
         json: toBool(getOsEnvOptional('LOG_JSON')),
         output: getOsEnv('LOG_OUTPUT'),
     },
-    jsonEncrypt: {
-        algorithm: getOsEnv('JSON_ENCRYPTION_ALGO'),
-        key: getOsEnv('JSON_ENCRYPTION_KEY'),
-    },
+
     monitor: {
         enabled: toBool(getOsEnv('MONITOR_ENABLED')),
         route: getOsEnv('MONITOR_ROUTE'),
         username: getOsEnv('MONITOR_USERNAME'),
         password: getOsEnv('MONITOR_PASSWORD'),
     },
-    passport: {
-        jwtToken: getOsEnv('PASSPORT_JWT'),
-        jwtAccessExpired: toNumber(getOsEnv('PASSPORT_JWT_ACCESS_EXPIRED')),
-        jwtRefreshExpired: toNumber(getOsEnv('PASSPORT_JWT_REFRESH_EXPIRED')),
-    },
+ 
  
 }
 
