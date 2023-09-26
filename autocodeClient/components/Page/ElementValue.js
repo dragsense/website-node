@@ -257,8 +257,8 @@ const handleMouseMove = (e, onMouseMove) => {
     // Determine scroll type and set scrollLeft and scrollTop accordingly
     if (onMouseMove.scrollType === 'pageScroll') {
         if (iframe) {
-            scrollLeft = window.pageYOffset;
-            scrollTop = window.pageYOffset;
+            scrollLeft = window.scrollX;
+            scrollTop = window.scrollY;
         }
     } else {
         scrollLeft = e.target.scrollLeft;

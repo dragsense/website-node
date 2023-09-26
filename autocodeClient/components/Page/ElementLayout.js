@@ -148,7 +148,7 @@ const ElementLayout = (props) => {
                 states={_cstates}
                 node={node}
                 element={handleElementSetting}
-                updateStates={updateStates}>{children}
+                updateStates={updateStates}>{elements}
             </Observable>;
         case 'menu':
             return <Menu states={_cstates}

@@ -7,7 +7,7 @@ import { getStates } from '../../utils/element-value';
 // CustomComponent is a component that loads a custom component from a given path and manages its states and props
 const CustomComponent = (props) => {
 
-    const { children, customPath, node, _states, _props, onSetStates, mapValue, mapIndex } = props;
+    const { children, customPath, node, _states, _props, onSetStates, mapValue, mapIndex, AutocodeCustom } = props;
 
     // Function to load the custom component
     const loadComponent = async (path) => {

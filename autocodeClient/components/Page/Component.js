@@ -194,8 +194,8 @@ const Component = (props) => {
             return;
 
         // Get scroll top and left values
-        const scrollTop = window.pageYOffset;
-        const scrollLeft = window.pageXOffset;
+        const scrollTop = window.scrollY;
+        const scrollLeft = window.scrollX;
         const delta = onScroll.delta;
 
         // If there are scroll values, evaluate expressions

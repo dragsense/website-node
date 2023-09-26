@@ -29,13 +29,13 @@ const settingSchema = {
         maintenancePage: pageSchema,
         errorPage: pageSchema,
         email: Joi.object({
-            host: Joi.string(),
-            port: Joi.string(),
+            host: Joi.string().allow(""),
+            port: Joi.string().allow(""),
             ignoreTLS: Joi.boolean(),
             secure: Joi.boolean(),
             auth: Joi.object({
-                user: Joi.string(),
-                pass: Joi.string()
+                user: Joi.string().allow(""),
+                pass: Joi.string().allow("")
             }),
             subject: Joi.string(),
             from: Joi.string().email(),

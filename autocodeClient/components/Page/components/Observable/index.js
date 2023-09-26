@@ -1,94 +1,169 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 
-// Function to get default value from states
-const getDefaultValue = (states, key, defaultValue) => states[key] ? states[key].defaultValue : defaultValue;
-
-// Function to handle scroll event
-const handleScroll = (onScroll, scrollTop, scrollLeft, scrollTopClass, scrollLeftClass, setTopClasses, setLeftClasses) => {
-    if (!onScroll || typeof window === 'undefined') return;
-
-
-    const top = window.pageYOffset || document.documentElement.scrollTop;
-    const left = window.pageXOffset || document.documentElement.scrollLeft;
-    if (top > scrollTop)
-        setTopClasses({ name: scrollTopClass })
-    else
-        setTopClasses({})
-    if (left > scrollLeft)
-        setLeftClasses({ name: scrollLeftClass })
-    else
-        setLeftClasses({})
-
-};
-
-// Function to handle visibility
-const handleVisibility = (onVisible, visible, visibleClass, inVisibleClass, setVisibleClasses, oneTime, ref) => {
-    let observer;
-    if (ref.current && onVisible) {
-        observer = new IntersectionObserver(function (entries) {
-            entries.forEach(function (entry) {
-                if (entry.isIntersecting && entry.intersectionRatio >= visible) {
-                    setVisibleClasses({ name: visibleClass });
-                    if (oneTime) {
-                        observer.disconnect();
-                        return;
-                    }
-                } else {
-                    setVisibleClasses({ name: inVisibleClass });
-                }
-            });
-        }, { threshold: visible });
-        observer.observe(ref.current);
-    }
-    return () => {
-        if (onVisible) {
-            observer.disconnect();
-        }
-    };
-};
 
 const Observable = (props) => {
-    const { children, states, element, node } = props;
+    const { children, states, node, updateStates } = props;
     const ref = useRef();
-    const [topClass, setTopClasses] = useState({});
-    const [leftClass, setLeftClasses] = useState({});
-    const [visibleCls, setVisibleClasses] = useState({ name: getDefaultValue(states, 'inVisibleClass', "") });
+
+    const [vValue, setVisibleValue] = useState('')
+    const [sTValue, setScrollTopValue] = useState('')
+    const [sLValue, setScrollLeftValue] = useState('')
+
+    const [vTValue, setVisibleTopValue] = useState(0)
+
+    // Function to get default value from states
+    const getDefaultValue = (states, key, defaultValue) => states[key] ? states[key].defaultValue : defaultValue;
 
     const tagName = getDefaultValue(states, 'tagName', 'div');
+
     const onScroll = getDefaultValue(states, 'onScroll', false);
-    const onVisible = getDefaultValue(states, 'onVisible', false);
     const scrollTop = getDefaultValue(states, 'scrollTop', 50);
     const scrollLeft = getDefaultValue(states, 'scrollLeft', 50);
-    const scrollTopClass = getDefaultValue(states, 'scrollTopClass', "");
-    const scrollLeftClass = getDefaultValue(states, 'scrollLeftClass', "");
+    const scrollTopValue = getDefaultValue(states, 'scrollTopValue', "");
+    const scrollLeftValue = getDefaultValue(states, 'scrollLeftValue', "");
+
+
+    const onVisible = getDefaultValue(states, 'onVisible', false);
+    const calculateVisibility = getDefaultValue(states, 'calculateVisibility', false);
+
     const oneTime = getDefaultValue(states, 'oneTime', false);
-    const visible = getDefaultValue(states, 'visible', 10 / 100);
-    const visibleClass = getDefaultValue(states, 'visibleClass', "");
-    const inVisibleClass = getDefaultValue(states, 'inVisibleClass', "");
+    const threshold = getDefaultValue(states, 'threshold', 10 / 100);
+    const visibleValue = getDefaultValue(states, 'visibleValue', "");
+    const inVisibleValue = getDefaultValue(states, 'inVisibleValue', "");
 
-    useEffect(() => handleVisibility(onVisible, visible, visibleClass, inVisibleClass, setVisibleClasses, oneTime, ref), [visibleClass, onVisible, visible, ref.current, oneTime]);
-    useEffect(() => handleScroll(onScroll, scrollTop, scrollLeft, scrollTopClass, scrollLeftClass, setTopClasses, setLeftClasses), [onScroll, scrollLeft, scrollTop, scrollTopClass, scrollLeftClass]);
 
-    const getClasses = () => {
-        let classes = node.classes || {};
-        if (topClass?.name)
-            classes['topClass'] = topClass;
+    // Function to handle scroll event
+    const handleScroll = () => {
+
+
+        const top = window.scrollY || document.documentElement.scrollTop;
+        const left = window.scrollX || document.documentElement.scrollLeft;
+        if (top > scrollTop)
+            setScrollTopValue(scrollTopValue)
         else
-            delete classes['topClass']
-        if (leftClass?.name)
-            classes['leftClass'] = leftClass;
+            setScrollTopValue('')
+        if (left > scrollLeft)
+            setScrollLeftValue(scrollLeftValue)
         else
-            delete classes['leftClass']
-        if (visibleCls?.name)
-            classes['visibleCls'] = visibleCls;
-        else
-            delete classes['visibleCls']
-        return classes;
+            setScrollLeftValue('')
+    };
+
+    useEffect(() => {
+
+        if (!onScroll || typeof window === 'undefined') return;
+        window.addEventListener('scroll', handleScroll);
+
+        return () => {
+            window.removeEventListener('scroll', handleScroll);
+        }
+
+    }, [onScroll, scrollLeft, scrollTop, scrollTopValue, scrollLeftValue]);
+
+    let observer;
+
+    // Function to handle visibility
+    const handleVisibility = () => {
+        if (ref.current && onVisible) {
+            observer = new IntersectionObserver(function (entries) {
+                entries.forEach(function (entry) {
+                    if (entry.isIntersecting && entry.intersectionRatio >= threshold) {
+                        setVisibleValue(visibleValue);
+                        if (oneTime) {
+                            observer.disconnect();
+                            return;
+                        }
+                    } else {
+                        setVisibleValue(inVisibleValue);
+                    }
+                });
+            }, { threshold: threshold });
+            observer.observe(ref.current);
+        }
+        return () => {
+            if (onVisible) {
+                observer.disconnect();
+            }
+        };
+    };
+    useEffect(() => handleVisibility, [
+        visibleValue,
+        inVisibleValue,
+        onVisible,
+        threshold,
+        ref.current,
+        oneTime]);
+
+
+    const calculateElementTopVisibility = useCallback(() => {
+        if (ref.current) {
+        
+                const scrollTop = window.scrollY || document.documentElement.scrollTop;
+
+                const viewportHeight = window.innerHeight;
+                const rect = ref.current.getBoundingClientRect();
+                // Vertical visibility
+                const elementTop = rect.top + scrollTop;
+                const elementBottom = rect.bottom + scrollTop;
+
+                const visibleTop = Math.max(elementTop, scrollTop);
+                const visibleBottom = Math.min(elementBottom, scrollTop + viewportHeight);
+
+                let visibleHeight = visibleBottom - visibleTop;
+                visibleHeight = Math.max(visibleHeight, 0);
+
+                const elementHeight = rect.height;
+                const visiblePercentageVertical = (visibleHeight / elementHeight) * 100;
+
+                // Assuming onScrollDiffer is a callback prop to parent component
+                setVisibleTopValue(visiblePercentageVertical);
+            
+        }
+    }, []);
+
+
+
+    useEffect(() => {
+        if (!calculateVisibility || typeof window === 'undefined') return;
+        window.addEventListener('scroll', calculateElementTopVisibility);
+        return () => {
+            window.removeEventListener('scroll', calculateElementTopVisibility);
+        }
+    }, [calculateVisibility, ref.current]);
+
+
+
+    useEffect(() => {
+        updateStates('updatedVisibleValue', vValue);
+    }, [vValue]);
+
+    useEffect(() => {
+        updateStates('upatedTopValue', sTValue);
+    }, [sTValue]);
+
+    useEffect(() => {
+        updateStates('upatedLeftValue', sLValue);
+    }, [sLValue]);
+
+    const deAttach = () => {
+        if (!oneTime || typeof window === 'undefined') return;
+        window.removeEventListener('scroll', calculateElementTopVisibility);
+
     }
 
-    const observableItem = useMemo(() => element({ ...node, tagName, classes: getClasses(), state: undefined, map: undefined }, children), [children, topClass, tagName, leftClass, visibleCls]);
+    useEffect(() => {
+        window.addEventListener('scroll', calculateElementTopVisibility);
+    }, [oneTime])
 
-    return <span style={{ display: 'inline' }} ref={ref}>{observableItem}</span>;
+    useEffect(() => {
+        if (vTValue) {
+            updateStates('visibleY', vTValue);
+            if (vTValue >= 100)
+                deAttach();
+        }
+
+    }, [vTValue, oneTime]);
+
+    return React.createElement(tagName, { ref }, children)
 };
 
 export default Observable;
