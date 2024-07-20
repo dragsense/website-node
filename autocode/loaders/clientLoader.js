@@ -141,8 +141,8 @@ module.exports = (app, AutoCode, AutocodeCustom, libraryName) => {
 
       const settingData = {
         global: {
-          title: setting.webtitle,
-          tagline: setting.tagLine,
+          webTitle: setting.webtitle,
+          tagLine: setting.tagLine,
           desc: setting.desc,
           author: setting.author,
           images: setting.images
