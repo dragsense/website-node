@@ -6,7 +6,6 @@ const env = require('../configs/env')
 const autocodeAPIAuth = (req, res, next) => {
 
     let api_key = req.header("x-api-key");
-    console.log(api_key)
 
     if (api_key === env.autocodeApiKey) {
         next();
