@@ -214,7 +214,7 @@ module.exports = (app, AutoCode, AutocodeCustom, libraryName) => {
 
 
       // Write CSS to temp file
-      fs.writeFileSync(path.join(publicDir, 'style.css'), `${rootCss}\n${fontCssString}\n${globalCss.css}\n${pagesResults.css.join(" ")}`);
+      fs.writeFileSync(path.join(publicDir, 'style.css'), `${rootCss}\n${globalCss.css}\n${pagesResults.css.join(" ")}`);
 
       // Write JS to temp file
       fs.writeFileSync(path.join(publicDir, 'index.js'), `${globalJs.code}`);
@@ -230,6 +230,7 @@ module.exports = (app, AutoCode, AutocodeCustom, libraryName) => {
           <link rel="icon" href="${host}${setting.images?.favicon?.src || `/images/default/favicon.ico`}" />
           <meta httpEquiv="Content-Language" content="${setting.lang}" />
           <link rel="stylesheet" type="text/css" href="/style.css">
+          ${fontCssString}
           ${setting.scripts?.head}
           </head>
           <body>
