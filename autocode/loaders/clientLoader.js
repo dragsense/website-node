@@ -141,12 +141,13 @@ module.exports = (app, AutoCode, AutocodeCustom, libraryName) => {
 
       const settingData = {
         global: {
-          webTitle: setting.webtitle,
+          webTitle: setting.webTitle,
           tagLine: setting.tagLine,
           desc: setting.desc,
           author: setting.author,
           images: setting.images
-        }
+        },
+        host
       };
 
       const htmlString = AutoCode === undefined ? '' :
