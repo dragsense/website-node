@@ -15,7 +15,9 @@ const types = [
   'image/png',
   'image/svg+xml',
   'image/webp',
-  'image/vnd.microsoft.icon', 'video/x-msvideo', 'video/mpeg', 'video/mp4', 'video/ogg', 'video/3gpp2', 'video/3gpp', 'application/x-freearc',
+  'image/vnd.microsoft.icon', // favicon
+  'image/x-icon', // favicon
+  'video/x-msvideo', 'video/mpeg', 'video/mp4', 'video/ogg', 'video/3gpp2', 'video/3gpp', 'application/x-freearc',
   'application/octet-stream',
   'application/msword',
   'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
