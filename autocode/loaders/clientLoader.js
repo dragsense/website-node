@@ -227,7 +227,7 @@ module.exports = (app, AutoCode, AutocodeCustom, libraryName) => {
           <meta name="description" content="${page.setting?.desc ?  page.setting.desc : setting.desc ?  setting.desc : ''}" />
           <meta name="author" content="${setting.author}" />
           <meta name="keywords" content="${setting.keywords}" />
-          <link rel="icon" href="${host}${setting.images?.favicon?.src || `/images/default/favicon.ico`}" />
+          <link rel="icon" href="${host}${setting.images?.favicon?.src || `/images/default/favicon.ico`}" type="${setting.images?.favicon?.mimetype || `image/x-icon`}" />
           <meta httpEquiv="Content-Language" content="${setting.lang}" />
           <link rel="stylesheet" type="text/css" href="/style.css">
           ${fontCssString}
@@ -239,8 +239,8 @@ module.exports = (app, AutoCode, AutocodeCustom, libraryName) => {
             window.__INITIAL_DATA__ = ${JSON.stringify(pageData)};
             </script>
             <script src="/index.js"></script>
-            ${setting.scripts ? setting.scripts.foot || '' : ''}
-            ${page.setting ? page.setting.scripts?.foot || '' : ''}
+            ${setting.scripts ? setting.scripts.footer || '' : ''}
+            ${page.setting ? page.setting.scripts?.footer || '' : ''}
            <script src="/${libraryName}.js"></script>
             <script src="/autocode-client.js"></script> 
           </body>
