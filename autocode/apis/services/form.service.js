@@ -148,7 +148,10 @@ const restoreForm = async (id, formBody) => {
     form._components = form.components;
     form._styles = form.styles;
 
-    form.updater = updater
+    form.updater = updater;
+
+    form.published = true;
+
 
     Object.assign(form, formBody);
     await form.save();

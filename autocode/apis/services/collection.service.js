@@ -113,7 +113,10 @@ const restoreCollection = async (id, collectionBody) => {
     collection._styles = collection.styles;
     collection._states = collection.states;
 
-    collection.updater = updater
+    collection.updater = updater;
+
+    collection.published = true;
+
 
     Object.assign(collection, collectionBody);
     await collection.save();

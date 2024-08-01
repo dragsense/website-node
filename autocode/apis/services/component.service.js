@@ -147,7 +147,9 @@ const restoreComponent = async (id, componentBody) => {
     component._collStates = component.collStates;
 
 
-    component.updater = updater
+    component.updater = updater;
+    component.published = true;
+
 
     Object.assign(component, componentBody);
     await component.save();

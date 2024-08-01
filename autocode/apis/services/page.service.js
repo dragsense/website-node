@@ -152,7 +152,9 @@ const restorePage = async (id, pageBody) => {
     page._forms = page.forms;
     page._styles = page.styles;
 
-    page.updater = updater
+    page.updater = updater;
+    page.published = true;
+
 
     Object.assign(page, pageBody);
     await page.save();
