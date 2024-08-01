@@ -36,6 +36,12 @@ const PublishComponent = catchAsync(async (req, res) => {
     res.status(httpStatus.OK).send({ status: true });
 });
 
+const RestoreComponent = catchAsync(async (req, res) => {
+    await componentService.restoreComponent(req.params.id, req.body);
+    res.status(httpStatus.OK).send({ status: true });
+});
+
+
 
 const UpdateComponent = catchAsync(async (req, res) => {
     const component = await componentService.updateComponent(req.params.id, req.body);
@@ -117,6 +123,7 @@ module.exports = {
     GetElements,
     GetCss,
     PublishComponent,
+    RestoreComponent,
     UpdateElements,
     UpdateStyle,
     GetPaths

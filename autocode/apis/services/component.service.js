@@ -118,6 +118,43 @@ const publishComponent = async (id, componentBody) => {
     return component;
 };
 
+
+/**
+ * Restore a component
+ * @param {String} id
+ * @param {Object} componentBody
+ * @returns {Promise<Component>}
+ */
+const restoreComponent = async (id, componentBody) => {
+
+    const component = await Component.findOne({ _id: id })
+    if (!component) {
+        throw new ApiError(httpStatus.NOT_FOUND, 'Component not found.');
+    }
+
+    const { updater } = componentBody;
+
+    if (component.published) {
+        throw new ApiError(httpStatus.NOT_FOUND, 'There are no new draft changes to restore.');
+    }
+
+    component._elements = component.elements;
+    component._components = component.components;
+    component._forms = component.forms;
+    component._styles = component.styles;
+    component._states = component.states;
+    component._events = component.events;
+    component._collStates = component.collStates;
+
+
+    component.updater = updater
+
+    Object.assign(component, componentBody);
+    await component.save();
+    return component;
+};
+
+
 /**
  * Get Custom Paths
  * @returns {Promise<Paths>}
@@ -268,5 +305,6 @@ module.exports = {
     updateElements,
     getStyle,
     getPaths,
-    publishComponent
+    publishComponent,
+    restoreComponent
 }

@@ -20,6 +20,7 @@ router.put('/:id', validate(formValidation.formSchema), formController.UpdateFor
 router.post('/elements/:id', validate(formValidation.elementsSchema), formController.UpdateElements);
 router.post('/styles/:id', validate(formValidation.styleSchema), formController.UpdateStyle);
 router.post('/publish/:id', formController.PublishForm);
+router.post('/restore/:id', formController.RestoreForm);
 
 router.delete('/:id', formController.DeleteForm);
 

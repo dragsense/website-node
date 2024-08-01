@@ -94,6 +94,32 @@ const publishCollection = async (id, collectionBody) => {
     return collection;
 };
 
+// Function to restore a collection
+const restoreCollection = async (id, collectionBody) => {
+    const collection = await Collection.findOne({ _id: id })
+    if (!collection) {
+        throw new ApiError(httpStatus.NOT_FOUND, 'Collection not found.');
+    }
+
+    const { updater } = collectionBody;
+
+    if (collection.published) {
+        throw new ApiError(httpStatus.NOT_FOUND, 'There are no new draft changes to restore.');
+    }
+    
+    collection._elements = collection.elements;
+    collection._components = collection.components;
+    collection._forms = collection.forms;
+    collection._styles = collection.styles;
+    collection._states = collection.states;
+
+    collection.updater = updater
+
+    Object.assign(collection, collectionBody);
+    await collection.save();
+    return collection;
+};
+
 // Function to update style of a collection
 const updateStyle = async (id, collectionBody) => {
     // Find the collection by id
@@ -295,6 +321,7 @@ module.exports = {
     updateElements,
     updateStyle,
     publishCollection,
+    restoreCollection,
     getStyle,
 }
 

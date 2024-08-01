@@ -21,6 +21,7 @@ router.get('/css/:id', pageController.GetCss);
 router.put('/:id', validate(pageValidation.pageSchema),  pageController.UpdatePage);
 router.post('/elements/:id', validate(pageValidation.elementsSchema), pageController.UpdateElements);
 router.post('/publish/:id', pageController.PublishPage);
+router.post('/restore/:id', pageController.RestorePage);
 
 router.post('/styles/:id', validate(pageValidation.styleSchema), pageController.UpdateStyle);
 

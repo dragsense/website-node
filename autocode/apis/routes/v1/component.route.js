@@ -22,6 +22,7 @@ router.post('/elements/:id', validate(componentValidation.elementsSchema), compo
 
 router.post('/styles/:id', validate(componentValidation.styleSchema), componentController.UpdateStyle);
 router.post('/publish/:id', componentController.PublishComponent);
+router.post('/restore/:id', componentController.RestoreComponent);
 
 router.put('/:id', validate(componentValidation.componentSchema), componentController.UpdateComponent);
 router.delete('/:id', componentController.DeleteComponent);

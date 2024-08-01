@@ -80,6 +80,12 @@ const PublishPage = catchAsync(async (req, res) => {
 });
 
 
+const RestorePage = catchAsync(async (req, res) => {
+    await pageService.restorePage(req.params.id, req.body);
+    res.status(httpStatus.OK).send({ status: true });
+});
+
+
 const UpdateStyle = catchAsync(async (req, res) => {
     await pageService.updateStyle(req.params.id, req.body);
     res.status(httpStatus.OK).send({ status: true });
@@ -117,5 +123,6 @@ module.exports = {
     UpdatePage,
     DeletePage,
     GetPages,
-    PublishPage
+    PublishPage,
+    RestorePage
 };

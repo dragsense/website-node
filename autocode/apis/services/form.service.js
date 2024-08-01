@@ -126,6 +126,36 @@ const publishForm = async (id, formBody) => {
 };
 
 /**
+ * Restore a form
+ * @param {String} id
+ * @param {Object} formBody
+ * @returns {Promise<Form>}
+ */
+const restoreForm = async (id, formBody) => {
+
+    const form = await Form.findOne({ _id: id })
+    if (!form) {
+        throw new ApiError(httpStatus.NOT_FOUND, 'Form not found.');
+    }
+
+    const { updater } = formBody;
+
+    if (form.published) {
+        throw new ApiError(httpStatus.NOT_FOUND, 'There are no new draft changes to restore.');
+    }
+
+    form._elements = form.elements;
+    form._components = form.components;
+    form._styles = form.styles;
+
+    form.updater = updater
+
+    Object.assign(form, formBody);
+    await form.save();
+    return form;
+};
+
+/**
  * Update a form Style
  * @param {String} id
  * @param {Object} formBody
@@ -524,6 +554,7 @@ module.exports = {
     deleteForm,
     updateForm,
     publishForm,
+    restoreForm,
     createForm,
     getStyle,
     updateElements,

@@ -77,6 +77,11 @@ const PublishForm = catchAsync(async (req, res) => {
     res.status(httpStatus.OK).send({ status: true });
 });
 
+const RestoreForm = catchAsync(async (req, res) => {
+    await formService.restoreForm(req.params.id, req.body);
+    res.status(httpStatus.OK).send({ status: true });
+});
+
 
 const DeleteForm = catchAsync(async (req, res) => {
     await formService.deleteForm(req.params.id);
@@ -142,6 +147,7 @@ module.exports = {
     DuplicateForm,
     UpdateForm,
     PublishForm,
+    RestoreForm,
     DeleteForm,
     GetForms,
     GetCss,

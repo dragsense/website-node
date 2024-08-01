@@ -68,6 +68,11 @@ const PublishCollection = catchAsync(async (req, res) => {
     res.status(httpStatus.OK).send({ status: true });
 });
 
+const RestoreCollection = catchAsync(async (req, res) => {
+    await collectionService.restoreCollection(req.params.id, req.body);
+    res.status(httpStatus.OK).send({ status: true });
+});
+
 
 
 const DuplicateCollection = catchAsync(async (req, res) => {
@@ -115,5 +120,6 @@ module.exports = {
     GetCss,
     GetElements,
     GetStyle,
-    PublishCollection
+    PublishCollection,
+    RestoreCollection
 };

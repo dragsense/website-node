@@ -128,6 +128,39 @@ const publishPage = async (id, pageBody) => {
 
 
 /**
+ * Restore a page
+ * @param {String} id
+ * @param {Object} pageBody
+ * @returns {Promise<Page>}
+ */
+const restorePage = async (id, pageBody) => {
+
+    const page = await Page.findOne({ _id: id })
+    if (!page) {
+        throw new ApiError(httpStatus.NOT_FOUND, 'Page not found.');
+    }
+
+    const { updater } = pageBody;
+
+    if (page.published) {
+        throw new ApiError(httpStatus.NOT_FOUND, 'There are no new draft changes to restore.');
+    }
+
+
+    page._elements = page.elements;
+    page._components = page.components;
+    page._forms = page.forms;
+    page._styles = page.styles;
+
+    page.updater = updater
+
+    Object.assign(page, pageBody);
+    await page.save();
+    return page;
+};
+
+
+/**
  * Update a page Style
  * @param {String} id
  * @param {Object} pageBody
@@ -292,5 +325,6 @@ module.exports = {
     updateElements,
     updateStyle,
     createPage,
+    restorePage,
     publishPage
 }
