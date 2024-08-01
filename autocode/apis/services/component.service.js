@@ -141,6 +141,8 @@ const getComponents = async (filter, options) => {
     const projection = {
         name: 1,
         slug: 1,
+        parent: 1,
+        attached: 1,
         creator: 1,
         createdAt: 1,
         updatedAt: 1,
