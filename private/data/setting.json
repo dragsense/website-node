@@ -1,46 +1,61 @@
 {
-    "webTitle": "Autocode Website",
-    "tagLine": "Contrary to popular belief, Lorem Ipsum is not simply ",
-    "desc": "Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 4",
-    "lang": "en",
-    "author": "Rana Awais",
-    "keywords": "Easy, Effortless, Rapid",
+    "webTitle": "Demo Website",
+    "tagLine": "Demo Website Tag Line",
+    "desc": "Demo Website Description",
+    "lang": "en-us",
+    "author": "@dragsense",
+    "keywords": "tag1, tag2, tag3",
     "images": {
+        "favicon": {
+            "_id": "66a0bb142965e444bca072bf",
+            "src": "/static/uploads/images/favicon-082804.ico",
+            "alt": "favicon.ico",
+            "mimetype": "image/x-icon",
+            "name": "favicon.ico"
+        },
         "logo": {
-            "_id": "650c9981dff7a63241098a86",
-            "src": "/static/uploads/images/react-192905.png",
-            "alt": "react.png",
+            "_id": "66a0bb3c2965e444bca072d4",
+            "src": "/static/uploads/images/dragsense-logo-082844.png",
+            "alt": "dragsense-logo.png",
             "mimetype": "image/png",
-            "name": "react.png"
+            "name": "dragsense-logo.png"
+        },
+        "mobileLogo": {
+            "_id": "66a0bb3c2965e444bca072d4",
+            "src": "/static/uploads/images/dragsense-logo-082844.png",
+            "alt": "dragsense-logo.png",
+            "mimetype": "image/png",
+            "name": "dragsense-logo.png"
+        },
+        "placeholder": {
+            "_id": "66a0bb502965e444bca072d6",
+            "src": "/static/uploads/images/placeholder-082903.png",
+            "alt": "placeholder.png",
+            "mimetype": "image/png",
+            "name": "placeholder.png"
         }
     },
     "email": {
-        "host": "localhost",
-        "port": "1025",
-        "ignoreTLS": true,
+        "host": "",
+        "port": "",
         "secure": false,
+        "ignoreTLS": true,
         "auth": {
-            "user": "test",
-            "pass": "test"
-        },
-        "subject": "Message from autocode {{webTitle}}",
-        "from": "info@autocode.com",
-        "to": "info@autocode.com",
-        "cc": "info@autocode.com",
-        "bcc": "info@autocode.com",
-        "replyTo": "info@autocode.com"
+            "user": "",
+            "pass": ""
+        }
     },
     "scripts": {
-        "head": "<link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">\n<link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin>\n<link href=\"https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap\" rel=\"stylesheet\">\n<link rel=\"stylesheet\" href=\"https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.2.1/css/fontawesome.min.css\" integrity=\"sha384-QYIZto+st3yW+o8+5OHfT6S482Zsvz2WfOzpFSXMF9zqeLcFV0/wlZpMtyFcZALm\" crossorigin=\"anonymous\">\n <link\n    rel=\"stylesheet\"\n    href=\"https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css\"\n  />",
-        "footer": ""
+        "head": "<link href=\"https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css\" rel=\"stylesheet\" integrity=\"sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC\" crossorigin=\"anonymous\">",
+        "footer": "<script src=\"https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js\" integrity=\"sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM\" crossorigin=\"anonymous\"></script>"
     },
-    "_id": "650aeb656dc7b0dfed256d6f",
+    "_id": "668855a79e0e609038f055d0",
     "homePage": {
-        "_id": "650c54e5fe68a00e7d15cca7",
-        "name": "Home Page"
+        "_id": "66ae74de5d580120f9a556db",
+        "name": "Home"
     },
     "errorPage": {
-        "_id": "650dcdb6ceeb7884982fdbda",
+        "_id": "66a0aa9fd23bfa28354726be",
         "name": "404"
     }
 }

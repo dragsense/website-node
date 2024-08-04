@@ -32,6 +32,7 @@ const ElementLayout = (props) => {
             {...(mapValue?.type === 'docs' ? { colStates: { ...props.colStates, ...mapValue } } : {})}
             mapIndex={mapIndex}
             options={options}
+            key={mapValue?.key || mapIndex || node._uid}
         >{React.Children.map(children, (child, index) => {
 
             return React.cloneElement(child, {
