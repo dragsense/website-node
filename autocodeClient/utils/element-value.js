@@ -674,7 +674,7 @@ export const getPageValue = (key, setting, host) => {
   if (key[0] === 'POPULATED') key.shift();
 
 
-  if (key[0] === 'states') {
+  if (key[0] === 'states'  || key[0] === 'STATES') {
     const modifiedKey = [...key];
     modifiedKey.shift();
     return getStateValue(modifiedKey, setting.states, setting.host || host);

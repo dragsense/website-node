@@ -199,7 +199,7 @@ const ElementSetting = (props) => {
         } else {
             const stateValue = getValue(attribute.valueState, attribute.value);
             let value = stateValue?.value || stateValue;
-            if (typeof attribute.value === 'string') {
+            if (typeof attribute.value === 'string' && attribute.value) {
                 value = attribute.value.replace(/\[state]/, value);
                 try {
                     attributeValue = eval(value);
