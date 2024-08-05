@@ -48,8 +48,8 @@ const handlePageNotFound = (res) => {
 }
 
 // Function to fetch page data
-const fetchPageData = async (page, host, document) => {
-  return await settingService.getPageData(page._id, page.type, host, true, document);
+const fetchPageData = async (page, host, remainingSlug) => {
+  return await settingService.getPageData(page._id, page.type, host, true, remainingSlug);
 }
 
 module.exports = (app, AutoCode, AutocodeCustom, libraryName) => {
@@ -74,8 +74,7 @@ module.exports = (app, AutoCode, AutocodeCustom, libraryName) => {
 
       const setting = await settingService.getSettings();
       let page = null;
-      let document = null;
-      let DocumentModel;
+      let remainingSlug = '';
 
       // Check if maintenance page is set
       if (setting.maintenancePage) {
@@ -108,13 +107,7 @@ module.exports = (app, AutoCode, AutocodeCustom, libraryName) => {
 
 
             if (page) {
-              const modelName = page.slug;
-              DocumentModel = Document(modelName);
-              const remainingSlug = slugParts.slice(i + 1).join('/');
-              document = await DocumentModel.findOne(
-                { slug: remainingSlug, 'setting.status': 'PUBLIC' }
-              ).select({ _id: 1, slug: 1 })
-
+              remainingSlug = slugParts.slice(i + 1).join('/');
               break;
             }
           }
@@ -137,7 +130,7 @@ module.exports = (app, AutoCode, AutocodeCustom, libraryName) => {
       const protocol = req.protocol || 'http';
       const host = `${protocol}://${req.headers.host}`;
 
-      const pagesResults = await fetchPageData(page, host, document);
+      const pagesResults = await fetchPageData(page, host, remainingSlug);
 
       const settingData = {
         global: {
@@ -165,6 +158,7 @@ module.exports = (app, AutoCode, AutocodeCustom, libraryName) => {
       const pageData = {
         type: page.type || 'page',
         _id: page._id,
+        remainingSlug: remainingSlug,
         setting: settingData,
       };
 

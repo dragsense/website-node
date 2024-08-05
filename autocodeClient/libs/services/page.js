@@ -14,11 +14,11 @@ const buildFetchOptions = (origin) => ({
 const PageServices = {
 
     // Fetches data based on the provided id, type and origin
-    get: async function (id, type, origin) {
+    get: async function (id, type, remainingSlug, origin) {
         try {
             const url = buildUrl(type, id);
             const options = buildFetchOptions(origin);
-            const response = await fetcher(url, options);
+            const response = await fetcher(`${url}?remainingSlug=${remainingSlug}`, options);
             return response;
         } catch (error) {
             console.error(`Error in fetchData: ${error}`);

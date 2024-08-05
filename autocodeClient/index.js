@@ -32,10 +32,10 @@ export default App;
 
 // Function to load initial data and hydrate the root
 const loadData = async (initialData) => {
-    const { _id, type, setting } = initialData;
+    const { _id, type, setting, remainingSlug } = initialData;
 
     try {
-        const res = await PageServices.get(_id, type, origin);
+        const res = await PageServices.get(_id, type, remainingSlug, origin);
 
         // Hydrate the root with the App component
         hydrateRoot(

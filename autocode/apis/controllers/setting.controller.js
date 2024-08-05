@@ -31,7 +31,8 @@ const GetPageData = catchAsync(async (req, res) => {
 const GetCollectionData = catchAsync(async (req, res) => {
     const protocol = req.protocol || 'http';
     const host = `${protocol}://${req.headers.host}`;
-    const results = await settingService.getPageData(req.params.id, 'collection', host)
+    const remainingSlug = req.query.remainingSlug;
+    const results = await settingService.getPageData(req.params.id, 'collection', host, false, remainingSlug)
     res.status(httpStatus.OK).send(results)
 })
 
