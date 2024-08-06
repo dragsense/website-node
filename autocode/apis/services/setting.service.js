@@ -80,28 +80,15 @@ const getPageData = async (id, type, host, withCss = false, remainingSlug) => {
     }
 
     const collections = [
-        {
-            collectionName: 'ac_collections',
-            localField: 'relationships',
-            foreignField: '_id',
-
-            as: 'populatedRelationships',
-            projection: { name: 1, slug: 1, _id: 1 },
-        },
+        ...getCollectionsToPopulate(),
         {
             collectionName: 'ac_layouts',
             localField: 'layout',
             foreignField: '_id',
             as: 'populatedLayout',
             projection: { name: 1, _id: 1, components: 1 },
-        },
-        {
-            collectionName: 'ac_medias',
-            localField: 'setting.image',
-            foreignField: '_id',
-            as: 'setting.populatedImage',
-            projection: { src: 1, alt: 1 },
-        },
+        }
+       
     ]
     try {
         let page = null
@@ -128,11 +115,13 @@ const getPageData = async (id, type, host, withCss = false, remainingSlug) => {
 
         let settingData = {}
 
+
         // Reduce the populatedRelationships to a relationships object
         const relationships = page.populatedRelationships.reduce((result, rel) => {
             result[rel._id] = rel.name
             return result
         }, {})
+
 
         // Function to populate a document with its relationships and setting data
         const populateDocument = async (page, document, projection) => {
@@ -145,7 +134,7 @@ const getPageData = async (id, type, host, withCss = false, remainingSlug) => {
                         foreignField: '_id',
 
                         as: `populatedRelationships.${rel._id}`,
-                        projection: { name: 1, _id: 1 },
+                        projection: { name: 1, url: 1, createdAt: 1, creator: 1, slug: 1, _id: 1, states: 1, setting: 1 },
                     }
                 }),
                 {
@@ -222,14 +211,34 @@ const getPageData = async (id, type, host, withCss = false, remainingSlug) => {
         }
 
     
+        let populatedRelationships = page.populatedRelationships;
 
         // If document exists, populate the document with its relationships and setting data
         if (document) {
             document = await populateDocument(page, document, projection)
             if (document) {
                 settingData = await getSettingData(page, document)
+                populatedRelationships =  document.populatedRelationships;
+                page.setting = document.setting;
+                page.states = document.states;
+                page.name = document.name;
+                page.slug = document.slug;
+                page.creator = document.creator;
+                page.createdAt = document.createdAt;
+                page.url = document.url;
+
+
             }
+
         }
+
+
+
+        if(Array.isArray(populatedRelationships))
+        populatedRelationships = populatedRelationships.reduce((acc, collection) => {
+            acc[collection._id] = [collection];
+            return acc;
+          }, {});
 
 
         // Add the page elements to the pages object
@@ -238,15 +247,15 @@ const getPageData = async (id, type, host, withCss = false, remainingSlug) => {
 
             pageSetting: {
                 _id: page._id,
-                setting: document?.setting || page.setting,
-                states: document?.states || page.states,
-                name: document?.name || page.name,
-                slug: document?.slug || page.slug,
+                setting: page.setting,
+                states: page.states,
+                name: page.name,
+                slug: page.slug,
                 relationships: relationships,
-                populatedRelationships: document?.populatedRelationships,
-                creator: document?.creator || page.creator,
-                createdAt: document?.createdAt || page.createdAt,
-                url: document?.url || page.url,
+                populatedRelationships,
+                creator: page.creator,
+                createdAt: page.createdAt,
+                url: page.url,
                 host,
                 ...settingData,
             },
@@ -880,8 +889,10 @@ const getElements = async (id, stream, type, host) => {
     const components = doc.components || []
     const forms = doc.forms || []
 
-    const collection = page.attached
+    const collection = page.attached;
+
     if (collection) await loadCollection(collection, projection, loaded, stream)
+
 
     await loadComponents(components, projection, loaded, stream)
     await loadForms(forms, projection, loaded, stream)

@@ -37,6 +37,7 @@ const loadData = async (initialData) => {
     try {
         const res = await PageServices.get(_id, type, remainingSlug, origin);
 
+
         // Hydrate the root with the App component
         hydrateRoot(
             document.getElementById('root'),

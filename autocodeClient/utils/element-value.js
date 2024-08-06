@@ -669,9 +669,18 @@ const getDocumentValue = (key, setting) => {
  * @param {object} setting - The settings object.
  * @returns {object|null} - The value based on the key or null if not found.
  */
-export const getPageValue = (key, setting, host) => {
+export const getPageValue = (elemKey, setting, host) => {
+
+  const key = [...elemKey];
   // Remove 'POPULATED' if it's the first element in the key array
-  if (key[0] === 'POPULATED') key.shift();
+  if (key[0] === "POPULATED") {
+    key.shift();
+    if (setting.populatedRelationships?.[key[0]]) {
+      setting = setting.populatedRelationships[key[0]][0];
+      key.shift();
+    } 
+    
+  }
 
 
   if (key[0] === 'states'  || key[0] === 'STATES') {
