@@ -387,8 +387,6 @@ const getAllFilteredDocuments = async (collectionId, documentBody, filter, optio
             }
         })
     }
-    console.log(relationships, collection.populatedRelationships)
-
 
     const modelName = collection.slug;
     const DocumentModel = Document(modelName);
