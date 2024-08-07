@@ -92,7 +92,7 @@ const ElementValue = (props) => {
             case 'STATES':
                 return getStateValue(key, _states, setting?.host);
             case 'PAGE':
-                return getPageValue(key, setting, setting?.host);
+                return getPageValue(key, setting, setting?.host, mapIndex);
             case 'COLSTATES':
                 return handleColStatesType(key, value, setting?.host);
             case 'FORMSTATES':
