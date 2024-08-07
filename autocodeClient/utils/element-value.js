@@ -675,7 +675,7 @@ export const getPageValue = (elemKey, setting, host, mapIndex = 0) => {
   const key = [...elemKey];
   if (key[0] === "POPULATED") {
     key.shift();
-    if (setting.populatedRelationships[key[0]]) {
+    if (setting.populatedRelationships?.[key[0]]) {
       const populated = setting.populatedRelationships[key[0]][mapIndex] || {};
       key.shift();
       return getPageValue([...key], populated, host)

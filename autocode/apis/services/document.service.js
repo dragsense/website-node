@@ -370,9 +370,8 @@ const getAllFilteredDocuments = async (collectionId, documentBody, filter, optio
     }
 
 
-
     let relationships = [];
-    if (withRelationship && collection.populatedRelationships) {
+    if (withRelationship && Array.isArray(collection.populatedRelationships)) {
         relationships = collection.populatedRelationships.filter(relation =>
             selectedRelationships.some(_id => _id === relation._id.toString())
         ).map(rel => {
@@ -388,6 +387,7 @@ const getAllFilteredDocuments = async (collectionId, documentBody, filter, optio
             }
         })
     }
+    console.log(relationships, collection.populatedRelationships)
 
 
     const modelName = collection.slug;

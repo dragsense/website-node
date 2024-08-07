@@ -76,7 +76,7 @@ const ElementValue = (props) => {
             if (key[0] === 'docsLength' && colStates.documents)
                 return colStates.documents.length || '0';
             else
-                return getPageValue(key, colStates, host);
+                return getPageValue(key, colStates, host, mapIndex);
     }
 
     // Main function to get value based on type

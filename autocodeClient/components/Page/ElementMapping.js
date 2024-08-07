@@ -40,18 +40,10 @@ const ElementMapping = (props) => {
     // Function to handle subtypes of 'COLSTATES'
     const handleColStatesSubTypes = useCallback((key) => {
         if (key[0] === 'DOCUMENTS' && colStates.documents) {
-            return colStates.documents.map((value) => {
-                return {
-                    type: "docs",
-                    label: value.name,
-                    value: value._id,
-                    key: value._id,
-                    ...value
-                }
-            })
+            return  getPageStates(colStates.documents, 'docs');
         } else if (key[0] === 'RELATIONSHIPS' && colStates.populatedRelationships) {
             const docs = colStates.populatedRelationships[key[1]];
-            return getPageStates(docs, 'docs');
+            return getPageStates(docs, 'pages');
         } else if (key[0] === 'PAGES') {
             return handlePages(key);
         }

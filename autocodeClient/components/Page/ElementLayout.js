@@ -28,8 +28,7 @@ const ElementLayout = (props) => {
             conditions={node.conditions}
             classes={node.classes}
             mapValue={mapValue}
-            {...(mapValue?.type === 'pages' ? { setting: { ...props.setting, ...mapValue } } : {})}
-            {...(mapValue?.type === 'docs' ? { colStates: { ...props.colStates, ...mapValue } } : {})}
+           {...(mapValue?.type === 'docs' ? { colStates: { ...props.colStates, ...mapValue } } : {})}
             mapIndex={mapIndex}
             options={options}
             key={mapValue?.key || mapIndex || node._uid}
@@ -40,7 +39,6 @@ const ElementLayout = (props) => {
                 ...(mapValue ? { mapValue } : {}),
                 ...(mapIndex ? { mapIndex } : {}),
                 ...(mapValue?.type === 'docs' ? { colStates: { ...props.colStates, ...mapValue } } : {}),
-                ...(mapValue?.type === 'pages' ? { setting: { ...props.setting, ...mapValue } } : {})
 
             })
         })

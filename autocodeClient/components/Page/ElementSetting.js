@@ -126,7 +126,7 @@ const ElementSetting = (props) => {
         if (!colStates) return value;
         if (key[0] === 'PAGES') return mapIndex + 1;
         else if (key[0] === 'docsLength' && colStates.documents) return colStates.documents.length || '0';
-        else return getPageValue(key, colStates, host);
+        else return getPageValue(key, colStates, host, mapIndex);
     };
 
     // Handle 'FORMSTATES' type
