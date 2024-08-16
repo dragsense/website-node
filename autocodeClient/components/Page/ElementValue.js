@@ -134,8 +134,8 @@ const ElementValue = (props) => {
         let withValue = getValue({ type: withType, key: withkey });
         withValue = withValue?.value ? withValue.value : withValue
 
-        const stateType = onclick.statetype;
-        const stateKey = onclick.statekey;
+        const stateType = onclick.type;
+        const stateKey = onclick.key;
         let stateValue = getValue({ type: stateType, key: stateKey }, '');
         stateValue = stateValue?.value ? stateValue.value : stateValue;
 
@@ -152,9 +152,6 @@ const handleOnClick = (changeFun, fun, withValue, stateValue) => {
 }
 
 const onClickNode = (e) => {
-    // Prevent default action for anchor tags
-    if (node.tagName === 'a')
-        e.preventDefault();
 
     try {
         if (node.onClick) {
@@ -399,7 +396,6 @@ const hasOnEnter = useMemo(() => Boolean(node.onMouseEnter), [node.onMouseEnter]
 const hasOnLeave = useMemo(() => Boolean(node.onMouseExit), [node.onMouseExit]);
 const hasOnClick = useMemo(() => Boolean(node.onClick), [node.onClick]);
 const hasOnScroll = useMemo(() => Boolean(node.onScroll), [node.onScroll]);
-
 
 return (
     <ElementType

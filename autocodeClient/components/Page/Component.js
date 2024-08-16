@@ -409,11 +409,10 @@ const Component = (props) => {
 
     // Function to handle onClick event
     const onClick = useCallback(
-        (node, stateValue, withValue) => {
+        (fun, stateValue, withValue) => {
             // Check if node and onClick event exist
-            if (node && node.onClick) {
-                const onclick = node.onClick
-                setValue(onclick, stateValue?.value || stateValue, withValue?.value || withValue)
+            if (fun) {
+                setValue(fun, stateValue?.value || stateValue, withValue?.value || withValue)
             }
         },
         [states, colStates, _states]
