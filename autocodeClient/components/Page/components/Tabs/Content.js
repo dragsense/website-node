@@ -11,7 +11,6 @@ const getActiveIndexAndDuration = (states) => {
 
 const TabsContent = (props) => {
     const { children, states, nodes, element, node } = props;
-
     // Get active index and duration
     const { activeIndex, duration } = getActiveIndexAndDuration(states);
 
@@ -36,6 +35,7 @@ const TabsContent = (props) => {
             const totalSlides = flattenedChildren.length;
             for (let i = 0; i < totalSlides; i++) {
                 const isActive = activeIndex === i;
+
                 tabsContent.push(<Tab isActive={isActive} zIndex={totalSlides - i} duration={duration}>{flattenedChildren[i]}</Tab>)
             }
             return tabsContent;
@@ -47,7 +47,7 @@ const TabsContent = (props) => {
         () =>
             element(
                 { ...node, state: undefined, map: undefined },
-                <div _uid={node._uid} style={{ position: 'relative', height: '100%', overflow: 'hidden' }}>
+                <div _uid={node._uid} style={{ position: 'relative', height: '100%' }}>
                     {renderTabsContent}
                 </div>
 

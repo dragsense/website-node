@@ -1,31 +1,8 @@
-const { Page, Component, Collection, Form } = require('../models');
+const { Page } = require('../models');
 const he = require('he');
-const { generateElementsCss } = require('../../utils/utils');
-
 const httpStatus = require('http-status')
 
 const ApiError = require('../../utils/api-error')
-
-
-const { getStateValue } = require('../../utils/element-value');
-const documentService = require('./document.service');
-
-
-
-const getValue = (elem, value = '', states, props) => {
-    const type = elem.type;
-    const key = elem.key;
-
-    switch (type) {
-        case 'STATES':
-            return getStateValue(key, states);
-        case 'PROPS':
-            return getStateValue(key, props);
-        default:
-            return value;
-    }
-
-}
 
 
 /**

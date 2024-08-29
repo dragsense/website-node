@@ -15,21 +15,6 @@ const publicDir = path.resolve(process.cwd(), 'public');
 
 const { Download } = require('../apis/controllers/setting.controller');
 
-// Function to handle page not found
-const handleError = (res) => {
-  res.status(500).send(`
-    <!DOCTYPE html>
-    <html>
-      <head>
-        <title>Error</title>
-      </head>
-      <body>
-        <div id="root">Something went wrong.</div>
-      </body>
-    </html>
-  `);
-  return;
-}
 
 // Function to handle page not found
 const handlePageNotFound = (res) => {

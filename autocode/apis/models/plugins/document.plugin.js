@@ -3,7 +3,6 @@ const { ObjectId } = require("mongodb");
 const { v4: uuidv4 } = require('uuid');
 const crypto = require('crypto');
 
-// Function to generate a random string of given length
 function generateRandomString(length) {
   try {
     const randomBytes = crypto.randomBytes(Math.ceil(length / 2));
@@ -14,7 +13,6 @@ function generateRandomString(length) {
   }
 }
 
-// Function to get style of a child element
 const getStyle = async (child) => {
   try {
     const style = {};
@@ -61,7 +59,7 @@ const getStyle = async (child) => {
   }
 };
 
-// Function to copy elements and update their styles
+
 const onCopyElements = async (elements, styles) => {
   try {
     // Iterating over each element
@@ -88,9 +86,7 @@ const onCopyElements = async (elements, styles) => {
   }
 };
 
-// Function to handle document schema
 const document = function (schema) {
-  // Adding a static method to the schema to get a document
   schema.statics.document = async function (id, collections, projection = { name: 1 }) {
 
     const lookups = collections.map((collection) => ({
@@ -152,7 +148,6 @@ const document = function (schema) {
     }
   };
 
-  // Adding a static method to the schema to duplicate a document
   schema.statics.duplicate = async function (id, name) {
     try {
       const doc = await this.findById(id);

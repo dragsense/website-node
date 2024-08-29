@@ -8,16 +8,17 @@ const httpStatus = require('http-status');
 const ApiError = require('../../utils/api-error');
 
 
-
 // Function to create a new collection
 const createCollection = async (collectionBody) => {
     if (collectionBody.setting)
         collectionBody.setting.content = he.decode(collectionBody.setting.content || '')
 
+
     if (collectionBody.scripts) {
         collectionBody.scripts.head = he.decode(collectionBody.scripts.head || '')
         collectionBody.scripts.footer = he.decode(collectionBody.scripts.footer || '')
     }
+
 
     if (collectionBody.states)
         updateContentWithType(collectionBody.states, 'content')
@@ -114,7 +115,6 @@ const restoreCollection = async (id, collectionBody) => {
     collection._states = collection.states;
 
     collection.updater = updater;
-
     collection.published = true;
 
 
@@ -174,12 +174,10 @@ const getCollection = async (id) => {
 
     // Define the collections to be populated
     const collections = [
-
         {
             collectionName: 'ac_collections',
             localField: 'relationships',
             foreignField: '_id',
-
             as: 'populatedRelationships',
             projection: { name: 1, slug: 1, _id: 1 }
         },
@@ -223,9 +221,6 @@ const getCollection = async (id) => {
 };
 
 
-
-
-
 /**
  * Get a collection Style
  * @param {String} id
@@ -233,14 +228,12 @@ const getCollection = async (id) => {
  */
 const getStyle = async (id, stream) => {
 
-
     const projection = {
         styles: 1,
         _id: 1,
         published: 1,
         _styles: 1,
     };
-
 
     const collection = await Collection.findById(id).select(projection);
     if (!collection) {
@@ -290,9 +283,10 @@ const deleteCollection = async (id) => {
             throw new ApiError(httpStatus.NOT_FOUND, 'Collection not found');
         }
 
-        const modelName = collection.slug;
 
-        const res = await mongoose.connection.db.dropCollection(modelName.toLowerCase());
+        const modelName = 'ac_' + pluralize(collection.slug.toLowerCase())
+
+        const res = await mongoose.connection.db.dropCollection(modelName);
 
         if (!res) {
             throw new ApiError(httpStatus.NOT_FOUND, 'Documents not found');

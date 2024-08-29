@@ -50,9 +50,9 @@ const getSettings = async () => {
 }
 
 /**
- * Get a collection data
+ * Get a page data
  * @param {String} id
- * @returns {Promise<Collection>}
+ * @returns {Promise<Array>}
  */
 const getPageData = async (id, type, host, withCss = false, remainingSlug) => {
     // Define the fields to be returned
@@ -844,9 +844,9 @@ const addFilesToZip = (folderPath, folderName, assetsFolder) => {
 }
 
 /**
- * Get a collection Elements
+ * Get a page Elements
  * @param {String} id
- * @returns {Promise<Collection>}
+ * @returns {Promise<any>}
  */
 const getElements = async (id, stream, type, host) => {
     // Define the fields to be returned

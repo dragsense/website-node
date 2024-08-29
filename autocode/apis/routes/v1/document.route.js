@@ -14,8 +14,8 @@ router.get('/:collectionId/:id',  documentController.GetDocument);
 router.put('/:collectionId/:id', validate(documentValidation.documentSchema), documentController.UpdateDocument);
 router.delete('/:collectionId/:id', documentController.DeleteDocument);
 
-router.post('/collection/:collectionId/document', validate(documentValidation.filterDocSchema), documentController.GetFilteredDocuments);
-router.put('/collection/:collectionId/document',validate(documentValidation.filterSchema), documentController.GetAllFilteredDocuments);
+router.post('/:collectionId/get/filtered', validate(documentValidation.filterDocSchema), documentController.GetFilteredDocuments);
+router.put('/:collectionId/get/filtered',validate(documentValidation.filterSchema), documentController.GetAllFilteredDocuments);
 
 module.exports = router
 

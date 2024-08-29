@@ -109,7 +109,7 @@ router.put('/v1/collection/:collectionId/document',
     setPublicStatus, GetAllFilteredDocuments)
 
 
-router.post("/v1/forms//submit/:id", uploadFile.array('files[]', 10), formSubmit);
+router.post("/v1/forms/submit/:id", uploadFile.array('files[]', 10), formSubmit);
 
 defaultRoutes.forEach((route) => {
     router.use(route.path, autocodeAPIAuth, route.route)

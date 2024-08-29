@@ -472,7 +472,9 @@ async function sendEmail(form, formStates, attachments) {
 
         const { html, body, head, footer, plain } = form.emailbody || {};
 
-        const email = html == 1 ? `<!DOCTYPE html>
+        const email =
+            html == 1
+                ? `<!DOCTYPE html>
     <html>
     <head>
       <meta charset="UTF-8">
@@ -482,7 +484,8 @@ async function sendEmail(form, formStates, attachments) {
     ${body}
     ${footer}
     </body>
-    </html>` : plain;
+    </html>`
+                : plain
 
         let compiledTemplate = handlebars.compile(email);
         let compiledSubject = handlebars.compile(subject ? subject : setting.email.subject);
@@ -531,7 +534,6 @@ async function recordForm(form, formStates) {
             slug: form.slug
         }
     }
-    console.log(body)
 
     await DocumentModel.create(body)
 }

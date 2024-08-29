@@ -4,4 +4,48 @@ html {
       
     }
 
+.ac-elem-wQiESbGm {
+  max-width: 100% ;height: auto 
+}
+
+.ac-tabs-8Mz9iUob .tabs-btn .tab-btn {
+  border: none ;outline: none ;background-color: #f2f2f2 ;padding: 10px 20px ;cursor: pointer 
+}
+
+.ac-tabs-8Mz9iUob .tabs-content .tab-content {
+  padding: 20px ;border: 1px solid #ccc ;background-color: #f2f2f2 
+}
+
+.ac-tabs-8Mz9iUob {
+  position: relative ;height: 400px 
+}
+
+.ac-slider-C2Kk5-uk .slides .slide {
+  height: 100% 
+}
+
+.ac-slider-C2Kk5-uk .slides {
+  position: relative ;height: 400px 
+}
+
+.ac-slider-C2Kk5-uk .slider-left-btn {
+  position: absolute ;top: 50% ;left: 10px ;transform: translateY(-50%) 
+}
+
+.ac-slider-C2Kk5-uk .slider-right-btn {
+  position: absolute ;top: 50% ;right: 10px ;transform: translateY(-50%) 
+}
+
+.ac-slider-C2Kk5-uk .slide-nav-item {
+  width: 10px ;height: 10px ;border-radius: 50% ; background-color: #ccc; ;margin: 0 5px ;cursor: pointer 
+}
+
+.ac-slider-C2Kk5-uk .slider-nav-container {
+  position: absolute ;bottom: 10px ;left: 50% ;transform: translateX(-50%) ;display: flex ;list-style-type: none 
+}
+
+.ac-slider-C2Kk5-uk {
+  position: relative 
+}
+
  

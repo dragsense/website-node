@@ -1,10 +1,9 @@
-const mongoose = require('mongoose');
-const shortid = require('shortid');
-const Schema = mongoose.Schema;
-const pluralize = require('pluralize');
+const mongoose = require('mongoose')
+const shortid = require('shortid')
+const Schema = mongoose.Schema
+const pluralize = require('pluralize')
 
 const { toJSON, document, paginate } = require('./plugins')
-
 
 const httpStatus = require('http-status')
 
@@ -21,7 +20,7 @@ const CollectionSchema = new Schema(
         },
         type: {
             type: String,
-            default: "collection",
+            default: 'collection',
         },
         layout: {
             type: mongoose.Schema.Types.ObjectId,
@@ -39,9 +38,9 @@ const CollectionSchema = new Schema(
                     type: String,
                     default: '',
                 },
-                _id: false
+                _id: false,
             },
-            default: {}
+            default: {},
         },
         url: {
             type: String,
@@ -49,15 +48,14 @@ const CollectionSchema = new Schema(
         elements: {
             type: Object,
             default: {
-                "0": {
-                    "_uid": "0",
-                    "tagName": "div",
-                    "type": "layout",
-                    "layout": "root",
-                    "nodeValue": "",
-                    "childNodes": [],
-
-                }
+                0: {
+                    _uid: '0',
+                    tagName: 'div',
+                    type: 'layout',
+                    layout: 'root',
+                    nodeValue: '',
+                    childNodes: [],
+                },
             },
         },
         components: {
@@ -70,16 +68,15 @@ const CollectionSchema = new Schema(
         },
         styles: {
             type: Object,
-            default: {
-            },
+            default: {},
         },
         states: {
             type: Object,
-            default: {}
+            default: {},
         },
         _states: {
             type: Object,
-            default: {}
+            default: {},
         },
         _components: {
             type: Array,
@@ -91,12 +88,11 @@ const CollectionSchema = new Schema(
         },
         _elements: {
             type: Object,
-            default: {}
+            default: {},
         },
         _styles: {
             type: Object,
-            default: {
-            },
+            default: {},
         },
         published: {
             type: Boolean,
@@ -150,78 +146,91 @@ const CollectionSchema = new Schema(
         },
     },
     { timestamps: true }
-);
+)
 
 // Pre-save hook for the CollectionSchema
 CollectionSchema.pre('save', async function (next) {
-
     // Define the current collection
-    const collection = this;
+    const collection = this
 
     // Function to handle new and non-duplicated collections
     const handleNewCollection = (collection) => {
-        let id = shortid.generate();
-        const className = `ac-elem-${id}`;
-        collection.elements['0'].className = className;
-        collection.elements['0'].selector = `.${className}`;
+        let id = shortid.generate()
+        const className = `ac-elem-${id}`
+        collection.elements['0'].className = className
+        collection.elements['0'].selector = `.${className}`
 
-        let styleUid = shortid.generate();
-        collection.elements['0'].styleUid = styleUid;
+        let styleUid = shortid.generate()
+        collection.elements['0'].styleUid = styleUid
 
         collection.styles = {
             [styleUid]: {
                 _uid: styleUid,
                 selectorText: `.${className}`,
                 type: 'div',
-                style: {}
-            }
+                style: {},
+            },
         }
     }
 
     // If the collection is new and not duplicated, handle it
-    if (collection.isNew && !collection.duplicated){
-        handleNewCollection(collection);
+    if (collection.isNew && !collection.duplicated) {
+        handleNewCollection(collection)
     }
 
     // If the slug is not modified, proceed to the next middleware
     if (!collection.isModified('slug')) {
-        return next();
+        return next()
     }
 
     // Function to check if the slug is already taken
     const isSlugTaken = async (modelName) => {
-        const existingCollection = await collection.constructor.findOne({ slug: modelName });
-        const Form = mongoose.model('AC_Form');
-        const existingForm = await Form.findOne({ slug: modelName });
+        const existingCollection = await collection.constructor.findOne({ slug: modelName })
+        const Form = mongoose.model('AC_Form')
+        const existingForm = await Form.findOne({ slug: modelName })
 
-        const Page = mongoose.model('AC_Page');
-        const existingPage = await Page.findOne({ slug: modelName });
+        const Page = mongoose.model('AC_Page')
+        const existingPage = await Page.findOne({ slug: modelName })
 
-        const modelNames = mongoose.modelNames().map(name => name.toLowerCase());
-        const isModelSingular = modelNames.includes(modelName.toLowerCase());
-        const isModelPlural = modelNames.includes(pluralize(modelName.toLowerCase()));
+        const modelNames = mongoose.modelNames().map((name) => name.toLowerCase())
+        const isModelSingular = modelNames.includes(modelName.toLowerCase())
+        const isModelPlural = modelNames.includes(pluralize(modelName.toLowerCase()))
 
-        return existingCollection || existingPage || existingForm || isModelSingular || isModelPlural;
+        return existingCollection || existingPage || existingForm || isModelSingular || isModelPlural
     }
 
     // Check if the slug is already taken
     if (await isSlugTaken(collection.slug)) {
-        const error = new Error('Slug already taken');
-        error.status = httpStatus.BAD_REQUEST;
-        return next(error);
+        const error = new Error('Slug already taken')
+        error.status = httpStatus.BAD_REQUEST
+        return next(error)
     }
 
+    const oldSlug = collection.getOriginal('slug');
+    const newSlug = collection.slug;
+
+    if (oldSlug && oldSlug !== newSlug) {
+        const oldTableName = `ac_${pluralize(oldSlug.toLowerCase())}`
+        const newTableName = `ac_${pluralize(newSlug.toLowerCase())}`
+
+        try {
+            await mongoose.connection.db.renameCollection(oldTableName, newTableName)
+        } catch (err) {
+            const error = new Error(`Error renaming table from ${oldTableName} to ${newTableName}: ${err.message}`)
+            error.status = httpStatus.INTERNAL_SERVER_ERROR
+            return next(error)
+        }
+    }
     // Set the URL of the collection
-    collection.url = `/${collection.slug}`
+    collection.url = `/${newSlug}`
 
     // Proceed to the next middleware
-    next();
-});
+    next()
+})
 
 CollectionSchema.plugin(paginate)
-CollectionSchema.plugin(document);
+CollectionSchema.plugin(document)
 
+const Collection = mongoose.model('AC_Collection', CollectionSchema)
 
-const Collection = mongoose.model('AC_Collection', CollectionSchema);
-
-module.exports = Collection;
+module.exports = Collection

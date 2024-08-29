@@ -31,11 +31,10 @@ const createDocument = async (collectionId, isForm, documentBody) => {
         updateContentWithType(documentBody.states, 'content')
 
 
-    const modelName = collection.slug;
 
     documentBody.coll = { _id: collection._id, slug: collection.slug };
 
-    const DocumentModel = Document(modelName)
+    const DocumentModel = Document(collection.slug)
 
     return DocumentModel.create(documentBody);
 };
