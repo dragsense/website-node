@@ -275,19 +275,11 @@ const Component = (props) => {
 
     // Function to handle page changes
     const handlePageChange = useCallback(
-        async (withValue) => {
-          if (isNaN(withValue)) withValue = colStates.page;
-    
-          const totalPages = Math.ceil(colStates.maxPage / colStates.limit);
-          const page = { max: totalPages, min: 1, defaultValue: colStates.page };
-    
-          if (withValue < 1) withValue = 1;
-    
-          if (withValue >= totalPages) withValue = totalPages;
-    
-          //updateStateValue({ type: 'COLSTATES', key }, withValue, { page }, value);
-          page.defaultValue = withValue;
-    
+        async (elem, withValue, value) => {
+            const totalPages = Math.ceil(colStates.maxPage / colStates.limit)
+            const page = { max: totalPages, min: 1, defaultValue: colStates.page }
+
+            updateStateValue(elem, withValue, { page }, value)
 
             if (colStates.page === page.defaultValue) return
 
@@ -305,7 +297,8 @@ const Component = (props) => {
                 }
             } else {
                 setColStates({ ...colStates, loading: 1, error: 0 })
-                await loadDocuments({ ...colStates, page: page.defaultValue })
+
+                loadDocuments({ ...colStates, page: page.defaultValue })
             }
         },
         [colStates]
@@ -333,7 +326,7 @@ const Component = (props) => {
                     break
                 case 'COLSTATES':
                     if (key[0] === 'page') {
-                        await handlePageChange(key, value, withValue)
+                        await handlePageChange(elem, withValue, value)
                     }
                     break
                 case 'FORMSTATES':

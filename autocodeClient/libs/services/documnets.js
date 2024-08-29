@@ -21,14 +21,14 @@ const DocumentServices = {
 
     // Fetch all documents with filters applied
     getAllFilteredDocuments: async function (collectionId, states, page = 1, limit=25, sortBy = 'createdAt', sort="acs") {
-        const url =  `/api/v1/documents/collection/${collectionId}/document?limit=${limit}&page=${page}&sortBy=${sortBy+":"+sort}`;
+        const url =  `/api/v1/collection/${collectionId}/document?limit=${limit}&page=${page}&sortBy=${sortBy+":"+sort}`;
         const sanitizedUrl = sanitizeUrl(url);
         return fetchData(sanitizedUrl, 'PUT', states);
     },
 
     // Fetch documents based on collectionId and states
     getFilteredDocuments: async function (collectionId, states) {
-        const url = `/api/v1/documents/collection/${collectionId}/document`;
+        const url = `/api/v1/collection/${collectionId}/document`;
         const sanitizedUrl = sanitizeUrl(url);
         return fetchData(sanitizedUrl, 'POST', states);
     },
