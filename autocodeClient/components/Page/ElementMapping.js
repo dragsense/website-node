@@ -52,7 +52,7 @@ const ElementMapping = (props) => {
     // Function to handle 'PAGES' subtype of 'COLSTATES'
     const handlePages = useCallback((key) => {
         const currentPage = colStates.page || 1;
-        const totalPages = Math.ceil(colStates.maxPage / colStates.limit);
+        const totalPages = Math.ceil(colStates.maxPage);
         const pagination = colStates.pagination || { leftRange: 1, rightRange: 1, nearRange: 4 }
         const pages = getPaginationRange(currentPage, totalPages, pagination).map((value, index) => {
             const val = parseInt(value);
@@ -60,7 +60,7 @@ const ElementMapping = (props) => {
             return {
                 label: value,
                 value: val,
-                key: val,
+                key: isNan ? `${value}-${index}` : `page-${val}`,
                 notClickable: isNan,
             }
         });

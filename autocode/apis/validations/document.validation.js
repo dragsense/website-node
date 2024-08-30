@@ -20,8 +20,10 @@ const documentObject = {
     excerpt: Joi.string().allow(''),
     status: Joi.string().default('DRAFT'),
   }).default({}),
+  duplicated: Joi.boolean(),
   updater: Joi.object().allow(null),
   creator: Joi.object().allow(null),
+
 };
 
 

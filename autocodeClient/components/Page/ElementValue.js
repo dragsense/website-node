@@ -53,12 +53,12 @@ const ElementValue = (props) => {
                 const image = images[key[2]] || {}
                 return {
                     value: image?.src ? setting?.host +image.src : '/images/default/default-img.png',
-                    label: image === undefined ? `[${key[2]}]` : image?.alt || "Global Image"
+                    label: image === undefined ? `image` : image?.alt || "image"
                 }
             }
             return {
                 value: global[key[1]],
-                label: global[key[1]] || `[global ${key[1]}]`
+                label: global[key[1]] || ``
             }
         }  else
         if (key[0] === "WINDOW") 
@@ -88,7 +88,7 @@ const ElementValue = (props) => {
             case 'GLOBAL':
                 return handleGlobalType(key);
             case 'PROPS':
-                return getStateValue(key, _props, setting?.host) || `[props.${key}]`;
+                return getStateValue(key, _props, setting?.host);
             case 'STATES':
                 return getStateValue(key, _states, setting?.host);
             case 'PAGE':
@@ -96,7 +96,7 @@ const ElementValue = (props) => {
             case 'COLSTATES':
                 return handleColStatesType(key, value, setting?.host);
             case 'FORMSTATES':
-                return _states && _states[key[0]] ? _states[key[0]][key[1]] || '[form state]' : value;
+                return _states && _states[key[0]] ? _states[key[0]][key[1]] || '' : value;
             case 'MAPVALUE':
                 return mapValue;
             case 'MAPINDEX':
@@ -374,7 +374,7 @@ const onScroll = (e) => {
                 valueX = eval(valueX);
                 valueY = eval(valueY);
             } catch (e) {
-                message.error("Invalid expression:" + e?.message);
+                console.error("Invalid expression:" + e?.message);
             }
 
             if (fun?.onChange)
@@ -385,7 +385,7 @@ const onScroll = (e) => {
         }
     }
     catch (e) {
-        message.error(e?.message);
+        console.error(e?.message);
     }
 }
 

@@ -107,7 +107,7 @@ const ElementSetting = (props) => {
         }
         return {
             value: global[key[1]],
-            label: global[key[1]] || `[global ${key[1]}]`
+            label: global[key[1]] || ``
         };
     };
 
@@ -117,7 +117,7 @@ const ElementSetting = (props) => {
         const image = images[key[2]] || {};
         return {
             value: image?.src ? setting?.host +image.src : '/images/default/default-img.png',
-            label: image === undefined ? `[${key[2]}]` : image?.alt || "Global Image"
+            label: image === undefined ? `image` : image?.alt || "image"
         };
     };
 
@@ -157,12 +157,14 @@ const ElementSetting = (props) => {
         let original = expression.replace(/\[state]/g, v);
         original = original.replace(/\[key]/g, keyValue);
         try {
-            return eval(original);
+            return !!eval(original);
         } catch (e) {
-            message.error("Invalid expression:" + e?.message);
+            console.error("Invalid expression:" + e?.message);
             return true;
         }
     };
+
+
 
     /**
      * This function is used to calculate the conditions for rendering the component.
@@ -204,7 +206,7 @@ const ElementSetting = (props) => {
                 try {
                     attributeValue = eval(value);
                 } catch (e) {
-                    message.error("Invalid expression: " + e?.message);
+                    console.error("Invalid expression: " + e?.message);
                 }
             } else {
                 attributeValue = value;

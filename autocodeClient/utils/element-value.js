@@ -556,33 +556,35 @@ export const getPaginationRange = (currentPage, totalPages, pagination) => {
   const rangeSize = pagination.nearRange || 2;
   const dots = pagination.dots || "...";
 
-  let start = Math.max(currentPage - rangeSize, 1);
-  let end = Math.min(currentPage + rangeSize, totalPages);
+  let start = Math.max(currentPage - rangeSize, leftRangeLength + 1);
+  let end = Math.min(currentPage + rangeSize, totalPages - rightRangeLength);
 
-  // Fix the bug: Adjust condition for leftRange + rightRange >= totalPages
+  // Handle case where leftRange + rightRange >= totalPages
   if (leftRangeLength + rightRangeLength + rangeSize * 2 >= totalPages) {
     return Array.from({ length: totalPages }, (_, index) => index + 1);
   }
 
-  if (start <= leftRangeLength) {
-    end = Math.min(leftRangeLength + rangeSize * 2, totalPages);
-  } else if (end >= totalPages - rightRangeLength + 1) {
-    start = Math.max(totalPages - rightRangeLength - rangeSize * 2 + 1, 1);
-  }
-
   const leftRange = Array.from({ length: leftRangeLength }, (_, index) => index + 1);
   const rightRange = Array.from({ length: rightRangeLength }, (_, index) => totalPages - rightRangeLength + index + 1);
+
+  // Nearby pages range
   const nearbyRange = Array.from({ length: end - start + 1 }, (_, index) => start + index);
 
+  // Adjust for dots
   if (start > leftRangeLength + 1) {
     leftRange.push(dots);
+  } else {
+    start = leftRangeLength + 1;
   }
 
   if (end < totalPages - rightRangeLength) {
     rightRange.unshift(dots);
+  } else {
+    end = totalPages - rightRangeLength;
   }
 
-  return [...leftRange, ...nearbyRange, ...rightRange];
+  // Combine ranges without duplication
+  return [...new Set([...leftRange, ...nearbyRange, ...rightRange])];
 };
 
 
@@ -606,7 +608,7 @@ export const getSettingValue = (key, setting, host) => {
     const image = _setting["populatedImage"];
     return {
       value: host+image?.src || '/images/default/default-img.png',
-      label: image?.alt || '[featured image]'
+      label: image?.alt || ''
     }
   }
 
@@ -615,14 +617,14 @@ export const getSettingValue = (key, setting, host) => {
     const status = _setting[key[1]];
     return {
       value: status,
-      label: status || '[page status]'
+      label: status || ''
     }
   }
 
   // For other keys, return the value and label from the setting object
   return {
     value: key[1] === 'content' ? key[1] : _setting[key[1]],
-    label: _setting[key[1]] || `[page ${key[1]}]`
+    label: _setting[key[1]] || ``
   }
 };
 
@@ -655,7 +657,7 @@ const getDocumentValue = (key, setting) => {
   // For other keys, return the value and label from the document object
   return {
     value: doc[key[1]],
-    label: doc[key[1]] || `[document ${key[1]}]`
+    label: doc[key[1]] || ``
   }
 };
 
@@ -700,13 +702,13 @@ export const getPageValue = (elemKey, setting, host, mapIndex = 0) => {
     };
   } else if (key[0] === 'createdAt') {
     const createdAt = setting[key[0]];
-    return createdAt ? formatDate(createdAt, key[1]) : `[page ${key[1]}]`;
+    return createdAt ? formatDate(createdAt, key[1]) : ``;
   } else if (key[1] === 'NEXTDOCUMNET' || key[1] === 'PREVDOCUMNET') {
     return getDocumentValue(key, setting);
   } else {
     return {
-      value: setting[key[0]] || `[page ${key[0]}]`,
-      label: setting[key[0]] || `[page ${key[0]}]`,
+      value: setting[key[0]] !== undefined ? setting[key[0]] : ``,
+      label: setting[key[0]] || ``,
     };
   }
 };

@@ -9,7 +9,7 @@ html {
 }
 
 .ac-elem-qFlm3MdK {
-  width: 23% ;padding-top: 16px ;padding-right: 16px ;padding-bottom: 16px ;padding-left: 16px ;margin-top: 10px ;margin-right: 10px ;margin-bottom: 10px ;margin-left: 10px 
+  width: 21% ;padding-top: 16px ;padding-right: 16px ;padding-bottom: 16px ;padding-left: 16px ;margin-top: 10px ;margin-right: 10px ;margin-bottom: 10px ;margin-left: 10px 
 }
 
 .ac-elem-NIAyal0G {
@@ -24,19 +24,63 @@ html {
   width: 40px ;height: 40px 
 }
 
-.ac-elem-1MythaSR {
-  display: flex ;column-gap: 20px ;justify-content: center 
+.ac-elem-dwqByYaf {
+  display: flex ;justify-content: center 
 }
 
-.ac-elem-ucf_CNto {
-  padding-top: 12px ;padding-right: 12px ;padding-bottom: 12px ;padding-left: 12px ;cursor: pointer 
+.ac-elem-0x8obsB_ {
+  padding-top: 8px ;padding-right: 8px ;padding-bottom: 8px ;padding-left: 8px 
 }
 
-.ac-elem-W1PY5Q6u {
+.ac-elem-0x8obsB_:hover {
+  background-color: rgba(243.29549999999998, 159.72349574999998, 159.72349574999998, 0.8633664574953589) ;cursor: pointer 
+}
+
+.ac-elem--yjFC60H {
+  text-align: center 
+}
+
+.ac-elem-JUB_6ama {
+  display: flex ;justify-content: center ;content: " " 
+}
+
+.ac-elem--o6zQXMV {
+  display: none 
+}
+
+.ac-elem-Kh3nyvRj {
+  display: none 
+}
+
+.ac-elem-6rg89hyv {
   display: flex ;justify-content: space-between 
 }
 
-.ac-elem-3XaSvR0D {
-  text-align: center ;width: 100% ;height: 100% ;display: flex ;justify-content: center ;align-items: center ;position: absolute ;background-color: rgba(164.95950000000002, 71.62541490000001, 71.62541490000001, 0.6108912099706064) ;background: linear-gradient(180deg, ) 
+.ac-elem-6rg89hyv::before {
+  width: 5px ;content: "" 
+}
+
+.ac-elem-6rg89hyv::after {
+  content: "" ;width: 5px 
+}
+
+.ac-elem-MXzUltKg {
+  display: flex ;justify-content: flex-end 
+}
+
+.ac-elem-MfK5ralI {
+  margin-right: 10px 
+}
+
+ .ac-elem-tSUyRuGu {
+  display: flex ;column-gap: 20px 
+}
+
+.ac-elem-MO1igvzK {
+  width: 40px ;height: 40px ;color: rgba(246.91649999999998, 246.49674194999997, 246.49674194999997, 1) 
+}
+
+ .ac-elem-DHYYHJgW {
+  display: flex ;column-gap: 15px 
 }
 

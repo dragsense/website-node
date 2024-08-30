@@ -13,6 +13,24 @@ const getTagType = (node, layout) => {
     return tagType;
 }
 
+/**
+ * This function checks if `value` is an object and if it has a `label` property.
+ * If `label` is undefined and `value` is not an object, it returns `value`.
+ * Otherwise, it returns an empty string.
+ * 
+ * @param {any} value - The input value to evaluate.
+ * @return {string} The evaluated result.
+ */
+function getLabelOrValue(value, property = 'label') {
+    // Check if value is an object and has a label property
+    if (value && typeof value === 'object' && value.hasOwnProperty(property)) {
+        return value[property] || ''; // If property exists, return it or empty string if label is undefined
+    }
+
+    // If value is not an object or label is undefined, return value or empty string
+    return typeof value === 'object' ? '' : value || '';
+}
+
 // Function to handle the rendering of different types of elements
 const renderElement = (tagType, layout, props) => {
     const { 
@@ -42,9 +60,9 @@ const renderElement = (tagType, layout, props) => {
 
     switch (tagType) {
         case 'select':
-            return <Select disabled={disabled} onChange={onChange} innerWraaper={children} value={value.value || value} _uid={_uid} pos={pos} options={options} conds={conds} onClick={onClick}>{element}</Select>;
+            return <Select disabled={disabled} onChange={onChange} innerWraaper={children} value={getLabelOrValue(value, 'value')} _uid={_uid} pos={pos} options={options} conds={conds} onClick={onClick}>{element}</Select>;
         case 'option':
-            return <Option value={value.value || value} 
+            return <Option value={getLabelOrValue(value, 'value')} 
             
             mapIndex={mapIndex} mapValue={mapValue}>{element}</Option>;
         case 'input':
@@ -52,28 +70,28 @@ const renderElement = (tagType, layout, props) => {
             return <Input disabled={disabled} 
             conds={conds} 
             onClick={onClick}
-             type={attributes["type"]} onChange={onChange} _uid={_uid} pos={pos} value={value.value ?? value}>{element}</Input>;
+             type={attributes["type"]} onChange={onChange} _uid={_uid} pos={pos} value={getLabelOrValue(value, 'value')}>{element}</Input>;
         case 'inputgroup':
-            return <InputGroup disabled={disabled} type={attributes["type"]} onChange={onChange} value={value} mapValue={mapValue} labelPos={node.labelPos || 0} _uid={_uid} pos={pos} conds={conds} onClick={onClick} onMouseMove={onMouseMove} attributes={attributes} options={options}><Element classes={classes} tagName={'label'} /></InputGroup>;
+            return <InputGroup disabled={disabled} type={attributes["type"]} onChange={onChange} value={getLabelOrValue(value, 'value')} mapValue={mapValue} labelPos={node.labelPos || 0} _uid={_uid} pos={pos} conds={conds} onClick={onClick} onMouseMove={onMouseMove} attributes={attributes} options={options}><Element classes={classes} tagName={'label'} /></InputGroup>;
         case 'img':
             return <Image disabled={disabled} 
             onMouseEnter={onMouseEnter}
                 onMouseExit={onMouseExit}
             
-            host={setting?.host || ''} conds={conds} onClick={onClick} onMouseMove={onMouseMove} _uid={_uid} name={node.name || node.tagName} pos={pos} value={value}>{element}</Image>;
+            host={setting?.host || ''} conds={conds} onClick={onClick} onMouseMove={onMouseMove} _uid={_uid} name={node.name || node.tagName} pos={pos} value={getLabelOrValue(value, 'value')}>{element}</Image>;
         case 'video':
         case 'audio':
-            return <Media disabled={disabled} host={setting?.host || ''} conds={conds} tag={node.tagName} _uid={_uid} pos={pos} onClick={onClick} onMouseMove={onMouseMove} value={value}>{element}</Media>;
+            return <Media disabled={disabled} host={setting?.host || ''} conds={conds} tag={node.tagName} _uid={_uid} pos={pos} onClick={onClick} onMouseMove={onMouseMove} value={getLabelOrValue(value, 'value')}>{element}</Media>;
         case 'close':
             return <CloseTag disabled={disabled} conds={conds} onClick={onClick} onMouseMove={onMouseMove} name={node.name || node.tagName} _uid={_uid} pos={pos}>{element}</CloseTag>;
         case 'icon':
             return <Icon disabled={disabled} 
             onMouseEnter={onMouseEnter}
                 onMouseExit={onMouseExit}
-            onChange={onChange} value={value} _uid={_uid} pos={pos} onClick={onClick} onMouseMove={onMouseMove} conds={conds} layout={layout} classes={node.classes}>{element}</Icon>;
+            onChange={onChange} value={getLabelOrValue(value, 'value')} _uid={_uid} pos={pos} onClick={onClick} onMouseMove={onMouseMove} conds={conds} layout={layout} classes={node.classes}>{element}</Icon>;
         case 'component':
         case 'layouts':
-            return <Component disabled={disabled} value={value.label || value}
+            return <Component disabled={disabled} value={getLabelOrValue(value, 'label')}
             
              pos={pos} _uid={_uid} name={node.cname || node.name || node.tagName}
               conds={conds} 
@@ -86,7 +104,7 @@ const renderElement = (tagType, layout, props) => {
             conds={conds} 
             onMouseEnter={onMouseEnter}
                 onMouseExit={onMouseExit}
-            onMouseMove={onMouseMove} onScroll={onScroll} onClick={onClick} value={value?.label || value} innerWraaper={children}>{element}</General>;
+            onMouseMove={onMouseMove} onScroll={onScroll} onClick={onClick} value={getLabelOrValue(value, 'label')} innerWraaper={children}>{element}</General>;
     }
 }
 
