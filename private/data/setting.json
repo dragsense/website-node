@@ -36,13 +36,13 @@
         }
     },
     "email": {
-        "host": "",
-        "port": "",
+        "host": "sandbox.smtp.mailtrap.io",
+        "port": "2525",
         "secure": false,
         "ignoreTLS": true,
         "auth": {
-            "user": "",
-            "pass": ""
+            "user": "6323a5bfec2676",
+            "pass": "a0bc2b3a4c62d5"
         }
     },
     "scripts": {
