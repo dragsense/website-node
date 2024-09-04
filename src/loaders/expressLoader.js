@@ -25,14 +25,15 @@ module.exports = (autocodeRoutes) => {
   const cspConfig = {
     directives: {
       defaultSrc: ["'self'"],
-      fontSrc: ["'self'", "https://cdnjs.cloudflare.com"],
+      fontSrc: ["'self'", "https://cdnjs.cloudflare.com", "https://fonts.gstatic.com"],
       scriptSrc: ["'self'", "'unsafe-eval'", "'unsafe-inline'"],
-      styleSrc: ["'self'", "'unsafe-inline'", "https://cdnjs.cloudflare.com"], // Allow styles from the same origin, unsafe-inline, and the specified CDN
+      styleSrc: ["'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net", "https://cdnjs.cloudflare.com", "https://fonts.gstatic.com", "https://fonts.googleapis.com"], // Allow styles from the same origin, unsafe-inline, and the specified CDN
+      mediaSrc: ["'self", "https://youtu.be", "https://www.youtube.com"]
       // Add other directives as needed
     },
   };
 
-  // Override CSP directive settings if needed
+   // Override CSP directive settings if needed
   app.use(helmet.contentSecurityPolicy(cspConfig));
 
 
@@ -55,6 +56,8 @@ module.exports = (autocodeRoutes) => {
   app.use(cors())
   
   app.options('*', cors())
+
+  
 
   // setup limits
   if (env.isProduction) {

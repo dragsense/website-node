@@ -50,7 +50,8 @@ const transitions = {
     getTransition: (duration = 300, initialValue, expandValue) => {
       const defaultStyles = {
         transition: `width ${duration}ms ease-in-out`,
-        width: initialValue
+        width: initialValue,
+        overflow: 'hidden'
       };
 
       const entering = { width: expandValue };
@@ -66,7 +67,8 @@ const transitions = {
     getTransition: (duration = 300, initialValue, expandValue) => {
       const defaultStyles = {
         transition: `height ${duration}ms ease-in-out`,
-        height: initialValue
+        height: initialValue,
+        overflow: 'hidden'
       };
 
       const entering = { height: expandValue };

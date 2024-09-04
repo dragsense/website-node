@@ -7,13 +7,21 @@ const createCustomAttributes = (onMouseMove,  onClick, onScroll,  onMouseEnter, 
         onScroll,
         onMouseEnter,
         onMouseLeave,
-        onClick
-
+        onClick,
     }
 }
 
-const General = ({  conds, onMouseMove, onClick, onScroll,onMouseEnter,
-    onMouseExit, innerWraaper, value, children }) => {
+const General = ({  
+    _uid, 
+    conds, 
+    onMouseMove, 
+    onClick, 
+    onScroll,
+    onMouseEnter,
+    onMouseExit, 
+    innerWraaper, 
+    value, 
+    children }) => {
 
 
 
@@ -22,10 +30,10 @@ const General = ({  conds, onMouseMove, onClick, onScroll,onMouseEnter,
 
     // Create span element based on the innerWrapper
     const spanElement = useMemo(() => {
-        return (value || innerWraaper) ?  (<>
-            {React.isValidElement(value) ? value : value && <span
+        return (value || innerWraaper) ?  (<> {_uid !== '0' ? 
+            React.isValidElement(value) ? value : value && <span
                 dangerouslySetInnerHTML={{ __html: value }}
-            />}
+            />: null}
             {innerWraaper}</>
         ) : 
         <></>;
@@ -34,7 +42,7 @@ const General = ({  conds, onMouseMove, onClick, onScroll,onMouseEnter,
     // Clone the element with custom attributes and span element
     const clonedElement = useMemo(() => React.cloneElement(children, { customAttributes }, spanElement), [children, customAttributes, spanElement]);
 
- 
+
     // Return disabled element if disabled, else return clonedElement
     return conds ? clonedElement : null;
 

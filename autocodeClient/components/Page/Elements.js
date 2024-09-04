@@ -30,7 +30,7 @@ function TreeNode(props) {
   const rootForm = pageType === 'form' ? { _id } : null;
 
 
-
+  
   return (<ErrorBoundary><ElementWrapper key={_uid}
     {...props}
     component={rootComponent || component}

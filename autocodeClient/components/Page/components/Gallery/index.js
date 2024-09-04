@@ -10,7 +10,7 @@ const Gallery = ({ children, states, nodes, element, node, updateStates }) => {
     const total = getDefaultValue(states, 'total', 0);
     const activeIndex = getDefaultValue(states, 'currentIndex', -1);
     const activeItem = getDefaultValue(states, 'activeItem', null);
-    const openModal = getDefaultValue(states, 'openModal', 0);
+    const openModal = getDefaultValue(states, 'openModal', 'close');
     const modal = getDefaultValue(states, 'modal', false);
 
     // Flatten children nodes
@@ -32,24 +32,29 @@ const Gallery = ({ children, states, nodes, element, node, updateStates }) => {
 
     // Update active item on active index change
     useEffect(() => {
-        updateStates('activeItem', flattenedChildren[activeIndex]);
-    }, [activeIndex]);
+        
+        if (activeIndex !== -1)
+          updateStates("activeItem", flattenedChildren[activeIndex]);
+       
 
-    // Open modal on active item or modal change
-    useEffect(() => {
-        if (modal) {
-            updateStates('openModal', 1, 'states');
-
+       
+      }, [activeIndex]);
+    
+      // Open modal on active item or modal change
+      useEffect(() => {
+        if (modal && activeItem) {
+          updateStates("openModal", "open");
         }
-    }, [activeItem, modal]);
 
-    // Reset current index on modal close
-    useEffect(() => {
-        if(openModal === 0) {
-            updateStates('currentIndex', -1);
 
+      }, [activeItem, modal]);
+    
+      // Reset current index on modal close
+      useEffect(() => {
+        if (openModal === "close") {
+          updateStates("currentIndex", -1);
         }
-    }, [openModal]);
+      }, [openModal]);
 
     // Render gallery items
     const renderGallery = useMemo(() => {

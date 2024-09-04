@@ -41,17 +41,17 @@
         "secure": false,
         "ignoreTLS": true,
         "auth": {
-            "user": "6323a5bfec2676",
-            "pass": "a0bc2b3a4c62d5"
+            "user": "a16463565b5b84",
+            "pass": "f392ec11a44b0e"
         }
     },
     "scripts": {
-        "head": "<link href=\"https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css\" rel=\"stylesheet\" integrity=\"sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC\" crossorigin=\"anonymous\">",
+        "head": "<link href=\"https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css\" rel=\"stylesheet\" integrity=\"sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC\" crossorigin=\"anonymous\">\n\n <link\n    rel=\"stylesheet\"\n    href=\"https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css\"\n  />",
         "footer": "<script src=\"https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js\" integrity=\"sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM\" crossorigin=\"anonymous\"></script>"
     },
     "_id": "66ca0c4b34c32a29b596b73d",
     "homePage": {
-        "_id": "66d08c2cbf17bbbe2406a082",
+        "_id": "66d6e452b49566c816b0e7eb",
         "name": "Home"
     },
     "errorPage": {

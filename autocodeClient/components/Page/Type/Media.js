@@ -38,6 +38,8 @@ const Media = (props) => {
     // useMemo to avoid unnecessary re-renders and improve performance
     const key = useMemo(() => generateRandomId(), [value.srcs]);
 
+    console.log(value);
+
     const InputsElement = React.cloneElement(children, {
                 key,
                 customAttributes: {
@@ -51,7 +53,7 @@ const Media = (props) => {
 
 
 
-    return conds ?  InputsElement() : null;
+    return conds ?  InputsElement : null;
 };
 
 export default Media;

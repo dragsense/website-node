@@ -53,6 +53,7 @@ const CollectionSchema = new Schema(
                     tagName: 'div',
                     type: 'layout',
                     layout: 'root',
+                    name: 'Collection Root Element',
                     nodeValue: '',
                     childNodes: [],
                 },
@@ -156,7 +157,7 @@ CollectionSchema.pre('save', async function (next) {
     // Function to handle new and non-duplicated collections
     const handleNewCollection = (collection) => {
         let id = shortid.generate()
-        const className = `ac-elem-${id}`
+        const className = `ac-elem-root-${id}`
         collection.elements['0'].className = className
         collection.elements['0'].selector = `.${className}`
 

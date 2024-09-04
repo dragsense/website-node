@@ -86,15 +86,15 @@ const getPageData = async (id, type, host, withCss = false, remainingSlug) => {
             localField: 'layout',
             foreignField: '_id',
             as: 'populatedLayout',
-            projection: { name: 1, _id: 1, components: 1 },
-        }
-       
+            projection: { ...projection, main: 1 },
+        },
     ]
     try {
         let page = null
         if (type === 'collection') page = await Collection.document(id, collections, projection)
         else if (type === 'component') page = await Component.document(id, collections, projection)
         else if (type === 'form') page = await Form.document(id, collections, projection)
+        else if (type === 'layout') page = await Layout.document(id, collections, projection)
         else page = await Page.document(id, collections, projection)
 
         // Initialize the pages object
@@ -115,13 +115,11 @@ const getPageData = async (id, type, host, withCss = false, remainingSlug) => {
 
         let settingData = {}
 
-
         // Reduce the populatedRelationships to a relationships object
-        const relationships = page.populatedRelationships.reduce((result, rel) => {
+        const relationships = page.populatedRelationships?.reduce((result, rel) => {
             result[rel._id] = rel.name
             return result
         }, {})
-
 
         // Function to populate a document with its relationships and setting data
         const populateDocument = async (page, document, projection) => {
@@ -199,7 +197,7 @@ const getPageData = async (id, type, host, withCss = false, remainingSlug) => {
             return settingData
         }
 
-        let document = null;
+        let document = null
 
         if (remainingSlug) {
             const modelName = page.slug
@@ -210,56 +208,31 @@ const getPageData = async (id, type, host, withCss = false, remainingSlug) => {
             })
         }
 
-    
-        let populatedRelationships = page.populatedRelationships;
+        let populatedRelationships = page.populatedRelationships
 
         // If document exists, populate the document with its relationships and setting data
         if (document) {
             document = await populateDocument(page, document, projection)
             if (document) {
                 settingData = await getSettingData(page, document)
-                populatedRelationships =  document.populatedRelationships;
-                page.setting = document.setting;
-                page.states = document.states;
-                page.name = document.name;
-                page.slug = document.slug;
-                page.creator = document.creator;
-                page.createdAt = document.createdAt;
-                page.url = document.url;
-
-
+                populatedRelationships = document.populatedRelationships
+                page.setting = document.setting
+                page.states = document.states
+                page.name = document.name
+                page.slug = document.slug
+                page.creator = document.creator
+                page.createdAt = document.createdAt
+                page.url = document.url
             }
-
         }
 
-
-
-        if(Array.isArray(populatedRelationships))
-        populatedRelationships = populatedRelationships.reduce((acc, collection) => {
-            acc[collection._id] = [collection];
-            return acc;
-          }, {});
-
+        if (Array.isArray(populatedRelationships))
+            populatedRelationships = populatedRelationships.reduce((acc, collection) => {
+                acc[collection._id] = [collection]
+                return acc
+            }, {})
 
         // Add the page elements to the pages object
-        pages[page._id] = {
-            elements: page.elements || {},
-
-            pageSetting: {
-                _id: page._id,
-                setting: page.setting,
-                states: page.states,
-                name: page.name,
-                slug: page.slug,
-                relationships: relationships,
-                populatedRelationships,
-                creator: page.creator,
-                createdAt: page.createdAt,
-                url: page.url,
-                host,
-                ...settingData,
-            },
-        }
 
         // Get the components of the page
         const components = page.components || []
@@ -392,6 +365,7 @@ const getPageData = async (id, type, host, withCss = false, remainingSlug) => {
                 states: 1,
                 relationships: 1,
                 setting: 1,
+                type: 1,
                 name: 1,
                 _id: 1,
             }
@@ -417,6 +391,7 @@ const getPageData = async (id, type, host, withCss = false, remainingSlug) => {
                         url: coll.url,
                         name: coll.name,
                         slug: coll.slug,
+                        type: coll.type,
                         elements: coll.elements || {},
                         states: coll.states || {},
                         setting: coll.setting || {},
@@ -445,6 +420,9 @@ const getPageData = async (id, type, host, withCss = false, remainingSlug) => {
             pages[component._id] = {
                 elements: component.elements || {},
                 states: component.states || {},
+                events: component.events || {},
+
+                type: component.type || 'component',
             }
 
             if (withCss) {
@@ -536,6 +514,8 @@ const getPageData = async (id, type, host, withCss = false, remainingSlug) => {
                 pages[form._id] = {
                     elements: form.elements || {},
                     states: form.states || {},
+                    type: form.type || 'form',
+                    setting: form.setting || {},
                 }
                 // If withCss is true, generate the css for the form styles and add it to the css array
                 if (withCss) {
@@ -562,22 +542,81 @@ const getPageData = async (id, type, host, withCss = false, remainingSlug) => {
         await Promise.all([loadForms(forms, projection), loadComponents(components, projection)])
 
         // Initialize layout components
-        const layout = page.populatedLayout?.[0].components
+        const layout = page.populatedLayout?.[0]
         const LayoutComponents = []
+
+        const mainPageData = {
+            pageSetting: {
+                _id: page._id,
+                setting: page.setting,
+                states: page.states,
+                name: page.name,
+                slug: page.slug,
+                relationships: relationships,
+                populatedRelationships,
+                creator: page.creator,
+                createdAt: page.createdAt,
+                url: page.url,
+                host,
+                ...settingData,
+            },
+        }
+
+        const pageElements = page.elements || {
+            0: {
+                _uid: '0',
+                tagName: 'div',
+                type: 'layout',
+                layout: 'root',
+                nodeValue: '',
+                childNodes: [],
+            },
+        }
 
         // Check if layout exists
         if (layout) {
-            // If top layout exists, convert it to string and store it in LayoutComponents
-            if (layout.top) {
-                LayoutComponents[0] = layout.top.toString()
-            }
-            // If bottom layout exists, convert it to string and store it in LayoutComponents
-            if (layout.bottom) {
-                LayoutComponents[1] = layout.bottom.toString()
+            if (withCss) {
+                const styles = layout.styles || {}
+                style.css = [...style.css, generateElementsCss(styles, layout._id)]
             }
 
+            const components = layout.components || []
+            const forms = layout.forms || []
+
             // Load layout components
-            await loadComponents(LayoutComponents, projection)
+            await Promise.all([loadForms(forms, projection), loadComponents(components, projection)])
+
+          
+            const layoutElements = layout.elements || {
+                0: {
+                    _uid: '0',
+                    tagName: 'div',
+                    type: 'layout',
+                    layout: 'root',
+                    nodeValue: '',
+                    childNodes: [],
+                },
+            }
+
+            if (layoutElements[layout.main]) {
+                layoutElements[layout.main].childNodes.push('main')
+            } else {
+                layoutElements['0'].childNodes.push('main')
+            }
+
+            pageElements['main'] = {...pageElements['0']};
+            delete pageElements['0'];
+
+            pages[page._id] = {
+                elements: { ...layoutElements, ...pageElements},
+                ...mainPageData
+            }
+
+        } else {
+            pages[page._id] = {
+                elements: pageElements,
+                ...mainPageData,
+            }
         }
 
         // Return the css, pages, layout and states
@@ -585,7 +624,6 @@ const getPageData = async (id, type, host, withCss = false, remainingSlug) => {
         return {
             ...style,
             pages,
-            layout: { top: LayoutComponents[0], bottom: LayoutComponents[1] },
         }
     } catch (error) {
         // Log the error and rethrow it
@@ -593,6 +631,10 @@ const getPageData = async (id, type, host, withCss = false, remainingSlug) => {
         throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, 'An unexpected error occurred')
     }
 }
+
+
+
+
 
 const generatePages = async (_pages, pagesFolder, setting, AutoCode, AutocodeCustom) => {
     // Iterate over each page
@@ -861,6 +903,7 @@ const getElements = async (id, stream, type, host) => {
     if (type === 'collection') page = await Collection.document(id, collections, projection)
     else if (type === 'component') page = await Component.document(id, collections, projection)
     else if (type === 'form') page = await Form.document(id, collections, projection)
+    else if (type === 'layout') page = await Layout.document(id, collections, projection)
     else page = await Page.document(id, collections, projection)
 
     // If collection does not exist, throw an error
@@ -869,7 +912,7 @@ const getElements = async (id, stream, type, host) => {
     }
 
     // Prepare the document to be sent to the client
-    const doc = prepareDocument(page)
+    const doc = prepareDocument(page);
 
     doc.host = host
 
@@ -889,10 +932,9 @@ const getElements = async (id, stream, type, host) => {
     const components = doc.components || []
     const forms = doc.forms || []
 
-    const collection = page.attached;
+    const collection = page.attached
 
     if (collection) await loadCollection(collection, projection, loaded, stream)
-
 
     await loadComponents(components, projection, loaded, stream)
     await loadForms(forms, projection, loaded, stream)
@@ -927,6 +969,7 @@ const getProjection = () => {
         slug: 1,
         name: 1,
         _id: 1,
+        main: 1,
     }
 }
 
@@ -964,6 +1007,7 @@ const prepareDocument = (collection) => {
         _id: collection._id,
         attached: collection.attached,
         parent: collection.parent,
+        main: collection.main,
     }
     if (!collection.published) {
         doc.elements = collection._elements
@@ -1043,6 +1087,7 @@ const getCss = async (id, type) => {
         _forms: 1,
         _components: 1,
         _styles: 1,
+        published: 1
     }
 
     let style = { css: [] }
@@ -1051,6 +1096,7 @@ const getCss = async (id, type) => {
     if (type === 'collection') page = await Collection.findById(id).select(projection)
     else if (type === 'component') page = await Component.findById(id).select(projection)
     else if (type === 'form') page = await Form.findById(id).select(projection)
+    else if (type === 'layout') page = await Layout.findById(id).select(projection)
     else page = await Page.findById(id).select(projection)
 
     if (!page) {
@@ -1073,12 +1119,14 @@ const getCss = async (id, type) => {
     // Load CSS for components
     await loadComponentsCSS(doc.components || [], projection, style)
 
+
     return style
 }
 
 // Function to generate CSS for the styles
 const generateCssForStyles = (doc, css) => {
     const styles = doc.styles || {}
+
     return [...css, generateElementsCss(styles, doc._id)]
 }
 

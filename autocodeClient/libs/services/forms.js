@@ -1,3 +1,4 @@
+import { fetcher } from '../../utils/fetch';
 
 
 // Helper function to sanitize URL

@@ -28,6 +28,7 @@ const ComponentSchema = new Schema(
                     "tagName": "div",
                     "type": "layout",
                     "layout": "root",
+                    name: 'Component Root Element',
                     "nodeValue": "",
                     "childNodes": [],
                 }
@@ -159,7 +160,7 @@ function generateShortId() {
 
 // Function to create a class name
 function createClassName(id) {
-    return `ac-elem-${id}`;
+    return `ac-elem-root-${id}`;
 }
 
 // Function to assign class name and selector to the component

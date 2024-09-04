@@ -13,14 +13,18 @@ import { InlineSkeleton } from './Elements';
  * @param {React.ReactNode} children - The content to be rendered inside the element.
  * @returns {React.ReactNode} The rendered element.
  */
-const Element = ({ tagName, customAttributes = {}, attributes, classes, children = null }) => {
+const Element = ({ key, tagName, customAttributes = {}, attributes, classes, children = null }) => {
+
+    const elementProps = {
+        ...customAttributes,
+        ...attributes,
+       
+        className: classes || undefined
+    };
+    
     return tagName ? React.createElement(
         tagName,
-        {
-            ...customAttributes,
-            ...attributes,
-            className: classes || undefined
-        },
+        elementProps,
         children
     ) : <InlineSkeleton />;
 };

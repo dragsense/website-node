@@ -21,7 +21,17 @@ const getTagType = (node, layout) => {
  * @param {any} value - The input value to evaluate.
  * @return {string} The evaluated result.
  */
-function getLabelOrValue(value, property = 'label') {
+function getLabelOrValue(value, property = 'label', MediaLayout = false) {
+
+    if (React.isValidElement(value)) {
+        return value; 
+    }
+
+
+    if (MediaLayout) {
+        return value; 
+    }
+
     // Check if value is an object and has a label property
     if (value && typeof value === 'object' && value.hasOwnProperty(property)) {
         return value[property] || ''; // If property exists, return it or empty string if label is undefined
@@ -55,8 +65,8 @@ const renderElement = (tagType, layout, props) => {
         classes } = props;
 
       
-
     const element = <Element key={_uid} classes={classes} attributes={attributes} tagName={node.tagName} />;
+
 
     switch (tagType) {
         case 'select':
@@ -81,7 +91,7 @@ const renderElement = (tagType, layout, props) => {
             host={setting?.host || ''} conds={conds} onClick={onClick} onMouseMove={onMouseMove} _uid={_uid} name={node.name || node.tagName} pos={pos} value={getLabelOrValue(value, 'value')}>{element}</Image>;
         case 'video':
         case 'audio':
-            return <Media disabled={disabled} host={setting?.host || ''} conds={conds} tag={node.tagName} _uid={_uid} pos={pos} onClick={onClick} onMouseMove={onMouseMove} value={getLabelOrValue(value, 'value')}>{element}</Media>;
+            return <Media disabled={disabled} host={setting?.host || ''} conds={conds} tag={node.tagName} _uid={_uid} pos={pos} onClick={onClick} onMouseMove={onMouseMove} value={getLabelOrValue(value, 'value', true)}>{element}</Media>;
         case 'close':
             return <CloseTag disabled={disabled} conds={conds} onClick={onClick} onMouseMove={onMouseMove} name={node.name || node.tagName} _uid={_uid} pos={pos}>{element}</CloseTag>;
         case 'icon':
@@ -104,7 +114,9 @@ const renderElement = (tagType, layout, props) => {
             conds={conds} 
             onMouseEnter={onMouseEnter}
                 onMouseExit={onMouseExit}
-            onMouseMove={onMouseMove} onScroll={onScroll} onClick={onClick} value={getLabelOrValue(value, 'label')} innerWraaper={children}>{element}</General>;
+            onMouseMove={onMouseMove} onScroll={onScroll} onClick={onClick} 
+            value={getLabelOrValue(value, 'label')}
+             innerWraaper={children}>{element}</General>;
     }
 }
 

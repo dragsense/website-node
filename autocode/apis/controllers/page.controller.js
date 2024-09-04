@@ -54,7 +54,7 @@ const GetStyle = catchAsync(async (req, res) => {
 });
 
 const GetCss = catchAsync(async (req, res) => {
-    const css = await settingService.getCss(req.params.id);
+    const css = await settingService.getCss(req.params.id, 'page');
     res.status(httpStatus.OK).send(css);
 });
 

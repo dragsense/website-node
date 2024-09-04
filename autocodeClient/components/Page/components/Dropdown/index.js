@@ -35,7 +35,7 @@ const DropdownItem = (props) => {
 
 // Close dropdown function
   const closeDropdown = () => {
-    if(openDropdown === 1)
+    if(openDropdown === 1 || openDropdown === true )
     updateState('openDropdown', 0, states, updateStates)
   };
 

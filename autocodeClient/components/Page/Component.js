@@ -16,12 +16,42 @@ const Component = (props) => {
 
     if (!comp) return null
 
-    // Initializing states
-    const [states, setStates] = useState(comp.states)
+    const initialStates =
+        comp.type === 'form'
+            ? {
+                  ...comp.states,
+                  __setting__: {
+                      successMessage: comp.setting?.successMessage,
+                      errorMessage: comp.setting?.errorMessage,
+                      error: 0,
+                      success: 0,
+                      loading: 0,
+                  },
+              }
+            : comp.states;
+
+
+    const [states, setStates] = useState(initialStates)
+
     const [events, setEvents] = useState(comp.events)
     const [loading, setLoading] = useState(false)
     const [colStates, setColStates] = useState({ ...comp.collStates, loading: 0, error: 0 })
     const [isFilterChange, setFilters] = useState(false)
+
+    useEffect(() => {
+        if (comp.type === 'form') {
+            setStates((prevStates) => ({
+                ...prevStates,
+                __setting__: {
+                    successMessage: comp.setting?.successMessage,
+                    errorMessage: comp.setting?.errorMessage,
+                    error: 0,
+                    success: 0,
+                    loading: 0,
+                },
+            }))
+        }
+    }, [comp])
 
     // Function to get value based on element type
     const getValue = useCallback(
@@ -53,8 +83,6 @@ const Component = (props) => {
             if (typeof defaultValue === 'string' && defaultValue.includes('all')) {
                 defaultValue = ''
             }
-
-
 
             return { name: filter.name, filterKey: [filter.type, ...filter.filterKey], defaultValue: defaultValue || '' }
         })

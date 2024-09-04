@@ -131,14 +131,18 @@ const ElementSetting = (props) => {
 
     // Handle 'FORMSTATES' type
     const handleFormStatesType = (key) => {
-        if (_states && _states[key[0]]) return _states[key[0]][key[1]] || "''"
-
+        if (_states && _states[key[0]]) {
+            const val = _states[key[0]][key[1]];
+            return val !== undefined ? val :  "''";
+        }
         
     };
 
-    // Handle default type
     const handleDefaultType = (type, key) => {
-        const types = ['Menu', 'Flex', 'Tabs', 'Accordion', 'Sider', 'Grid', 'Container', 'Slider', 'Gallery', 'Dropdown', 'Observable', 'Modal', 'GoToTop'];
+        
+        const cstateId = _cstates?._uid;
+        let types = ['Menu', 'Flex', 'Tabs', 'Accordion', 'Sider', 'Grid', 'Container', 'Slider', 'Gallery', 'Dropdown', 'Observable', 'Modal', 'GoToTop'];
+        types = types.map(t => t+ "-" +cstateId);
         if (types.includes(type)) {
             return getStateValue(key, _cstates);
         }
@@ -201,6 +205,7 @@ const ElementSetting = (props) => {
         } else {
             const stateValue = getValue(attribute.valueState, attribute.value);
             let value = stateValue?.value || stateValue;
+
             if (typeof attribute.value === 'string' && attribute.value) {
                 value = attribute.value.replace(/\[state]/, value);
                 try {
@@ -212,6 +217,7 @@ const ElementSetting = (props) => {
                 attributeValue = value;
             }
         }
+
         const conditions = attribute.conditions;
         const cond = calculateConditions(conditions);
         return cond ? attributeValue : null;
@@ -225,6 +231,7 @@ const ElementSetting = (props) => {
      */
     const calculateAttributes = (attributes) => {
         if (!attributes) return {};
+
         return Object.values(attributes).reduce((a, attribute) => {
             const attributeValue = calculateAttributeValue(attribute);
             return { ...a, [attribute.key]: attributeValue };
@@ -242,6 +249,7 @@ const ElementSetting = (props) => {
 
     let attr = useMemo(() => {
         try {
+
             return calculateAttributes(attributes);
         } catch (e) {
             return {};
@@ -308,7 +316,7 @@ const ElementSetting = (props) => {
     const nodeValue = useMemo(() => {
         if (!node.nodeValue) return '';
         const inputString = node.nodeValue;
-        return replacePlaceholders(inputString);
+        return node.isStateActive === true ? replacePlaceholders(inputString) : inputString;
     }, [classes, colStates, _cstates, _states, _props, mapIndex, mapValue, node.nodeValue, setting?.resize]);
 
     // useMemo to calculate fallback image only when setting changes

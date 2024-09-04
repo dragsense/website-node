@@ -10,6 +10,7 @@ const Slides = (props) => {
     states,
     element,
     node,
+    updateStates 
   } = props;
 
 // Using useMemo to optimize performance by memoizing the state values
@@ -24,6 +25,14 @@ const Slides = (props) => {
   useEffect(() => {
     setIsDisabled(!states);
   }, [states]);
+
+  useEffect(() => {
+    if (openSider)
+      updateStates("siderStatus", "close");
+    else
+      updateStates("siderStatus", "open");
+   
+  }, [openSider]);
 
   return (
     <Sider 

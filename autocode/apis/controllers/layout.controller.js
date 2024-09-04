@@ -2,9 +2,10 @@ const httpStatus = require('http-status')
 
 const catchAsync = require('../../utils/catch-async')
 const pickKeys = require('../../utils/pick-keys')
+const { Readable } = require('stream');
 
 
-const { layoutService } = require('../services')
+const { layoutService, settingService } = require('../services')
 
 const GetLayout = catchAsync(async (req, res) => {
     const layout = await layoutService.getLayout(req.params.id);
@@ -12,7 +13,8 @@ const GetLayout = catchAsync(async (req, res) => {
 });
 
 const CreateLayout = catchAsync(async (req, res) => {
-    const layout = await layoutService.createLayout(req.body);
+    const withTemplate = req.query.withTemplate;
+    const layout = await layoutService.createLayout(req.body, withTemplate);
     res.status(httpStatus.CREATED).send({ layout });
 });
 
@@ -25,6 +27,74 @@ const DeleteLayout = catchAsync(async (req, res) => {
     await layoutService.deleteLayout(req.params.id);
     res.status(httpStatus.NO_CONTENT).send();
 });
+
+const GetElements = catchAsync(async (req, res) => {
+
+
+    const stream = new Readable({
+        objectMode: true,
+        read() { }
+    });
+
+    const protocol = req.protocol || 'http';
+    const host = `${protocol}://${req.headers.host}`;
+
+    await settingService.getElements(req.params.id, stream, 'layout', host);
+
+    res.setHeader('Transfer-Encoding', 'chunked');
+    res.setHeader('Content-Type', 'application/json');
+    stream.pipe(res);
+});
+
+const GetStyle = catchAsync(async (req, res) => {
+
+    const stream = new Readable({
+        objectMode: true,
+        read() { }
+    });
+
+    await layoutService.getStyle(req.params.id, stream);
+
+    res.setHeader('Transfer-Encoding', 'chunked');
+    res.setHeader('Content-Type', 'application/json');
+    stream.pipe(res);
+});
+
+const GetCss = catchAsync(async (req, res) => {
+    const css = await settingService.getCss(req.params.id, 'layout');
+    res.status(httpStatus.OK).send(css);
+});
+
+
+const DuplicateLayout= catchAsync(async (req, res) => {
+    const layout = await layoutService.duplicateLayout(req.params.id);
+    res.status(httpStatus.OK).send({ layout });
+});
+
+const PublishLayout = catchAsync(async (req, res) => {
+    await layoutService.publishLayout(req.params.id, req.body);
+    res.status(httpStatus.OK).send({ status: true });
+});
+
+
+const RestoreLayout = catchAsync(async (req, res) => {
+    await layoutService.restoreLayout(req.params.id, req.body);
+    res.status(httpStatus.OK).send({ status: true });
+});
+
+
+const UpdateStyle = catchAsync(async (req, res) => {
+    await layoutService.updateStyle(req.params.id, req.body);
+    res.status(httpStatus.OK).send({ status: true });
+});
+
+
+
+const UpdateElements = catchAsync(async (req, res) => {
+    await layoutService.updateElements(req.params.id, req.body);
+    res.status(httpStatus.OK).send({ status: true });
+});
+
 
 const GetLayouts = catchAsync(async (req, res) => {
     const filter = pickKeys(req.query, ['name']);
@@ -40,4 +110,12 @@ module.exports = {
     UpdateLayout,
     DeleteLayout,
     GetLayouts,
+    GetElements,
+    GetStyle,
+    GetCss,
+    UpdateElements,
+    UpdateStyle,
+    PublishLayout,
+    DuplicateLayout,
+    RestoreLayout
 };

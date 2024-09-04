@@ -621,7 +621,8 @@ const getCss = async () => {
   const animData = await fsUtils.read(path.join(dataDir, 'animation.json'));
   const aniamtion = JSON.parse(animData || '{}');
 
-  css += generateAnimations(aniamtion.elements)
+  css += generateAnimations(aniamtion);
+
 
   return { css }
 

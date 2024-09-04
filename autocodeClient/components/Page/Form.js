@@ -41,6 +41,7 @@ const Form = (props) => {
 
           // If form data is valid, submit form
           if (isValid) {
+               console.log(data)
 
                submitForm(data);
           } else {
