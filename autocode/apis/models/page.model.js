@@ -175,7 +175,7 @@ PageSchema.pre('save', async function (next) {
  */
 function setupNewPage(page) {
     let id = shortid.generate();
-    const className = `ac-elem-root-${id}`;
+    const className = `ac-elem-page-root-${id}`;
     page.elements['0'].className = className;
     page.elements['0'].selector = `.${className}`;
     let styleUid = shortid.generate();

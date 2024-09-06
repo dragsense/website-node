@@ -1,3 +1,4 @@
+import { evaluate } from 'mathjs';
 import { formatDate } from './utils';
 
 /**
@@ -147,6 +148,8 @@ export const getStateStates = (key, states, host) => {
  * @returns {any} - The state reference or undefined if not found.
  */
 export const getStateRef = (key, states) => {
+
+
   // If states object is not provided, return undefined
   if (!states) {
     return undefined;
@@ -154,7 +157,6 @@ export const getStateRef = (key, states) => {
 
   // Get the value from the states object using the first element of the key array
   let value = states[key[0]];
-
 
   // If the value is not found, return undefined
   if (!value) {
@@ -304,7 +306,6 @@ export const updateStateValue = (elem, withValue, states, value, updateKey = "de
   const expression = elem.value;
 
   let stateRef = getStateRef(key, states);
-
   if (!stateRef) {
     return false;
   }
@@ -317,7 +318,7 @@ export const updateStateValue = (elem, withValue, states, value, updateKey = "de
       originalExpression = originalExpression.replace(/\[value]/g, value);
       originalExpression = originalExpression.replace(/\[key]/g, stateRef[updateKey]);
 
-      updatedValue = eval(originalExpression);
+      updatedValue = evaluate(`{originalExpression}`);
     } else {
       updatedValue = value;
     }

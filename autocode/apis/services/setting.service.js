@@ -23,6 +23,8 @@ const dataDir = path.resolve(process.cwd(), 'private', 'data')
 const publicDir = path.resolve(process.cwd(), 'public')
 
 const { ObjectId } = require('mongodb')
+const shortid = require('shortid')
+const { default: mongoose } = require('mongoose')
 
 /**
  * Create a setting
@@ -586,7 +588,6 @@ const getPageData = async (id, type, host, withCss = false, remainingSlug) => {
             // Load layout components
             await Promise.all([loadForms(forms, projection), loadComponents(components, projection)])
 
-          
             const layoutElements = layout.elements || {
                 0: {
                     _uid: '0',
@@ -604,14 +605,13 @@ const getPageData = async (id, type, host, withCss = false, remainingSlug) => {
                 layoutElements['0'].childNodes.push('main')
             }
 
-            pageElements['main'] = {...pageElements['0']};
-            delete pageElements['0'];
+            pageElements['main'] = { ...pageElements['0'] }
+            delete pageElements['0']
 
             pages[page._id] = {
-                elements: { ...layoutElements, ...pageElements},
-                ...mainPageData
+                elements: { ...layoutElements, ...pageElements },
+                ...mainPageData,
             }
-
         } else {
             pages[page._id] = {
                 elements: pageElements,
@@ -631,10 +631,6 @@ const getPageData = async (id, type, host, withCss = false, remainingSlug) => {
         throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, 'An unexpected error occurred')
     }
 }
-
-
-
-
 
 const generatePages = async (_pages, pagesFolder, setting, AutoCode, AutocodeCustom) => {
     // Iterate over each page
@@ -885,6 +881,42 @@ const addFilesToZip = (folderPath, folderName, assetsFolder) => {
     })
 }
 
+const defaultElement = (page, name, type) => {
+    let id = shortid.generate()
+    const className = `ac-elem-${type}-root-${id}`
+    let styleUid = shortid.generate()
+  const styles = {
+        [styleUid]: {
+            _uid: styleUid,
+            selectorText: `.${className}`,
+            type: 'div',
+            style: {},
+        },
+    }
+
+    page['styles'] = styles;
+    page['_styles'] = styles;
+
+    const elements = {
+        0: {
+            _uid: '0',
+            tagName: 'div',
+            type: 'layout',
+            name: name,
+            layout: 'root',
+            nodeValue: '',
+            childNodes: [],
+            selector: `.${className}`,
+            className,
+            styleUid,
+        },
+    }
+
+    page['elements']  = elements;
+    page['_elements']  = elements;
+
+}
+
 /**
  * Get a page Elements
  * @param {String} id
@@ -899,20 +931,34 @@ const getElements = async (id, stream, type, host) => {
 
     // Fetch the collection by id, populate the defined collections and return the defined fields
 
-    let page = null
-    if (type === 'collection') page = await Collection.document(id, collections, projection)
-    else if (type === 'component') page = await Component.document(id, collections, projection)
-    else if (type === 'form') page = await Form.document(id, collections, projection)
-    else if (type === 'layout') page = await Layout.document(id, collections, projection)
-    else page = await Page.document(id, collections, projection)
+    const Model =
+        type === 'collection'
+            ? Collection
+            : type === 'component'
+            ? Component
+            : type === 'form'
+            ? Form
+            : type === 'layout'
+            ? Layout
+            : Page
 
-    // If collection does not exist, throw an error
+    let page = await Model.document(id, collections, projection)
+
+    // If the collection does not exist, throw an error
     if (!page) {
         throw new ApiError(httpStatus.NOT_FOUND, 'Elements not found')
     }
 
+    // Check if the elements array is empty or doesn't have a 0th element
+    if (!page['elements'] || !page['elements'][0]) {
+        defaultElement(page, type + ' Root Element', type)
+
+        // Use findOneAndUpdate to update the existing document
+        await Model.findOneAndUpdate({ _id: page._id }, page, { new: true })
+    }
+
     // Prepare the document to be sent to the client
-    const doc = prepareDocument(page);
+    const doc = prepareDocument(page)
 
     doc.host = host
 
@@ -1087,7 +1133,7 @@ const getCss = async (id, type) => {
         _forms: 1,
         _components: 1,
         _styles: 1,
-        published: 1
+        published: 1,
     }
 
     let style = { css: [] }
@@ -1118,7 +1164,6 @@ const getCss = async (id, type) => {
 
     // Load CSS for components
     await loadComponentsCSS(doc.components || [], projection, style)
-
 
     return style
 }

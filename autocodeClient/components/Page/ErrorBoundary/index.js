@@ -26,7 +26,6 @@ class ErrorBoundary extends React.Component {
       return (
         <>
           <span style={{ color: "red" }}>An Error Has Occured</span>
-          <details>{this.state.error && this.state.error.toString()}</details>
         </>
       );
     }

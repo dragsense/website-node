@@ -1,9 +1,10 @@
-const React = require("react");
+import React from 'react'
 
 import ComplexLogics from './ComplexLogics';
 
 
 export default function AutocodeClient({ children, name, getStateValue, getPropValue, updateProp, updateState }) {
+
 
     switch (name) {
         case 'ComplexLogics':
@@ -15,7 +16,7 @@ export default function AutocodeClient({ children, name, getStateValue, getPropV
                 updateState={updateState}>
                 {children}</ComplexLogics>
         default:
-            return null;
+            return <div></div>;
     }
 }
 

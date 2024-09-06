@@ -3,6 +3,7 @@ import React, { useEffect, useState, useMemo, useCallback } from 'react'
 import ElementMapping from './ElementMapping'
 
 import { InlineSkeleton } from './Elements'
+import { evaluate } from 'mathjs'
 
 import { getStateValue, updateStateValue, getStateRef, generateCascader } from '../../utils/element-value'
 import DocumentServices from '../../libs/services/documnets'
@@ -204,6 +205,7 @@ const Component = (props) => {
 
     // Use useEffect to call handleLoadDocuments when states, _states, filters, isFilterChange, or colStates change
     useEffect(() => {
+
         handleLoadDocuments()
     }, [states])
 
@@ -214,7 +216,7 @@ const Component = (props) => {
         result = result.replace(/\[top]/g, scrollTop)
         result = result.replace(/\[delta]/g, delta)
         try {
-            return eval(result)
+            return evaluate(`${result}`)
         } catch (e) {
             console.error('Invalid expression:' + e?.message)
             return null
@@ -407,17 +409,23 @@ const Component = (props) => {
     // Function to set states based on type
     const onSetStates = useCallback(
         async (key, value, type) => {
+
+
             // Switch case to handle different types
             switch (type) {
                 case 'PROPS':
-                    const prop = getStateRef(key, _states)
+
+                    const prop = getStateRef(key, _states);
+
                     if (prop) {
-                        prop.defaultValue = value
+                        prop.defaultValue = value;
+
                         _setStates({ ..._states })
                     }
                     break
                 case 'STATES':
                     const state = getStateRef(key, states)
+
                     if (state) {
                         state.defaultValue = value
                         setStates({ ...states })

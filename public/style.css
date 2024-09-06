@@ -18,29 +18,33 @@ html {
 
  }
 
-@media (min-width: 320px) and (orientation: portrait) {
-.ac-elem-vrEZ798P1 {
-  color: rgba(32.0025, 2.9570309999999975, 2.9570309999999975, 1) 
+ .ac-elem-zg1w {
+  text-align: center 
+}
+
+  .ac-elem-root-oVuKrjzGv {
+  display: grid ;grid-template-areas: "header header header"
+        "main main main"
+        "footer footer footer" ;grid-template-columns: 1fr 2fr 1fr ;grid-template-rows: auto 
+}
+
+@media (min-width: 768px) and (orientation: landscape) {
+.ac-elem-root-oVuKrjzGv {
+  grid-template-areas: "header header header"
+        "main main main"
+        "footer footer footer" ;grid-template-columns: 1fr 2fr 1fr 
 }
 
  }
-.ac-gallery-KQ6D .ac-modal-body .ac-gallery-img {
-  object-fit: contain 
+.ac-element-header-53iYiJREcP {
+  grid-area: header 
 }
 
-.ac-gallery-D1LI .ac-modal-body .ac-gallery-img {
-  object-fit: contain 
+.ac-element-main-qkpMZcC5aZ {
+  grid-area: main 
 }
 
- .ac-elem-q1tM {
-  height: 400px ;overflow-x: scroll ;overflow-y: scroll ;position: relative 
-}
-
-.ac-elem-4ao6 {
-  height: 800px 
-}
-
-.ac-elem-y3ad {
-  position: absolute ;top: 0px ;width: 50px ;height: 50px ;background-color: rgba(223.2525, 140.827677, 140.827677, 0.9227723980894184) 
+.ac-element-footer-uLET_guita {
+  grid-area: footer 
 }
 

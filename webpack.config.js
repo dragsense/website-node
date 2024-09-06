@@ -155,7 +155,7 @@ const webpack = require('webpack');
          globalObject: 'this',
          publicPath: '',
 
-    },
+    }, 
    
     module: {
         rules: [

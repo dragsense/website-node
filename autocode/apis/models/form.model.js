@@ -260,7 +260,7 @@ FormSchema.pre('save', async function (next) {
 // Function to generate unique identifiers and styles for a form
 async function generateUniqueIdentifiersAndStyles(form) {
     let id = shortid.generate();
-    const className = `ac-elem-root-${id}`;
+    const className = `ac-elem-form-root-${id}`;
     form.elements['0'].className = className;
     form.elements['0'].selector = `.${className}`;
 

@@ -99,7 +99,7 @@ LayoutSchema.pre('save', async function (next) {
  */
 function setupNewPage(page) {
     let id = shortid.generate()
-    const className = `ac-elem-root-${id}`
+    const className = `ac-elem-layout-root-${id}`
     page.elements['0'].className = className
     page.elements['0'].selector = `.${className}`
     let styleUid = shortid.generate()
@@ -206,7 +206,7 @@ function setupTemplate(page, styleUid, withTemplate) {
                     root: {
                         properties: {
                             'grid-area': {
-                                value: childClassNames[i].replace('-', ' '),
+                                value: childClassNames[i],
                                 unit: '',
                             },
                         },
@@ -219,7 +219,7 @@ function setupTemplate(page, styleUid, withTemplate) {
     // Define grid areas based on the template
     let gridTemplateAreas = `
         "header header header"
-        "${includeLeft ? 'left-aside' : ''} main ${includeRight ? 'right-aside' : ''}"
+        "${includeLeft ? 'left-aside' : 'main'} main ${includeRight ? 'right-aside' : 'main'}"
         "footer footer footer"
     `;
 

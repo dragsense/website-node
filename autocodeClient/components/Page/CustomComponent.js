@@ -1,5 +1,5 @@
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 
 import ElementSetting from "./ElementSetting";
 import { getStates } from '../../utils/element-value';
@@ -9,18 +9,12 @@ const CustomComponent = (props) => {
 
     const { children, customPath, node, _states, _props, onSetStates, mapValue, mapIndex, AutocodeCustom } = props;
 
-    // Function to load the custom component
-    const loadComponent = async (path) => {
-        // logic to load component
-    };
 
-    // useEffect to load the component when the component mounts
-    useEffect(() => {
-        loadComponent(customPath);
-    }, [])
 
     // Function to get the state value for a given key
     const getStateValue = (key) => {
+
+
         if (!_states || key) {
             return null;
         }
@@ -29,6 +23,8 @@ const CustomComponent = (props) => {
 
     // Function to get the prop value for a given key
     const getPropValue = (key) => {
+
+
         if (!_states || key) {
             return null;
         }
@@ -37,6 +33,8 @@ const CustomComponent = (props) => {
 
     // Function to update the state for a given key and value
     const updateState = (key, value) => {
+
+
         if (onSetStates) {
             onSetStates(key, value, 'STATES')
         }

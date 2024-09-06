@@ -49,7 +49,7 @@ async function initApp() {
     // autocode
     autocodeClient(app,
         AutocodePage,
-        AppClient,
+        AppClient, // Custom Components
         `app-client`
     )
 
