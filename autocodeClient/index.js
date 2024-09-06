@@ -42,8 +42,6 @@ const loadData = async (initialData) => {
         hydrateRoot(
             document.getElementById('root'),
             <App pages={res.pages} _id={_id} 
-                top={res.layout?.top}
-                bottom={res.layout?.bottom} 
                 setting={setting} 
                 type={type}
                 AutocodeCustom={AppClient} 

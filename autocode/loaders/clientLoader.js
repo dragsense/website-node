@@ -114,8 +114,6 @@ module.exports = (app, AutoCode, AutocodeCustom, libraryName) => {
                           <AutoCode
                               _id={page._id}
                               pages={pagesResults.pages}
-                              top={pagesResults.layout?.top}
-                              bottom={pagesResults.layout?.bottom}
                               setting={settingData}
                               type={page.type || 'page'}
                               AutocodeCustom={AutocodeCustom}
