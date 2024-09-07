@@ -280,41 +280,50 @@ const deleteForm = async (id) => {
  * @returns {Promise<>}
  */
 const submit = async (files, id, states) => {
-    // Validate form and states
-    const form = await validateForm(id)
-    const formStates = validateStates(form, states)
-    // Handle files if any
-    let attachments = []
-    if (files) {
-        attachments = await handleFiles(files, formStates)
-    }
+    try {
+        // Validate form and states
+        const form = await validateForm(id)
+        const formStates = validateStates(form, states)
+        // Handle files if any
+        let attachments = []
+        if (files) {
+            attachments = await handleFiles(files, formStates)
+        }
 
-    const extractedValues = {}
+        const extractedValues = {}
 
-    for (const key in formStates) {
-        if (formStates.hasOwnProperty(key)) {
-            extractedValues[key] = formStates[key].defaultValue
+        for (const key in formStates) {
+            if (formStates.hasOwnProperty(key)) {
+                extractedValues[key] = formStates[key].defaultValue
+            }
+        }
+
+        // Send email if not record only
+        if (!form.recordOnly) {
+            await sendEmail(form, extractedValues, attachments)
+        }
+
+        // Record form if necessary
+        if (form.record || form.recordOnly) {
+            await recordForm(form, formStates)
+        }
+    } catch (e) {
+        throw new ApiError(httpStatus[500], 'Something went wrong.')
+
+    } finally {
+        if (!form.record && !form.recordOnly) {
+            attachments.forEach((attachment) => {
+                mediaServices.deleteMedia(attachment.id)
+            })
+        }
+
+        if (files) {
+            await cleanUpTempFiles(files)
         }
     }
-
-    // Send email if not record only
-    if (!form.recordOnly) {
-        await sendEmail(form, extractedValues, attachments)
-    }
-
-    
-
-    // Record form if necessary
-    if (form.record || form.recordOnly) {
-        await recordForm(form, formStates)
-    }
-
     // Clean up temp files
-    if (files) {
-        await cleanUpTempFiles(files)
-    }
 
-    return
+    return form.setting
 }
 
 // Validate form
@@ -403,7 +412,7 @@ async function handleFiles(files, formStates) {
                 console.log('Successfully renamed - AKA moved!')
             })
 
-            attachments.push({ filename: file.originalname, path: destPath })
+            attachments.push({ id: media._id, mime: file.mimetype, filename: file.originalname, path: destPath })
         }
     }
 
@@ -462,8 +471,6 @@ async function sendEmail(form, states, attachments) {
         if (form.setting?.sendCopy && isValidEmail(states['email'])) {
             to = to + ',' + states['email']
         }
-
-        console.log(states)
 
         const info = await transporter.sendMail({
             from,
