@@ -26,9 +26,9 @@ module.exports = (autocodeRoutes) => {
     directives: {
       defaultSrc: ["'self'"],
       fontSrc: ["'self'", "https://cdnjs.cloudflare.com", "https://fonts.gstatic.com"],
-      scriptSrc: ["'self'",  "'unsafe-eval'", "'unsafe-inline'", "https://unpkg.com"],
+      scriptSrc: ["'self'",  "'unsafe-eval'", "'unsafe-inline'", "https://unpkg.com", "https://cdn.jsdelivr.net", "https://cdnjs.cloudflare.com"],
       styleSrc: ["'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net", "https://cdnjs.cloudflare.com", "https://fonts.gstatic.com", "https://fonts.googleapis.com"], // Allow styles from the same origin, unsafe-inline, and the specified CDN
-      mediaSrc: ["'self", "https://youtu.be", "https://www.youtube.com"]
+      mediaSrc: ["https://youtu.be", "https://www.youtube.com"]
       // Add other directives as needed
     },
   };

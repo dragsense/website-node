@@ -1,7 +1,8 @@
 const path = require('path');
 const TerserPlugin = require('terser-webpack-plugin');
 const webpack = require('webpack');
- 
+const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
+
   /*  module.exports = {
     entry: {
         'app-client': './src/client/components/index.js',
@@ -36,7 +37,10 @@ const webpack = require('webpack');
     resolve: {
         extensions: ['.js', '.jsx'],
     },
-
+ externals: {
+    'react': 'React',
+     
+  },
     optimization: {
         minimizer: [
             new TerserPlugin(),
@@ -47,53 +51,6 @@ const webpack = require('webpack');
  };    */
  
 
-
-/*   module.exports = {
-    entry: {
-        'autocode-server': './autocodeClient/server.js',
-    },
-    output: {
-        filename: '[name].js',
-        path: path.resolve(__dirname, 'dist'),
-         library: 'AutocodeServer',
-         libraryExport: 'default',
-         libraryTarget: 'umd',
-         globalObject: 'this',
-         publicPath: '',
-
-    },
-   
-    module: {
-        rules: [
-
-            {
-                test: /\.(js|jsx)$/,
-                exclude: /node_modules/,
-                use: {
-                    loader: 'babel-loader',
-                    options: {
-                        presets: ['@babel/preset-env', '@babel/preset-react'],
-                    },
-                },
-            },
-        ],
-    },
-  externals: {
-    'react': 'react',
-  },
-    resolve: {
-        extensions: ['.js', '.jsx'],
-    },
-
-    optimization: {
-        minimizer: [
-            new TerserPlugin(),
-        ],
-    },
-
-    mode: 'production',
- };   */ 
-  
  
   /*  module.exports = {
     entry: {
@@ -126,7 +83,8 @@ const webpack = require('webpack');
         ],
     },
   externals: {
-    'AppClient': 'AppClient',
+    'react': 'react',
+     
   },
     resolve: {
         extensions: ['.js', '.jsx'],
@@ -143,14 +101,27 @@ const webpack = require('webpack');
    */
 
 
+ const { dependencies } = require('./package.json');
+
+// Automatically mark all dependencies as externals
+const externals = Object.keys(dependencies).reduce((externalsObj, dep) => {
+    externalsObj[dep] = dep;
+    return externalsObj;
+}, {
+    'mongodb': 'mongodb', // Additional external library
+    'react-dom/server': 'react-dom/server',
+    '../dist/autocode-services': '../dist/autocode-services'
+});
+
   module.exports = {
     entry: {
+        //'autocode-services': './autocode/apis/services/index.js',
         'autocode': './autocode/app.js',
     },
     output: {
         filename: '[name].js',
         path: path.resolve(__dirname, 'dist'),
-         library: 'Autocode',
+        library: '[name]',
          libraryTarget: 'umd',
          globalObject: 'this',
          publicPath: '',
@@ -172,12 +143,7 @@ const webpack = require('webpack');
             },
         ],
     },
-    externals: {
-        'react' :'react',
-        'react-dom' :'react-dom',
-        'mongoose': 'mongoose',
-        'mongodb': 'mongodb'
-    },
+    externals,
     resolve: {
         extensions: ['.js', '.jsx'],
     },
@@ -186,7 +152,11 @@ const webpack = require('webpack');
         minimizer: [
             new TerserPlugin(),
         ],
+       
     },
+    plugins: [
+        new BundleAnalyzerPlugin(),
+    ],
     target: 'node',
     mode: 'production',
  };  

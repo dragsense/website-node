@@ -885,7 +885,7 @@ const defaultElement = (page, name, type) => {
     let id = shortid.generate()
     const className = `ac-elem-${type}-root-${id}`
     let styleUid = shortid.generate()
-  const styles = {
+    const styles = {
         [styleUid]: {
             _uid: styleUid,
             selectorText: `.${className}`,
@@ -894,8 +894,8 @@ const defaultElement = (page, name, type) => {
         },
     }
 
-    page['styles'] = styles;
-    page['_styles'] = styles;
+    page['styles'] = styles
+    page['_styles'] = styles
 
     const elements = {
         0: {
@@ -912,9 +912,8 @@ const defaultElement = (page, name, type) => {
         },
     }
 
-    page['elements']  = elements;
-    page['_elements']  = elements;
-
+    page['elements'] = elements
+    page['_elements'] = elements
 }
 
 /**
@@ -1211,10 +1210,41 @@ const loadComponentsCSS = async (components, projection, style) => {
     }
 }
 
+/**
+ * Get a page
+ * @param {String} id
+ * @param {String} type
+ * @returns {Promise<any>}
+ */
+const getPage = async (field, value, type = 'page') => {
+    const projection = {
+        _id: 1,
+        type: 1,
+        setting: 1,
+        slug: 1,
+    }
+
+    const Model =
+        type === 'collection'
+            ? Collection
+            : type === 'component'
+            ? Component
+            : type === 'form'
+            ? Form
+            : type === 'layout'
+            ? Layout
+            : Page
+
+    let page = await Model.findOne({ [field]: value, 'setting.status': 'PUBLIC' }).select(projection)
+
+    return page;
+}
+
 module.exports = {
     getSettings,
     saveSetting,
     getPageData,
+    getPage,
     download,
     getElements,
     getCss,

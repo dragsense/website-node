@@ -2,7 +2,6 @@
 import React, { useEffect, useState, useMemo, useCallback } from 'react'
 import ElementMapping from './ElementMapping'
 
-import { InlineSkeleton } from './Elements'
 import { evaluate } from 'mathjs'
 
 import { getStateValue, updateStateValue, getStateRef, generateCascader } from '../../utils/element-value'
@@ -525,7 +524,7 @@ const Component = (props) => {
     // Function to render the component
     const renderComponent = useCallback(() => {
         if (loading) {
-            return <InlineSkeleton />
+            return <></>
         } else {
             return (
                 <ElementMapping {...props} map={node.map} _states={states} _props={_states}>

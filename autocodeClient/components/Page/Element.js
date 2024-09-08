@@ -1,6 +1,4 @@
 const React = require("react");
-import { InlineSkeleton } from './Elements';
-
 
 /**
  * Element component renders a HTML element with given tagName and attributes.
@@ -26,7 +24,7 @@ const Element = ({ key, tagName, customAttributes = {}, attributes, classes, chi
         tagName,
         elementProps,
         children
-    ) : <InlineSkeleton />;
+    ) : <></>;
 };
 
 export default Element;

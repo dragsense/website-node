@@ -1,8 +1,7 @@
 const React = require('react')
 const ReactDOMServer = require('react-dom/server')
 
-const { Page, Collection, Document } = require('../apis/models')
-const { settingService, themeService } = require('../apis/services')
+const { loadService } = require('./servicesLoader')
 
 const path = require('path')
 const fs = require('fs')
@@ -28,7 +27,7 @@ const handlePageNotFound = (res) => {
 }
 
 // Function to fetch page data
-const fetchPageData = async (page, host, remainingSlug) => {
+const fetchPageData = async (page, host, remainingSlug, settingService) => {
     return await settingService.getPageData(page._id, page.type, host, true, remainingSlug)
 }
 
@@ -40,39 +39,29 @@ module.exports = (app, AutoCode, AutocodeCustom, libraryName) => {
             const dynamicSlugs = req.params[0].replace(/^\//, '')
             const slugParts = dynamicSlugs.split('/')
 
-            const projection = {
-                _id: 1,
-                type: 1,
-                setting: 1,
-                slug: 1,
-            }
+           
 
+            const settingService = await loadService("settingService");
             const setting = await settingService.getSettings()
             let page = null
             let remainingSlug = ''
 
             // Check if maintenance page is set
             if (setting.maintenancePage) {
-                page = await Page.findOne({
-                    _id: setting.maintenancePage._id,
-                    'setting.status': 'PUBLIC',
-                }).select(projection)
+                page = await settingService.getPage('_id', setting.maintenancePage._id);
+            
             } else {
                 // Check if home page is set
                 if (setting.homePage && (slugParts.length <= 0 || dynamicSlugs === '')) {
-                    page = await Page.findOne({ _id: setting.homePage._id, 'setting.status': 'PUBLIC' }).select(projection)
-                } else page = await Page.findOne({ slug: dynamicSlugs, 'setting.status': 'PUBLIC' }).select(projection)
-
+                    page = await settingService.getPage(setting.homePage._id);
+                } else page = await settingService.getPage('slug', dynamicSlugs);
+               
                 // If page not found, check in collections
                 if (!page)
                     for (let i = 0; i < slugParts.length; i++) {
                         const currentSlug = slugParts.slice(0, i + 1).join('/')
 
-                        page = await Collection.findOne({
-                            slug: currentSlug,
-                            'setting.status': 'PUBLIC',
-                        }).select(projection)
-
+                        page = await settingService.getPage('slug', currentSlug, 'collection');
                         if (page) {
                             remainingSlug = slugParts.slice(i + 1).join('/')
                             break
@@ -82,7 +71,7 @@ module.exports = (app, AutoCode, AutocodeCustom, libraryName) => {
 
             // If page not found, check if error page is set
             if (!page && setting.errorPage) {
-                page = await Page.findOne({ _id: setting.errorPage._id, 'setting.status': 'PUBLIC' }).select(projection)
+                page = await settingService.getPage(setting.errorPage._id);
             }
 
             // If page not found, handle page not found
@@ -94,7 +83,7 @@ module.exports = (app, AutoCode, AutocodeCustom, libraryName) => {
             const protocol = req.protocol || 'http'
             const host = `${protocol}://${req.headers.host}`
 
-            const pagesResults = await fetchPageData(page, host, remainingSlug)
+            const pagesResults = await fetchPageData(page, host, remainingSlug, settingService)
 
             const settingData = {
                 global: {
@@ -126,6 +115,8 @@ module.exports = (app, AutoCode, AutocodeCustom, libraryName) => {
                 remainingSlug: remainingSlug,
                 setting: settingData,
             }
+
+            const themeService = await loadService("themeService");
 
             const filter = {}
             const options = { limit: 100 }
@@ -207,8 +198,13 @@ module.exports = (app, AutoCode, AutocodeCustom, libraryName) => {
             ${setting.scripts ? setting.scripts.footer || '' : ''}
             ${page.setting ? page.setting.scripts?.footer || '' : ''}
          <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+         <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+         <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/13.1.1/math.min.js" integrity="sha512-g9Hl9sW0nMwhkRPakKcrKyxx6NMT/vD/zu7nhggnjI9as96SdYA/KocpFXxJ1TXFZN9ki0Bv1G7NPchjiSE2VQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+         <script>
+            window.react = window.React;
+        </script>
            <script src="/${libraryName}.js"></script>
+        
             <script src="/autocode-client.js"></script> 
           </body>
         </html>

@@ -1,28 +1,29 @@
-const httpStatus = require('http-status')
+const httpStatus = require('http-status');
 const { Readable } = require('stream');
+const catchAsync = require('../../utils/catch-async');
+const pickKeys = require('../../utils/pick-keys');
 
-const catchAsync = require('../../utils/catch-async')
-const pickKeys = require('../../utils/pick-keys')
-
-const { pageService, settingService } = require('../services');
+// Load the necessary services dynamically
+const { loadService } = require('../../loaders/servicesLoader')
 
 const GetPage = catchAsync(async (req, res) => {
+    const pageService = loadService('pageService');
     const page = await pageService.getPage(req.params.id);
 
     const protocol = req.protocol || 'http';
     const host = `${protocol}://${req.headers.host}`;
 
-
     res.status(httpStatus.OK).send({ page, host });
 });
 
 const GetPageData = catchAsync(async (req, res) => {
+    const pageService = loadService('pageService');
     const result = await pageService.getPageData(req.params.id);
     res.status(httpStatus.OK).send(result);
 });
 
 const GetElements = catchAsync(async (req, res) => {
-
+    const settingService = loadService('settingService');
 
     const stream = new Readable({
         objectMode: true,
@@ -40,6 +41,7 @@ const GetElements = catchAsync(async (req, res) => {
 });
 
 const GetStyle = catchAsync(async (req, res) => {
+    const pageService = loadService('pageService');
 
     const stream = new Readable({
         objectMode: true,
@@ -54,56 +56,61 @@ const GetStyle = catchAsync(async (req, res) => {
 });
 
 const GetCss = catchAsync(async (req, res) => {
+    const settingService = loadService('settingService');
     const css = await settingService.getCss(req.params.id, 'page');
     res.status(httpStatus.OK).send(css);
 });
 
-
 const DuplicatePage = catchAsync(async (req, res) => {
+    const pageService = loadService('pageService');
     const page = await pageService.duplicatePage(req.params.id);
     res.status(httpStatus.OK).send({ page });
 });
 
 const CreatePage = catchAsync(async (req, res) => {
+    const pageService = loadService('pageService');
     const page = await pageService.createPage(req.body);
     res.status(httpStatus.CREATED).send({ page });
 });
 
 const UpdatePage = catchAsync(async (req, res) => {
+    const pageService = loadService('pageService');
     const page = await pageService.updatePage(req.params.id, req.body);
     res.status(httpStatus.OK).send({ page });
 });
 
 const PublishPage = catchAsync(async (req, res) => {
+    const pageService = loadService('pageService');
     await pageService.publishPage(req.params.id, req.body);
     res.status(httpStatus.OK).send({ status: true });
 });
 
-
 const RestorePage = catchAsync(async (req, res) => {
+    const pageService = loadService('pageService');
     await pageService.restorePage(req.params.id, req.body);
     res.status(httpStatus.OK).send({ status: true });
 });
 
-
 const UpdateStyle = catchAsync(async (req, res) => {
+    const pageService = loadService('pageService');
     await pageService.updateStyle(req.params.id, req.body);
     res.status(httpStatus.OK).send({ status: true });
 });
 
-
-
 const UpdateElements = catchAsync(async (req, res) => {
+    const pageService = loadService('pageService');
     await pageService.updateElements(req.params.id, req.body);
     res.status(httpStatus.OK).send({ status: true });
 });
 
 const DeletePage = catchAsync(async (req, res) => {
+    const pageService = loadService('pageService');
     await pageService.deletePage(req.params.id);
     res.status(httpStatus.NO_CONTENT).send();
 });
 
 const GetPages = catchAsync(async (req, res) => {
+    const pageService = loadService('pageService');
     const filter = pickKeys(req.query, ['name']);
     const options = pickKeys(req.query, ['sortBy', 'limit', 'page']);
     const pages = await pageService.getPages(filter, options);

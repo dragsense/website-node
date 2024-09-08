@@ -1,3 +1,5 @@
+const ApiError = require('../../utils/api-error')
+
 module.exports.settingController = require('./setting.controller')
 module.exports.themeController = require('./theme.controller')
 module.exports.ecommerceController = require('./ecommerce.controller')

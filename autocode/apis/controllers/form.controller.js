@@ -1,21 +1,23 @@
-const httpStatus = require('http-status')
-const pickKeys = require('../../utils/pick-keys')
+const httpStatus = require('http-status');
+const pickKeys = require('../../utils/pick-keys');
 const { Readable } = require('stream');
+const catchAsync = require('../../utils/catch-async');
 
-const catchAsync = require('../../utils/catch-async')
-const { formService, settingService } = require('../services')
+// Load the necessary services dynamically
+const { loadService } = require('../../loaders/servicesLoader')
 
 const GetForm = catchAsync(async (req, res) => {
+    const formService = loadService('formService');
     const form = await formService.getForm(req.params.id);
     res.status(httpStatus.OK).send({ form });
 });
 
 const GetElements = catchAsync(async (req, res) => {
-
+    const settingService = loadService('settingService');
 
     const stream = new Readable({
         objectMode: true,
-        read() { }
+        read() {}
     });
 
     const protocol = req.protocol || 'http';
@@ -29,10 +31,11 @@ const GetElements = catchAsync(async (req, res) => {
 });
 
 const GetStyle = catchAsync(async (req, res) => {
+    const formService = loadService('formService');
 
     const stream = new Readable({
         objectMode: true,
-        read() { }
+        read() {}
     });
 
     await formService.getStyle(req.params.id, stream);
@@ -43,62 +46,70 @@ const GetStyle = catchAsync(async (req, res) => {
 });
 
 const GetCss = catchAsync(async (req, res) => {
+    const settingService = loadService('settingService');
     const css = await settingService.getCss(req.params.id, 'form');
     res.status(httpStatus.OK).send(css);
 });
 
 const CreateForm = catchAsync(async (req, res) => {
+    const formService = loadService('formService');
     const form = await formService.createForm(req.body);
     res.status(httpStatus.CREATED).send({ form });
 });
 
 const DuplicateForm = catchAsync(async (req, res) => {
+    const formService = loadService('formService');
     const form = await formService.duplicateForm(req.params.id);
     res.status(httpStatus.OK).send({ form });
 });
 
 const UpdateForm = catchAsync(async (req, res) => {
+    const formService = loadService('formService');
     const form = await formService.updateForm(req.params.id, req.body);
     res.status(httpStatus.OK).send({ form });
 });
 
 const UpdateStyle = catchAsync(async (req, res) => {
+    const formService = loadService('formService');
     await formService.updateStyle(req.params.id, req.body);
     res.status(httpStatus.OK).send({ status: true });
 });
 
 const UpdateElements = catchAsync(async (req, res) => {
+    const formService = loadService('formService');
     await formService.updateElements(req.params.id, req.body);
     res.status(httpStatus.OK).send({ status: true });
 });
 
 const PublishForm = catchAsync(async (req, res) => {
+    const formService = loadService('formService');
     await formService.publishForm(req.params.id, req.body);
     res.status(httpStatus.OK).send({ status: true });
 });
 
 const RestoreForm = catchAsync(async (req, res) => {
+    const formService = loadService('formService');
     await formService.restoreForm(req.params.id, req.body);
     res.status(httpStatus.OK).send({ status: true });
 });
 
-
 const DeleteForm = catchAsync(async (req, res) => {
+    const formService = loadService('formService');
     await formService.deleteForm(req.params.id);
     res.status(httpStatus.NO_CONTENT).send();
 });
 
 const GetForms = catchAsync(async (req, res) => {
+    const formService = loadService('formService');
     const filter = pickKeys(req.query, ['name']);
     const options = pickKeys(req.query, ['sortBy', 'limit', 'page']);
     const forms = await formService.getForms(filter, options);
     res.status(httpStatus.OK).send({ forms });
 });
 
-
 const Submit = catchAsync(async (req, res) => {
-
-
+    const formService = loadService('formService');
+    
     // Extract files from the request
     let files = req.files;
 
@@ -116,13 +127,12 @@ const Submit = catchAsync(async (req, res) => {
             updatedFiles.push({ file, type });
         });
     }
-
     
     // Submit the updated files to the form service
-    await formService.submit(updatedFiles, req.params.id, req.body);
+    const setting = await formService.submit(updatedFiles, req.params.id, req.body);
 
     // Send a response with a status of true
-    res.status(httpStatus.OK).send({ status: true });
+    res.status(httpStatus.OK).send({ status: true, setting });
 });
 
 // Helper function to determine the file type based on the mimetype

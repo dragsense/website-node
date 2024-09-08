@@ -1,25 +1,20 @@
-const React = require("react");
-
-import { useMemo } from "react";
-import { hydrateRoot } from 'react-dom/client';
+import React, { useMemo } from "react";
 import { PageComponent } from './components';
+
 import PageServices from './libs/services/page';
-import AppClient from 'AppClient';
 
 // Function to create the PageComponent with memoization for performance
-const createPageComponent = ({ pages, _id, top, bottom, setting, states, type, AutocodeCustom }) => {
+const createPageComponent = ({ pages, _id, setting, states, type, AutocodeCustom }) => {
     return useMemo(() => (
         <PageComponent 
             pages={pages}
-            top={top}
-            bottom={bottom} 
             _id={_id} 
             setting={setting}
             AutocodeCustom={AutocodeCustom}
             states={states} 
             type={type} 
         />
-    ), [pages, _id, top, bottom, setting, states, type, AutocodeCustom]);
+    ), [pages, _id, setting, states, type, AutocodeCustom]);
 };
 
 // Main App component
@@ -31,15 +26,14 @@ function App(props) {
 export default App;
 
 // Function to load initial data and hydrate the root
-const loadData = async (initialData) => {
+const loadData = async (initialData, AppClient) => {
     const { _id, type, setting, remainingSlug } = initialData;
 
     try {
         const res = await PageServices.get(_id, type, remainingSlug, origin);
 
-
         // Hydrate the root with the App component
-        hydrateRoot(
+        ReactDOM.hydrateRoot(
             document.getElementById('root'),
             <App pages={res.pages} _id={_id} 
                 setting={setting} 
@@ -62,5 +56,8 @@ const loadData = async (initialData) => {
 // Load initial data if window is defined
 if (typeof window !== 'undefined') {
     const initialData = window.__INITIAL_DATA__ || {};
-    loadData(initialData);
+    loadData(initialData, AppClient);
 }
+
+
+export { createPageComponent };
