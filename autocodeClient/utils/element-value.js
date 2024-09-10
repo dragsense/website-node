@@ -1,5 +1,6 @@
-import { evaluate } from 'mathjs';
 import { formatDate } from './utils';
+import { Parser } from "expr-eval";
+const parser = new Parser();
 
 /**
  * Get the value of a state based on its key.
@@ -318,7 +319,8 @@ export const updateStateValue = (elem, withValue, states, value, updateKey = "de
       originalExpression = originalExpression.replace(/\[value]/g, value);
       originalExpression = originalExpression.replace(/\[key]/g, stateRef[updateKey]);
 
-      updatedValue = evaluate(`{originalExpression}`);
+      const expr = parser.parse(originalExpression);
+      updatedValue = expr.evaluate();
     } else {
       updatedValue = value;
     }

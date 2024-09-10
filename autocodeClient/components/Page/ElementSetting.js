@@ -4,7 +4,9 @@ import React, { useMemo } from "react";
 
 import { getStateValue, getPageValue } from '../../utils/element-value';
 import ElementValue from './ElementValue';
-import { evaluate } from "mathjs";
+import { Parser } from "expr-eval";
+const parser = new Parser();
+
 /**
  * This is a React functional component called ElementSetting.
  * It renders an ElementValue component with certain props.
@@ -162,7 +164,9 @@ const ElementSetting = (props) => {
         let original = expression.replace(/\[state]/g, v);
         original = original.replace(/\[key]/g, keyValue);
         try {
-            return !!evaluate(`${original}`);
+            const expr = parser.parse(original);
+            const evaluatedResult = expr.evaluate();
+            return evaluatedResult;
         } catch (e) {
             console.error("Invalid expression:" + e?.message);
             return true;
@@ -210,7 +214,9 @@ const ElementSetting = (props) => {
             if (typeof attribute.value === 'string' && attribute.value) {
                 value = attribute.value.replace(/\[state]/, value);
                 try {
-                    attributeValue = evaluate(`${value}`);
+                    const expr = parser.parse(value);
+                    const evaluatedResult = expr.evaluate();
+                    attributeValue = evaluatedResult;
                 } catch (e) {
                     console.error("Invalid expression: " + e?.message);
                 }

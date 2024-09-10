@@ -20,7 +20,7 @@ const fetchData = async (url, method, body) => {
 const FormServices = {
 
     submit: async function (formId, formStates) {
-        const url =  `/api/v1/forms/submit/${formId}`;
+        const url =  `${AUTOCODE_API_PREFIX}/v1/forms/submit/${formId}`;
         const sanitizedUrl = sanitizeUrl(url);
         return fetchData(sanitizedUrl, 'POST', formStates);
     },

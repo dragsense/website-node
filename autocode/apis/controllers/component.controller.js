@@ -10,7 +10,7 @@ const { loadService } = require('../../loaders/servicesLoader')
 
 const GetComponent = catchAsync(async (req, res) => {
     
-    const componentService = await loadService('componentService');
+    const componentService =loadService('componentService');
     const component = await componentService.getComponent(req.params.id);
 
     const protocol = req.protocol || 'http';
@@ -20,35 +20,35 @@ const GetComponent = catchAsync(async (req, res) => {
 });
 
 const GetPaths = catchAsync(async (req, res) => {
-    const componentService = await loadService('componentService');
+    const componentService =loadService('componentService');
 
     const paths = await componentService.getPaths();
     res.status(httpStatus.OK).send({ paths });
 });
 
 const DuplicateComponent = catchAsync(async (req, res) => {
-    const componentService = await loadService('componentService');
+    const componentService =loadService('componentService');
 
     const component = await componentService.duplicateComponent(req.params.id);
     res.status(httpStatus.OK).send({ component });
 });
 
 const CreateComponent = catchAsync(async (req, res) => {
-    const componentService = await loadService('componentService');
+    const componentService =loadService('componentService');
 
     const component = await componentService.createComponent(req.body);
     res.status(httpStatus.CREATED).send({ component });
 });
 
 const PublishComponent = catchAsync(async (req, res) => {
-    const componentService = await loadService('componentService');
+    const componentService =loadService('componentService');
 
     await componentService.publishComponent(req.params.id, req.body);
     res.status(httpStatus.OK).send({ status: true });
 });
 
 const RestoreComponent = catchAsync(async (req, res) => {
-    const componentService = await loadService('componentService');
+    const componentService =loadService('componentService');
 
     await componentService.restoreComponent(req.params.id, req.body);
     res.status(httpStatus.OK).send({ status: true });
@@ -57,14 +57,14 @@ const RestoreComponent = catchAsync(async (req, res) => {
 
 
 const UpdateComponent = catchAsync(async (req, res) => {
-    const componentService = await loadService('componentService');
+    const componentService =loadService('componentService');
 
     const component = await componentService.updateComponent(req.params.id, req.body);
     res.status(httpStatus.OK).send({ component });
 });
 
 const UpdateElements = catchAsync(async (req, res) => {
-    const componentService = await loadService('componentService');
+    const componentService =loadService('componentService');
 
     const component = await componentService.updateElements(req.params.id, req.body);
     res.status(httpStatus.OK).send({ component });
@@ -72,7 +72,7 @@ const UpdateElements = catchAsync(async (req, res) => {
 
 
 const DeleteComponent = catchAsync(async (req, res) => {
-    const componentService = await loadService('componentService');
+    const componentService =loadService('componentService');
 
     await componentService.deleteComponent(req.params.id);
     res.status(httpStatus.NO_CONTENT).send();
@@ -80,7 +80,7 @@ const DeleteComponent = catchAsync(async (req, res) => {
 
 const GetElements = catchAsync(async (req, res) => {
 
-    const settingService = await loadService('settingService');
+    const settingService = loadService('settingService');
 
     const stream = new Readable({
         objectMode: true,
@@ -100,7 +100,7 @@ const GetElements = catchAsync(async (req, res) => {
 
 
 const GetStyle = catchAsync(async (req, res) => {
-    const componentService = await loadService('componentService');
+    const componentService =loadService('componentService');
 
     const stream = new Readable({
         objectMode: true,
@@ -115,14 +115,14 @@ const GetStyle = catchAsync(async (req, res) => {
 });
 
 const UpdateStyle = catchAsync(async (req, res) => {
-    const componentService = await loadService('componentService');
+    const componentService =loadService('componentService');
 
     await componentService.updateComponent(req.params.id, req.body);
     res.status(httpStatus.OK).send({ status: true });
 });
 
 const GetCss = catchAsync(async (req, res) => {
-    const settingService = await loadService('settingService');
+    const settingService = loadService('settingService');
 
     const css = await settingService.getCss(req.params.id, 'component');
     res.status(httpStatus.OK).send(css);
@@ -131,7 +131,7 @@ const GetCss = catchAsync(async (req, res) => {
 
 
 const GetComponents = catchAsync(async (req, res) => {
-    const componentService = await loadService('componentService');
+    const componentService =loadService('componentService');
 
     const filter = pickKeys(req.query, ['name']);
     const options = pickKeys(req.query, ['sortBy', 'limit', 'page']);

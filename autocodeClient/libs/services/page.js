@@ -1,7 +1,9 @@
 import { fetcher } from '../../utils/fetch';
 
+
+
 // Helper function to build the URL
-const buildUrl = (type, id) => `/api/v1/${type}s/data/${id}`;
+const buildUrl = (type, id) => `${AUTOCODE_API_PREFIX}/v1/${type}s/data/${id}`;
 
 // Helper function to build the fetch options
 const buildFetchOptions = (origin) => ({

@@ -7,7 +7,7 @@ const { loadService } = require('../../loaders/servicesLoader')
 
 const GetCollection = catchAsync(async (req, res) => {
 
-    const collectionService = await loadService('collectionService');
+    const collectionService = loadService('collectionService');
 
     const collection = await collectionService.getCollection(req.params.id);
 
@@ -20,7 +20,7 @@ const GetCollection = catchAsync(async (req, res) => {
 
 
 const GetPageData = catchAsync(async (req, res) => {
-    const collectionService = await loadService('collectionService');
+    const collectionService = loadService('collectionService');
 
     const result = await collectionService.getPageData(req.params.id);
     res.status(httpStatus.OK).send(result);
@@ -28,7 +28,7 @@ const GetPageData = catchAsync(async (req, res) => {
 
 const GetElements = catchAsync(async (req, res) => {
 
-    const settingService = await loadService('settingService');
+    const settingService = loadService('settingService');
 
     const stream = new Readable({
         objectMode: true,
@@ -46,7 +46,7 @@ const GetElements = catchAsync(async (req, res) => {
 });
 
 const GetStyle = catchAsync(async (req, res) => {
-    const collectionService = await loadService('collectionService');
+    const collectionService = loadService('collectionService');
 
     const stream = new Readable({
         objectMode: true,
@@ -61,28 +61,28 @@ const GetStyle = catchAsync(async (req, res) => {
 });
 
 const GetCss = catchAsync(async (req, res) => {
-    const settingService = await loadService('settingService');
+    const settingService = loadService('settingService');
 
     const css = await settingService.getCss(req.params.id, 'collection');
     res.status(httpStatus.OK).send(css);
 });
 
 const CreateCollection = catchAsync(async (req, res) => {
-    const collectionService = await loadService('collectionService');
+    const collectionService = loadService('collectionService');
 
     const collection = await collectionService.createCollection(req.body);
     res.status(httpStatus.CREATED).send({ collection });
 });
 
 const PublishCollection = catchAsync(async (req, res) => {
-    const collectionService = await loadService('collectionService');
+    const collectionService = loadService('collectionService');
 
     await collectionService.publishCollection(req.params.id, req.body);
     res.status(httpStatus.OK).send({ status: true });
 });
 
 const RestoreCollection = catchAsync(async (req, res) => {
-    const collectionService = await loadService('collectionService');
+    const collectionService = loadService('collectionService');
 
     await collectionService.restoreCollection(req.params.id, req.body);
     res.status(httpStatus.OK).send({ status: true });
@@ -91,42 +91,42 @@ const RestoreCollection = catchAsync(async (req, res) => {
 
 
 const DuplicateCollection = catchAsync(async (req, res) => {
-    const collectionService = await loadService('collectionService');
+    const collectionService = loadService('collectionService');
 
     const collection = await collectionService.duplicateCollection(req.params.id);
     res.status(httpStatus.OK).send({ collection });
 });
 
 const UpdateCollection = catchAsync(async (req, res) => {
-    const collectionService = await loadService('collectionService');
+    const collectionService = loadService('collectionService');
 
     const collection = await collectionService.updateCollection(req.params.id, req.body);
     res.status(httpStatus.OK).send({ collection });
 });
 
 const UpdateStyle = catchAsync(async (req, res) => {
-    const collectionService = await loadService('collectionService');
+    const collectionService = loadService('collectionService');
 
     await collectionService.updateStyle(req.params.id, req.body);
     res.status(httpStatus.OK).send({ status: true });
 });
 
 const UpdateElements = catchAsync(async (req, res) => {
-    const collectionService = await loadService('collectionService');
+    const collectionService = loadService('collectionService');
 
     await collectionService.updateElements(req.params.id, req.body);
     res.status(httpStatus.OK).send({ status: true });
 });
 
 const DeleteCollection = catchAsync(async (req, res) => {
-    const collectionService = await loadService('collectionService');
+    const collectionService = loadService('collectionService');
 
     await collectionService.deleteCollection(req.params.id);
     res.status(httpStatus.NO_CONTENT).send();
 });
 
 const GetCollections = catchAsync(async (req, res) => {
-    const collectionService = await loadService('collectionService');
+    const collectionService = loadService('collectionService');
 
     const filter = pickKeys(req.query, ['name']);
     const options = pickKeys(req.query, ['sortBy', 'limit', 'page']);

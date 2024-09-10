@@ -1,6 +1,7 @@
 const React = require('react')
 const ReactDOMServer = require('react-dom/server')
-
+const dotenv = require('dotenv')
+dotenv.config()
 const { loadService } = require('./servicesLoader')
 
 const path = require('path')
@@ -31,7 +32,7 @@ const fetchPageData = async (page, host, remainingSlug, settingService) => {
     return await settingService.getPageData(page._id, page.type, host, true, remainingSlug)
 }
 
-module.exports = (app, AutoCode, AutocodeCustom, libraryName) => {
+module.exports = (app, AutoCode, AutocodeCustom, headCode = '', footCode = '') => {
     app.get('/api/v1/project/download', (req, res) => Download(req, res, AutoCode, AutocodeCustom))
 
     app.get('*', async (req, res) => {
@@ -39,29 +40,26 @@ module.exports = (app, AutoCode, AutocodeCustom, libraryName) => {
             const dynamicSlugs = req.params[0].replace(/^\//, '')
             const slugParts = dynamicSlugs.split('/')
 
-           
-
-            const settingService = await loadService("settingService");
+            const settingService = await loadService('settingService')
             const setting = await settingService.getSettings()
             let page = null
             let remainingSlug = ''
 
             // Check if maintenance page is set
             if (setting.maintenancePage) {
-                page = await settingService.getPage('_id', setting.maintenancePage._id);
-            
+                page = await settingService.getPage('_id', setting.maintenancePage._id)
             } else {
                 // Check if home page is set
                 if (setting.homePage && (slugParts.length <= 0 || dynamicSlugs === '')) {
-                    page = await settingService.getPage(setting.homePage._id);
-                } else page = await settingService.getPage('slug', dynamicSlugs);
-               
+                    page = await settingService.getPage(setting.homePage._id)
+                } else page = await settingService.getPage('slug', dynamicSlugs)
+
                 // If page not found, check in collections
                 if (!page)
                     for (let i = 0; i < slugParts.length; i++) {
                         const currentSlug = slugParts.slice(0, i + 1).join('/')
 
-                        page = await settingService.getPage('slug', currentSlug, 'collection');
+                        page = await settingService.getPage('slug', currentSlug, 'collection')
                         if (page) {
                             remainingSlug = slugParts.slice(i + 1).join('/')
                             break
@@ -71,7 +69,7 @@ module.exports = (app, AutoCode, AutocodeCustom, libraryName) => {
 
             // If page not found, check if error page is set
             if (!page && setting.errorPage) {
-                page = await settingService.getPage(setting.errorPage._id);
+                page = await settingService.getPage(setting.errorPage._id)
             }
 
             // If page not found, handle page not found
@@ -116,7 +114,7 @@ module.exports = (app, AutoCode, AutocodeCustom, libraryName) => {
                 setting: settingData,
             }
 
-            const themeService = await loadService("themeService");
+            const themeService = await loadService('themeService')
 
             const filter = {}
             const options = { limit: 100 }
@@ -188,6 +186,7 @@ module.exports = (app, AutoCode, AutocodeCustom, libraryName) => {
           <link rel="stylesheet" type="text/css" href="/style.css">
           ${fontCssString}
           ${setting.scripts?.head}
+          ${headCode}
           </head>
           <body>
             <div id="root">${htmlString}</div>
@@ -199,12 +198,11 @@ module.exports = (app, AutoCode, AutocodeCustom, libraryName) => {
             ${page.setting ? page.setting.scripts?.footer || '' : ''}
          <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
          <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-         <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/13.1.1/math.min.js" integrity="sha512-g9Hl9sW0nMwhkRPakKcrKyxx6NMT/vD/zu7nhggnjI9as96SdYA/KocpFXxJ1TXFZN9ki0Bv1G7NPchjiSE2VQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
          <script>
             window.react = window.React;
+            window.AUTOCODE_API_PREFIX = '${process.env.AUTOCODE_API_PREFIX || 'autocode-api'}'
         </script>
-           <script src="/${libraryName}.js"></script>
-        
+           ${footCode}
             <script src="/autocode-client.js"></script> 
           </body>
         </html>

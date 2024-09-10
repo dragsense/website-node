@@ -25,7 +25,7 @@ const env = {
     isProduction: process.env.NODE_ENV === 'production',
     isTest: process.env.NODE_ENV === 'test',
     isDevelopment: process.env.NODE_ENV === 'development',
-    autocodeApiKey: process.env.AUTCODE_API_KEY,
+    autocodeApiKey: process.env.AUTOCODE_API_KEY,
 
     database: {
         name: getOsEnv('DB_NAME')

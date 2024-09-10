@@ -38,12 +38,10 @@ const Media = (props) => {
     // useMemo to avoid unnecessary re-renders and improve performance
     const key = useMemo(() => generateRandomId(), [value.srcs]);
 
-    console.log(value);
-
     const InputsElement = React.cloneElement(children, {
                 key,
                 customAttributes: {
-                    width: 320, height: 'auto', controls: true,
+                    controls: true,
                     poster: tag === 'video' ? poster.src : undefined,
                     alt: poster.alt,
                     onMouseMove: onMouseMove,

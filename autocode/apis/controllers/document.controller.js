@@ -5,7 +5,7 @@ const ApiError = require('../../utils/api-error'); // Make sure this utility is 
 const { loadService } = require('../../loaders/servicesLoader')
 
 const GetDocument = catchAsync(async (req, res) => {
-    const documentService = await loadService('documentService');
+    const documentService = loadService('documentService');
     
     if (!documentService.getDocument) {
         throw new ApiError(httpStatus.NOT_FOUND, 'Method getDocument not found in documentService');
@@ -19,7 +19,7 @@ const GetDocument = catchAsync(async (req, res) => {
 });
 
 const CreateDocument = catchAsync(async (req, res) => {
-    const documentService = await loadService('documentService');
+    const documentService = loadService('documentService');
     
     if (!documentService.createDocument) {
         throw new ApiError(httpStatus.NOT_FOUND, 'Method createDocument not found in documentService');
@@ -30,7 +30,7 @@ const CreateDocument = catchAsync(async (req, res) => {
 });
 
 const DuplicateDocument = catchAsync(async (req, res) => {
-    const documentService = await loadService('documentService');
+    const documentService = loadService('documentService');
     
     if (!documentService.duplicateDocument) {
         throw new ApiError(httpStatus.NOT_FOUND, 'Method duplicateDocument not found in documentService');
@@ -41,7 +41,7 @@ const DuplicateDocument = catchAsync(async (req, res) => {
 });
 
 const UpdateDocument = catchAsync(async (req, res) => {
-    const documentService = await loadService('documentService');
+    const documentService = loadService('documentService');
     
     if (!documentService.updateDocument) {
         throw new ApiError(httpStatus.NOT_FOUND, 'Method updateDocument not found in documentService');
@@ -52,7 +52,7 @@ const UpdateDocument = catchAsync(async (req, res) => {
 });
 
 const DeleteDocument = catchAsync(async (req, res) => {
-    const documentService = await loadService('documentService');
+    const documentService = loadService('documentService');
     
     if (!documentService.deleteDocument) {
         throw new ApiError(httpStatus.NOT_FOUND, 'Method deleteDocument not found in documentService');
@@ -63,7 +63,7 @@ const DeleteDocument = catchAsync(async (req, res) => {
 });
 
 const GetDocuments = catchAsync(async (req, res) => {
-    const documentService = await loadService('documentService');
+    const documentService = loadService('documentService');
     
     if (!documentService.getDocuments) {
         throw new ApiError(httpStatus.NOT_FOUND, 'Method getDocuments not found in documentService');
@@ -76,7 +76,7 @@ const GetDocuments = catchAsync(async (req, res) => {
 });
 
 const GetAllFilteredDocuments = catchAsync(async (req, res) => {
-    const documentService = await loadService('documentService');
+    const documentService = loadService('documentService');
     
     if (!documentService.getAllFilteredDocuments) {
         throw new ApiError(httpStatus.NOT_FOUND, 'Method getAllFilteredDocuments not found in documentService');
@@ -89,7 +89,7 @@ const GetAllFilteredDocuments = catchAsync(async (req, res) => {
 });
 
 const GetFilteredDocuments = catchAsync(async (req, res) => {
-    const documentService = await loadService('documentService');
+    const documentService = loadService('documentService');
     
     if (!documentService.getFilteredDocuments) {
         throw new ApiError(httpStatus.NOT_FOUND, 'Method getFilteredDocuments not found in documentService');

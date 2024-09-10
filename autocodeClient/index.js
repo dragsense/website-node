@@ -56,7 +56,8 @@ const loadData = async (initialData, AppClient) => {
 // Load initial data if window is defined
 if (typeof window !== 'undefined') {
     const initialData = window.__INITIAL_DATA__ || {};
-    loadData(initialData, AppClient);
+    const CustomComponents = typeof DragSenseAppClient !== 'undefined' ? DragSenseAppClient : window.DragSenseAppClient;
+    loadData(initialData, CustomComponents); 
 }
 
 

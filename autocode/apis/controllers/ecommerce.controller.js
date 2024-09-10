@@ -3,14 +3,10 @@ const catchAsync = require('../../utils/catch-async');
 const ApiError = require('../../utils/api-error'); // Ensure this is correctly imported
 const { loadService } = require('../../loaders/servicesLoader')
 
-const getEcommerceService = async () => {
-    const ecommerceService = await loadService('ecommerceService');
-    return ecommerceService;
-};
 
 // Product CRUD
 const CreateProduct = catchAsync(async (req, res) => {
-    const ecommerceService = await getEcommerceService();
+    const ecommerceService = loadService('ecommerceService');
     if (!ecommerceService.createProduct) {
         throw new ApiError(httpStatus.NOT_FOUND, 'Method createProduct not found');
     }
@@ -19,7 +15,7 @@ const CreateProduct = catchAsync(async (req, res) => {
 });
 
 const UpdateProduct = catchAsync(async (req, res) => {
-    const ecommerceService = await getEcommerceService();
+    const ecommerceService = loadService('ecommerceService');
     if (!ecommerceService.updateProduct) {
         throw new ApiError(httpStatus.NOT_FOUND, 'Method updateProduct not found');
     }
@@ -28,7 +24,7 @@ const UpdateProduct = catchAsync(async (req, res) => {
 });
 
 const DeleteProduct = catchAsync(async (req, res) => {
-    const ecommerceService = await getEcommerceService();
+    const ecommerceService = loadService('ecommerceService');
     if (!ecommerceService.deleteProduct) {
         throw new ApiError(httpStatus.NOT_FOUND, 'Method deleteProduct not found');
     }
@@ -37,7 +33,7 @@ const DeleteProduct = catchAsync(async (req, res) => {
 });
 
 const GetProduct = catchAsync(async (req, res) => {
-    const ecommerceService = await getEcommerceService();
+    const ecommerceService = loadService('ecommerceService');
     if (!ecommerceService.getProduct) {
         throw new ApiError(httpStatus.NOT_FOUND, 'Method getProduct not found');
     }
@@ -46,7 +42,7 @@ const GetProduct = catchAsync(async (req, res) => {
 });
 
 const GetProducts = catchAsync(async (req, res) => {
-    const ecommerceService = await getEcommerceService();
+    const ecommerceService = loadService('ecommerceService');
     if (!ecommerceService.getProducts) {
         throw new ApiError(httpStatus.NOT_FOUND, 'Method getProducts not found');
     }
@@ -56,7 +52,7 @@ const GetProducts = catchAsync(async (req, res) => {
 
 // Variation CRUD
 const CreateVariation = catchAsync(async (req, res) => {
-    const ecommerceService = await getEcommerceService();
+    const ecommerceService = loadService('ecommerceService');
     if (!ecommerceService.createVariation) {
         throw new ApiError(httpStatus.NOT_FOUND, 'Method createVariation not found');
     }
@@ -65,7 +61,7 @@ const CreateVariation = catchAsync(async (req, res) => {
 });
 
 const UpdateVariation = catchAsync(async (req, res) => {
-    const ecommerceService = await getEcommerceService();
+    const ecommerceService = loadService('ecommerceService');
     if (!ecommerceService.updateVariation) {
         throw new ApiError(httpStatus.NOT_FOUND, 'Method updateVariation not found');
     }
@@ -74,7 +70,7 @@ const UpdateVariation = catchAsync(async (req, res) => {
 });
 
 const DeleteVariation = catchAsync(async (req, res) => {
-    const ecommerceService = await getEcommerceService();
+    const ecommerceService = loadService('ecommerceService');
     if (!ecommerceService.deleteVariation) {
         throw new ApiError(httpStatus.NOT_FOUND, 'Method deleteVariation not found');
     }
@@ -83,7 +79,7 @@ const DeleteVariation = catchAsync(async (req, res) => {
 });
 
 const GetVariation = catchAsync(async (req, res) => {
-    const ecommerceService = await getEcommerceService();
+    const ecommerceService = loadService('ecommerceService');
     if (!ecommerceService.getVariation) {
         throw new ApiError(httpStatus.NOT_FOUND, 'Method getVariation not found');
     }
@@ -92,7 +88,7 @@ const GetVariation = catchAsync(async (req, res) => {
 });
 
 const GetVariations = catchAsync(async (req, res) => {
-    const ecommerceService = await getEcommerceService();
+    const ecommerceService = loadService('ecommerceService');
     if (!ecommerceService.getVariations) {
         throw new ApiError(httpStatus.NOT_FOUND, 'Method getVariations not found');
     }
@@ -102,7 +98,7 @@ const GetVariations = catchAsync(async (req, res) => {
 
 // Collection CRUD
 const CreateCollection = catchAsync(async (req, res) => {
-    const ecommerceService = await getEcommerceService();
+    const ecommerceService = loadService('ecommerceService');
     if (!ecommerceService.createCollection) {
         throw new ApiError(httpStatus.NOT_FOUND, 'Method createCollection not found');
     }
@@ -111,7 +107,7 @@ const CreateCollection = catchAsync(async (req, res) => {
 });
 
 const UpdateCollection = catchAsync(async (req, res) => {
-    const ecommerceService = await getEcommerceService();
+    const ecommerceService = loadService('ecommerceService');
     if (!ecommerceService.updateCollection) {
         throw new ApiError(httpStatus.NOT_FOUND, 'Method updateCollection not found');
     }
@@ -120,7 +116,7 @@ const UpdateCollection = catchAsync(async (req, res) => {
 });
 
 const DeleteCollection = catchAsync(async (req, res) => {
-    const ecommerceService = await getEcommerceService();
+    const ecommerceService = loadService('ecommerceService');
     if (!ecommerceService.deleteCollection) {
         throw new ApiError(httpStatus.NOT_FOUND, 'Method deleteCollection not found');
     }
@@ -129,7 +125,7 @@ const DeleteCollection = catchAsync(async (req, res) => {
 });
 
 const GetCollection = catchAsync(async (req, res) => {
-    const ecommerceService = await getEcommerceService();
+    const ecommerceService = loadService('ecommerceService');
     if (!ecommerceService.getCollection) {
         throw new ApiError(httpStatus.NOT_FOUND, 'Method getCollection not found');
     }
@@ -138,7 +134,7 @@ const GetCollection = catchAsync(async (req, res) => {
 });
 
 const GetCollections = catchAsync(async (req, res) => {
-    const ecommerceService = await getEcommerceService();
+    const ecommerceService = loadService('ecommerceService');
     if (!ecommerceService.getCollections) {
         throw new ApiError(httpStatus.NOT_FOUND, 'Method getCollections not found');
     }
@@ -148,7 +144,7 @@ const GetCollections = catchAsync(async (req, res) => {
 
 // Cart CRUD
 const CreateCart = catchAsync(async (req, res) => {
-    const ecommerceService = await getEcommerceService();
+    const ecommerceService = loadService('ecommerceService');
     if (!ecommerceService.createCart) {
         throw new ApiError(httpStatus.NOT_FOUND, 'Method createCart not found');
     }
@@ -157,7 +153,7 @@ const CreateCart = catchAsync(async (req, res) => {
 });
 
 const UpdateCart = catchAsync(async (req, res) => {
-    const ecommerceService = await getEcommerceService();
+    const ecommerceService = loadService('ecommerceService');
     if (!ecommerceService.updateCart) {
         throw new ApiError(httpStatus.NOT_FOUND, 'Method updateCart not found');
     }
@@ -166,7 +162,7 @@ const UpdateCart = catchAsync(async (req, res) => {
 });
 
 const GetCart = catchAsync(async (req, res) => {
-    const ecommerceService = await getEcommerceService();
+    const ecommerceService = loadService('ecommerceService');
     if (!ecommerceService.getCart) {
         throw new ApiError(httpStatus.NOT_FOUND, 'Method getCart not found');
     }
@@ -175,7 +171,7 @@ const GetCart = catchAsync(async (req, res) => {
 });
 
 const DeleteCart = catchAsync(async (req, res) => {
-    const ecommerceService = await getEcommerceService();
+    const ecommerceService = loadService('ecommerceService');
     if (!ecommerceService.deleteCart) {
         throw new ApiError(httpStatus.NOT_FOUND, 'Method deleteCart not found');
     }
@@ -184,7 +180,7 @@ const DeleteCart = catchAsync(async (req, res) => {
 });
 
 const GetCarts = catchAsync(async (req, res) => {
-    const ecommerceService = await getEcommerceService();
+    const ecommerceService = loadService('ecommerceService');
     if (!ecommerceService.getCarts) {
         throw new ApiError(httpStatus.NOT_FOUND, 'Method getCarts not found');
     }
@@ -194,7 +190,7 @@ const GetCarts = catchAsync(async (req, res) => {
 
 // Category CRUD
 const CreateCategory = catchAsync(async (req, res) => {
-    const ecommerceService = await getEcommerceService();
+    const ecommerceService = loadService('ecommerceService');
     if (!ecommerceService.createCategory) {
         throw new ApiError(httpStatus.NOT_FOUND, 'Method createCategory not found');
     }
@@ -203,7 +199,7 @@ const CreateCategory = catchAsync(async (req, res) => {
 });
 
 const UpdateCategory = catchAsync(async (req, res) => {
-    const ecommerceService = await getEcommerceService();
+    const ecommerceService = loadService('ecommerceService');
     if (!ecommerceService.updateCategory) {
         throw new ApiError(httpStatus.NOT_FOUND, 'Method updateCategory not found');
     }
@@ -212,7 +208,7 @@ const UpdateCategory = catchAsync(async (req, res) => {
 });
 
 const DeleteCategory = catchAsync(async (req, res) => {
-    const ecommerceService = await getEcommerceService();
+    const ecommerceService = loadService('ecommerceService');
     if (!ecommerceService.deleteCategory) {
         throw new ApiError(httpStatus.NOT_FOUND, 'Method deleteCategory not found');
     }
@@ -221,7 +217,7 @@ const DeleteCategory = catchAsync(async (req, res) => {
 });
 
 const GetCategory = catchAsync(async (req, res) => {
-    const ecommerceService = await getEcommerceService();
+    const ecommerceService = loadService('ecommerceService');
     if (!ecommerceService.getCategory) {
         throw new ApiError(httpStatus.NOT_FOUND, 'Method getCategory not found');
     }
@@ -230,7 +226,7 @@ const GetCategory = catchAsync(async (req, res) => {
 });
 
 const GetCategories = catchAsync(async (req, res) => {
-    const ecommerceService = await getEcommerceService();
+    const ecommerceService = loadService('ecommerceService');
     if (!ecommerceService.getCategories) {
         throw new ApiError(httpStatus.NOT_FOUND, 'Method getCategories not found');
     }
@@ -240,7 +236,7 @@ const GetCategories = catchAsync(async (req, res) => {
 
 // Order CRUD
 const CreateOrder = catchAsync(async (req, res) => {
-    const ecommerceService = await getEcommerceService();
+    const ecommerceService = loadService('ecommerceService');
     if (!ecommerceService.createOrder) {
         throw new ApiError(httpStatus.NOT_FOUND, 'Method createOrder not found');
     }
@@ -249,7 +245,7 @@ const CreateOrder = catchAsync(async (req, res) => {
 });
 
 const UpdateOrder = catchAsync(async (req, res) => {
-    const ecommerceService = await getEcommerceService();
+    const ecommerceService = loadService('ecommerceService');
     if (!ecommerceService.updateOrder) {
         throw new ApiError(httpStatus.NOT_FOUND, 'Method updateOrder not found');
     }
@@ -258,7 +254,7 @@ const UpdateOrder = catchAsync(async (req, res) => {
 });
 
 const GetOrder = catchAsync(async (req, res) => {
-    const ecommerceService = await getEcommerceService();
+    const ecommerceService = loadService('ecommerceService');
     if (!ecommerceService.getOrder) {
         throw new ApiError(httpStatus.NOT_FOUND, 'Method getOrder not found');
     }
@@ -267,7 +263,7 @@ const GetOrder = catchAsync(async (req, res) => {
 });
 
 const GetOrders = catchAsync(async (req, res) => {
-    const ecommerceService = await getEcommerceService();
+    const ecommerceService = loadService('ecommerceService');
     if (!ecommerceService.getOrders) {
         throw new ApiError(httpStatus.NOT_FOUND, 'Method getOrders not found');
     }
@@ -276,7 +272,7 @@ const GetOrders = catchAsync(async (req, res) => {
 });
 
 const DeleteOrder = catchAsync(async (req, res) => {
-    const ecommerceService = await getEcommerceService();
+    const ecommerceService = loadService('ecommerceService');
     if (!ecommerceService.deleteOrder) {
         throw new ApiError(httpStatus.NOT_FOUND, 'Method deleteOrder not found');
     }
@@ -286,7 +282,7 @@ const DeleteOrder = catchAsync(async (req, res) => {
 
 // Merchant CRUD
 const CreateMerchant = catchAsync(async (req, res) => {
-    const ecommerceService = await getEcommerceService();
+    const ecommerceService = loadService('ecommerceService');
     if (!ecommerceService.createMerchant) {
         throw new ApiError(httpStatus.NOT_FOUND, 'Method createMerchant not found');
     }
@@ -295,7 +291,7 @@ const CreateMerchant = catchAsync(async (req, res) => {
 });
 
 const UpdateMerchant = catchAsync(async (req, res) => {
-    const ecommerceService = await getEcommerceService();
+    const ecommerceService = loadService('ecommerceService');
     if (!ecommerceService.updateMerchant) {
         throw new ApiError(httpStatus.NOT_FOUND, 'Method updateMerchant not found');
     }
@@ -304,7 +300,7 @@ const UpdateMerchant = catchAsync(async (req, res) => {
 });
 
 const GetMerchant = catchAsync(async (req, res) => {
-    const ecommerceService = await getEcommerceService();
+    const ecommerceService = loadService('ecommerceService');
     if (!ecommerceService.getMerchant) {
         throw new ApiError(httpStatus.NOT_FOUND, 'Method getMerchant not found');
     }
@@ -313,7 +309,7 @@ const GetMerchant = catchAsync(async (req, res) => {
 });
 
 const GetMerchants = catchAsync(async (req, res) => {
-    const ecommerceService = await getEcommerceService();
+    const ecommerceService = loadService('ecommerceService');
     if (!ecommerceService.getMerchants) {
         throw new ApiError(httpStatus.NOT_FOUND, 'Method getMerchants not found');
     }
@@ -322,7 +318,7 @@ const GetMerchants = catchAsync(async (req, res) => {
 });
 
 const DeleteMerchant = catchAsync(async (req, res) => {
-    const ecommerceService = await getEcommerceService();
+    const ecommerceService = loadService('ecommerceService');
     if (!ecommerceService.deleteMerchant) {
         throw new ApiError(httpStatus.NOT_FOUND, 'Method deleteMerchant not found');
     }
@@ -332,7 +328,7 @@ const DeleteMerchant = catchAsync(async (req, res) => {
 
 // Brand CRUD
 const CreateBrand = catchAsync(async (req, res) => {
-    const ecommerceService = await getEcommerceService();
+    const ecommerceService = loadService('ecommerceService');
     if (!ecommerceService.createBrand) {
         throw new ApiError(httpStatus.NOT_FOUND, 'Method createBrand not found');
     }
@@ -341,7 +337,7 @@ const CreateBrand = catchAsync(async (req, res) => {
 });
 
 const UpdateBrand = catchAsync(async (req, res) => {
-    const ecommerceService = await getEcommerceService();
+    const ecommerceService = loadService('ecommerceService');
     if (!ecommerceService.updateBrand) {
         throw new ApiError(httpStatus.NOT_FOUND, 'Method updateBrand not found');
     }
@@ -350,7 +346,7 @@ const UpdateBrand = catchAsync(async (req, res) => {
 });
 
 const GetBrand = catchAsync(async (req, res) => {
-    const ecommerceService = await getEcommerceService();
+    const ecommerceService = loadService('ecommerceService');
     if (!ecommerceService.getBrand) {
         throw new ApiError(httpStatus.NOT_FOUND, 'Method getBrand not found');
     }
@@ -359,7 +355,7 @@ const GetBrand = catchAsync(async (req, res) => {
 });
 
 const GetBrands = catchAsync(async (req, res) => {
-    const ecommerceService = await getEcommerceService();
+    const ecommerceService = loadService('ecommerceService');
     if (!ecommerceService.getBrands) {
         throw new ApiError(httpStatus.NOT_FOUND, 'Method getBrands not found');
     }
@@ -368,7 +364,7 @@ const GetBrands = catchAsync(async (req, res) => {
 });
 
 const DeleteBrand = catchAsync(async (req, res) => {
-    const ecommerceService = await getEcommerceService();
+    const ecommerceService = loadService('ecommerceService');
     if (!ecommerceService.deleteBrand) {
         throw new ApiError(httpStatus.NOT_FOUND, 'Method deleteBrand not found');
     }
@@ -378,7 +374,7 @@ const DeleteBrand = catchAsync(async (req, res) => {
 
 // Review CRUD
 const CreateReview = catchAsync(async (req, res) => {
-    const ecommerceService = await getEcommerceService();
+    const ecommerceService = loadService('ecommerceService');
     if (!ecommerceService.createReview) {
         throw new ApiError(httpStatus.NOT_FOUND, 'Method createReview not found');
     }
@@ -387,7 +383,7 @@ const CreateReview = catchAsync(async (req, res) => {
 });
 
 const UpdateReview = catchAsync(async (req, res) => {
-    const ecommerceService = await getEcommerceService();
+    const ecommerceService = loadService('ecommerceService');
     if (!ecommerceService.updateReview) {
         throw new ApiError(httpStatus.NOT_FOUND, 'Method updateReview not found');
     }
@@ -396,7 +392,7 @@ const UpdateReview = catchAsync(async (req, res) => {
 });
 
 const GetReview = catchAsync(async (req, res) => {
-    const ecommerceService = await getEcommerceService();
+    const ecommerceService = loadService('ecommerceService');
     if (!ecommerceService.getReview) {
         throw new ApiError(httpStatus.NOT_FOUND, 'Method getReview not found');
     }
@@ -405,7 +401,7 @@ const GetReview = catchAsync(async (req, res) => {
 });
 
 const GetReviews = catchAsync(async (req, res) => {
-    const ecommerceService = await getEcommerceService();
+    const ecommerceService = loadService('ecommerceService');
     if (!ecommerceService.getReviews) {
         throw new ApiError(httpStatus.NOT_FOUND, 'Method getReviews not found');
     }
@@ -414,7 +410,7 @@ const GetReviews = catchAsync(async (req, res) => {
 });
 
 const DeleteReview = catchAsync(async (req, res) => {
-    const ecommerceService = await getEcommerceService();
+    const ecommerceService = loadService('ecommerceService');
     if (!ecommerceService.deleteReview) {
         throw new ApiError(httpStatus.NOT_FOUND, 'Method deleteReview not found');
     }
@@ -424,7 +420,7 @@ const DeleteReview = catchAsync(async (req, res) => {
 
 // Wishlist CRUD
 const CreateWishlist = catchAsync(async (req, res) => {
-    const ecommerceService = await getEcommerceService();
+    const ecommerceService = loadService('ecommerceService');
     if (!ecommerceService.createWishlist) {
         throw new ApiError(httpStatus.NOT_FOUND, 'Method createWishlist not found');
     }
@@ -433,7 +429,7 @@ const CreateWishlist = catchAsync(async (req, res) => {
 });
 
 const UpdateWishlist = catchAsync(async (req, res) => {
-    const ecommerceService = await getEcommerceService();
+    const ecommerceService = loadService('ecommerceService');
     if (!ecommerceService.updateWishlist) {
         throw new ApiError(httpStatus.NOT_FOUND, 'Method updateWishlist not found');
     }
@@ -442,7 +438,7 @@ const UpdateWishlist = catchAsync(async (req, res) => {
 });
 
 const GetWishlist = catchAsync(async (req, res) => {
-    const ecommerceService = await getEcommerceService();
+    const ecommerceService = loadService('ecommerceService');
     if (!ecommerceService.getWishlist) {
         throw new ApiError(httpStatus.NOT_FOUND, 'Method getWishlist not found');
     }
@@ -451,7 +447,7 @@ const GetWishlist = catchAsync(async (req, res) => {
 });
 
 const GetWishlists = catchAsync(async (req, res) => {
-    const ecommerceService = await getEcommerceService();
+    const ecommerceService = loadService('ecommerceService');
     if (!ecommerceService.getWishlists) {
         throw new ApiError(httpStatus.NOT_FOUND, 'Method getWishlists not found');
     }
@@ -460,7 +456,7 @@ const GetWishlists = catchAsync(async (req, res) => {
 });
 
 const DeleteWishlist = catchAsync(async (req, res) => {
-    const ecommerceService = await getEcommerceService();
+    const ecommerceService = loadService('ecommerceService');
     if (!ecommerceService.deleteWishlist) {
         throw new ApiError(httpStatus.NOT_FOUND, 'Method deleteWishlist not found');
     }
@@ -470,7 +466,7 @@ const DeleteWishlist = catchAsync(async (req, res) => {
 
 // Shipping CRUD
 const CreateShipping = catchAsync(async (req, res) => {
-    const ecommerceService = await getEcommerceService();
+    const ecommerceService = loadService('ecommerceService');
     if (!ecommerceService.createShipping) {
         throw new ApiError(httpStatus.NOT_FOUND, 'Method createShipping not found');
     }
@@ -479,7 +475,7 @@ const CreateShipping = catchAsync(async (req, res) => {
 });
 
 const UpdateShipping = catchAsync(async (req, res) => {
-    const ecommerceService = await getEcommerceService();
+    const ecommerceService = loadService('ecommerceService');
     if (!ecommerceService.updateShipping) {
         throw new ApiError(httpStatus.NOT_FOUND, 'Method updateShipping not found');
     }
@@ -488,7 +484,7 @@ const UpdateShipping = catchAsync(async (req, res) => {
 });
 
 const GetShipping = catchAsync(async (req, res) => {
-    const ecommerceService = await getEcommerceService();
+    const ecommerceService = loadService('ecommerceService');
     if (!ecommerceService.getShipping) {
         throw new ApiError(httpStatus.NOT_FOUND, 'Method getShipping not found');
     }
@@ -497,7 +493,7 @@ const GetShipping = catchAsync(async (req, res) => {
 });
 
 const GetShippings = catchAsync(async (req, res) => {
-    const ecommerceService = await getEcommerceService();
+    const ecommerceService = loadService('ecommerceService');
     if (!ecommerceService.getShippings) {
         throw new ApiError(httpStatus.NOT_FOUND, 'Method getShippings not found');
     }
@@ -506,7 +502,7 @@ const GetShippings = catchAsync(async (req, res) => {
 });
 
 const DeleteShipping = catchAsync(async (req, res) => {
-    const ecommerceService = await getEcommerceService();
+    const ecommerceService = loadService('ecommerceService');
     if (!ecommerceService.deleteShipping) {
         throw new ApiError(httpStatus.NOT_FOUND, 'Method deleteShipping not found');
     }

@@ -1,10 +1,10 @@
 import React, { useMemo, useCallback } from 'react'
 
 import ElementType from './ElementType'
-import { evaluate } from 'mathjs'
+import { Parser } from "expr-eval";
 
 import { getStateValue, getPageValue } from '../../utils/element-value'
-
+const parser = new Parser();
 // Main component for handling Element Value
 const ElementValue = (props) => {
     // Destructuring props for easier access
@@ -296,8 +296,11 @@ const ElementValue = (props) => {
 
             if (valueX || valueY) {
                 try {
-                    valueX = evaluate(`${valueX}`)
-                    valueY = evaluate(`${valueY}`)
+                  
+                    const expr1 = parser.parse(valueX);
+                    const expr2 = parser.parse(valueY);
+                    valueX =  expr1.evaluate();
+                    valueY =  expr2.evaluate();
                 } catch (e) {
                     console.error('Invalid expression:', e)
                 }
@@ -361,8 +364,11 @@ const ElementValue = (props) => {
 
             if (valueX || valueY) {
                 try {
-                    valueX = evaluate(`${valueX}`)
-                    valueY = evaluate(`${valueY}`)
+                  
+                    const expr1 = parser.parse(valueX);
+                    const expr2 = parser.parse(valueY);
+                    valueX =  expr1.evaluate();
+                    valueY =  expr2.evaluate();
                 } catch (e) {
                     console.error('Invalid expression:' + e?.message)
                 }

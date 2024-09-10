@@ -8,7 +8,7 @@ const { loadService } = require('../../loaders/servicesLoader')
 
 const GetBackup = catchAsync(async (req, res) => {
 
-    const backupService = await loadService('backupService');
+    const backupService = loadService('backupService');
 
 
     const folderPath = await backupService.getBackup(req.params.id)
@@ -25,25 +25,25 @@ const GetBackup = catchAsync(async (req, res) => {
 })
 
 const CreateBackup = catchAsync(async (req, res) => {
-    const backupService = await loadService('backupService');
+    const backupService = loadService('backupService');
     const backup = await backupService.createBackup(req.body)
     res.status(httpStatus.CREATED).send({ backup })
 })
 
 const UpdateBackup = catchAsync(async (req, res) => {
-    const backupService = await loadService('backupService');
+    const backupService = loadService('backupService');
     const backup = await backupService.updateBackup(req.params.id, req.body)
     res.status(httpStatus.OK).send({ backup })
 })
 
 const DeleteBackup = catchAsync(async (req, res) => {
-    const backupService = await loadService('backupService');
+    const backupService = loadService('backupService');
     await backupService.deleteBackup(req.params.id)
     res.status(httpStatus.NO_CONTENT).send()
 })
 
 const InstallBackup = catchAsync(async (req, res) => {
-    const backupService = await loadService('backupService');
+    const backupService = loadService('backupService');
     const backup = await backupService.installBackup(req.params.id)
     res.status(httpStatus.OK).send({ backup })
 })

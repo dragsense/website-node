@@ -2,19 +2,16 @@ const httpStatus = require('http-status');
 const catchAsync = require('../../utils/catch-async');
 const { loadService } = require('../../loaders/servicesLoader')
 
-// Load the necessary service dynamically
-const getSettingService = async () => {
-    return await loadService('settingService');
-};
+
 
 const SaveSetting = catchAsync(async (req, res) => {
-    const settingService = await getSettingService();
+    const settingService = loadService('settingService')
     const setting = await settingService.saveSetting(req.body);
     res.status(httpStatus.CREATED).send({ setting });
 });
 
 const GetSettings = catchAsync(async (req, res) => {
-    const settingService = await getSettingService();
+    const settingService = loadService('settingService')
     const settings = await settingService.getSettings();
     const protocol = req.protocol || 'http';
     const host = `${protocol}://${req.headers.host}`;
@@ -22,7 +19,7 @@ const GetSettings = catchAsync(async (req, res) => {
 });
 
 const GetPageData = catchAsync(async (req, res) => {
-    const settingService = await getSettingService();
+    const settingService = loadService('settingService')
     const protocol = req.protocol || 'http';
     const host = `${protocol}://${req.headers.host}`;
     const results = await settingService.getPageData(req.params.id, 'page', host);
@@ -30,7 +27,7 @@ const GetPageData = catchAsync(async (req, res) => {
 });
 
 const GetCollectionData = catchAsync(async (req, res) => {
-    const settingService = await getSettingService();
+    const settingService = loadService('settingService')
     const protocol = req.protocol || 'http';
     const host = `${protocol}://${req.headers.host}`;
     const remainingSlug = req.query.remainingSlug;
@@ -39,7 +36,7 @@ const GetCollectionData = catchAsync(async (req, res) => {
 });
 
 const Download = catchAsync(async (req, res) => {
-    const settingService = await getSettingService();
+    const settingService = loadService('settingService')
     const protocol = req.protocol || 'http';
     const host = `${protocol}://${req.headers.host}`;
     const { AutoCode, AutocodeCustom } = req.query;

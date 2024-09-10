@@ -11,7 +11,7 @@ router.post('/:collectionId', validate(documentValidation.documentSchema), docum
 router.post('/:collectionId/duplicate/:id', validate(sharedValidation.sharedSchema), documentController.DuplicateDocument);
 router.get('/:collectionId', documentController.GetDocuments);
 router.get('/:collectionId/:id',  documentController.GetDocument);
-router.put('/:collectionId/:id', (req,res,next) => { console.log(req.body); next();}, validate(documentValidation.documentSchema), documentController.UpdateDocument);
+router.put('/:collectionId/:id', validate(documentValidation.documentSchema), documentController.UpdateDocument);
 router.delete('/:collectionId/:id', documentController.DeleteDocument);
 
 router.post('/:collectionId/get/filtered', validate(documentValidation.filterDocSchema), documentController.GetFilteredDocuments);

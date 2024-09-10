@@ -2,12 +2,12 @@
 import React, { useEffect, useState, useMemo, useCallback } from 'react'
 import ElementMapping from './ElementMapping'
 
-import { evaluate } from 'mathjs'
+import { Parser } from "expr-eval";
 
 import { getStateValue, updateStateValue, getStateRef, generateCascader } from '../../utils/element-value'
 import DocumentServices from '../../libs/services/documnets'
 import { debounce } from '../../utils/utils'
-
+const parser = new Parser();
 const Component = (props) => {
     // Destructuring props
     const { component, node, pages, _states, _setStates, children } = props
@@ -215,7 +215,10 @@ const Component = (props) => {
         result = result.replace(/\[top]/g, scrollTop)
         result = result.replace(/\[delta]/g, delta)
         try {
-            return evaluate(`${result}`)
+            
+            const expr = parser.parse(result);
+            const evaluatedResult = expr.evaluate();
+            return evaluatedResult;
         } catch (e) {
             console.error('Invalid expression:' + e?.message)
             return null
