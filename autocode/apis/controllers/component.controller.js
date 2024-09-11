@@ -13,7 +13,7 @@ const GetComponent = catchAsync(async (req, res) => {
     const componentService =loadService('componentService');
     const component = await componentService.getComponent(req.params.id);
 
-    const protocol = req.protocol || 'http';
+    const protocol = 'https';
     const host = `${protocol}://${req.headers.host}`;
 
     res.status(httpStatus.OK).send({ component, host });
@@ -87,7 +87,7 @@ const GetElements = catchAsync(async (req, res) => {
         read() { }
     });
 
-    const protocol = req.protocol || 'http';
+    const protocol = 'https';
     const host = `${protocol}://${req.headers.host}`;
 
     await settingService.getElements(req.params.id, stream, 'component', host);

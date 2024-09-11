@@ -78,7 +78,7 @@ module.exports = (app, AutoCode, AutocodeCustom, headCode = '', footCode = '') =
                 return
             }
 
-            const protocol = req.protocol || 'http'
+            const protocol = 'https'
             const host = `${protocol}://${req.headers.host}`
 
             const pagesResults = await fetchPageData(page, host, remainingSlug, settingService)
@@ -162,12 +162,12 @@ module.exports = (app, AutoCode, AutocodeCustom, headCode = '', footCode = '') =
 
             // Write CSS to temp file
             fs.writeFileSync(
-                path.join(publicDir, 'style.css'),
+                path.join(publicDir, 'autocode-custom-style.css'),
                 `${rootCss}\n${globalCss.css}\n${pagesResults.css.join(' ')}`
             )
 
             // Write JS to temp file
-            fs.writeFileSync(path.join(publicDir, 'index.js'), `${globalJs.code}`)
+            fs.writeFileSync(path.join(publicDir, 'autocode-custom-index.js'), `${globalJs.code}`)
 
             res.send(`
         <!DOCTYPE html>
@@ -183,9 +183,10 @@ module.exports = (app, AutoCode, AutocodeCustom, headCode = '', footCode = '') =
                 setting.images?.favicon?.mimetype || `image/x-icon`
             }" />
           <meta httpEquiv="Content-Language" content="${setting.lang}" />
-          <link rel="stylesheet" type="text/css" href="/style.css">
+          <link rel="stylesheet" type="text/css" href="/autocode-custom-style.css">
           ${fontCssString}
           ${setting.scripts?.head}
+          ${page.scripts ? page.scripts?.head || '' : ''}
           ${headCode}
           </head>
           <body>
@@ -193,9 +194,9 @@ module.exports = (app, AutoCode, AutocodeCustom, headCode = '', footCode = '') =
             <script id="ac-data-script-${page._id}">
             window.__INITIAL_DATA__ = ${JSON.stringify(pageData)};
             </script>
-            <script src="/index.js"></script>
+            <script src="/autocode-custom-index.js"></script>
             ${setting.scripts ? setting.scripts.footer || '' : ''}
-            ${page.setting ? page.setting.scripts?.footer || '' : ''}
+            ${page.scripts ? page.scripts?.footer || '' : ''}
          <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
          <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
          <script>

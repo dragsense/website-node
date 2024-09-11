@@ -39,7 +39,7 @@ const GetElements = catchAsync(async (req, res) => {
         read() {}
     });
 
-    const protocol = req.protocol || 'http';
+    const protocol = 'https';
     const host = `${protocol}://${req.headers.host}`;
 
     await settingService.getElements(req.params.id, stream, 'layout', host);

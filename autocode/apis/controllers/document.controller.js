@@ -12,7 +12,7 @@ const GetDocument = catchAsync(async (req, res) => {
     }
 
     const document = await documentService.getDocument(req.params.collectionId, req.params.id, req.query.form === 'true');
-    const protocol = req.protocol || 'http';
+    const protocol = 'https';
     const host = `${protocol}://${req.headers.host}`;
 
     res.status(httpStatus.OK).send({ document, host });

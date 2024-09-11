@@ -112,13 +112,13 @@ const externals = Object.keys(dependencies).reduce((externalsObj, dep) => {
 }, {
     'mongodb': 'mongodb', // Additional external library
     'react-dom/server': 'react-dom/server',
-    '../dist/autocode-services': '../dist/autocode-services'
+    //'../dist/autocode-services': '../dist/autocode-services'
 });
 
   module.exports = {
     entry: {
-        //'autocode-services': './autocode/apis/services/index.js',
-        'autocode': './autocode/app.js',
+        'autocode-services': './autocode/apis/services/index.js',
+        //'autocode': './autocode/app.js',
     },
     output: {
         filename: '[name].js',

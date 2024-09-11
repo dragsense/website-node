@@ -12,7 +12,7 @@ const CreateMedia = catchAsync(async (req, res) => {
     const type = req.query.type;
     const media = await mediaService.createMedia(file, type);
 
-    const protocol = req.protocol || 'http';
+    const protocol = 'https';
     const host = `${protocol}://${req.headers.host}`;
 
     res.status(httpStatus.CREATED).send({ media, host });
@@ -37,9 +37,9 @@ const GetMedia = catchAsync(async (req, res) => {
     const options = pickKeys(req.query, ['sortBy', 'limit', 'page']);
     const media = await mediaService.getMedia(filter, options);
 
-    const protocol = req.protocol || 'http';
+    const protocol = 'https';
     const host = `${protocol}://${req.headers.host}`;
-
+    
     res.status(httpStatus.OK).send({ media, host });
 });
 

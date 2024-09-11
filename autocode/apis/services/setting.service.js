@@ -1222,6 +1222,7 @@ const getPage = async (field, value, type = 'page') => {
         type: 1,
         setting: 1,
         slug: 1,
+        scripts: 1,
     }
 
     const Model =

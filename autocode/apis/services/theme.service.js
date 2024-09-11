@@ -578,8 +578,9 @@ const saveCss = async (cssBody) => {
  * @param
  * @returns {Promise<Style>}
  */
-const getCsutomCss = async () => {
+const getCustomCss = async () => {
   const code = await fsUtils.read(path.join(dataDir, 'customStyle.css'));
+  console.log(code);
   return { code }
 
 }
@@ -662,7 +663,7 @@ module.exports = {
   getAnimationsNames,
   getAnimationsCss,
   saveCss,
-  getCsutomCss,
+  getCustomCss,
   getCss,
   getJs,
   saveJs,

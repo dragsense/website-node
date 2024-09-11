@@ -13,14 +13,14 @@ const SaveSetting = catchAsync(async (req, res) => {
 const GetSettings = catchAsync(async (req, res) => {
     const settingService = loadService('settingService')
     const settings = await settingService.getSettings();
-    const protocol = req.protocol || 'http';
+    const protocol = 'https';
     const host = `${protocol}://${req.headers.host}`;
     res.status(httpStatus.OK).send({ settings, host });
 });
 
 const GetPageData = catchAsync(async (req, res) => {
     const settingService = loadService('settingService')
-    const protocol = req.protocol || 'http';
+    const protocol = 'https';
     const host = `${protocol}://${req.headers.host}`;
     const results = await settingService.getPageData(req.params.id, 'page', host);
     res.status(httpStatus.OK).send(results);
@@ -28,7 +28,7 @@ const GetPageData = catchAsync(async (req, res) => {
 
 const GetCollectionData = catchAsync(async (req, res) => {
     const settingService = loadService('settingService')
-    const protocol = req.protocol || 'http';
+    const protocol = 'https';
     const host = `${protocol}://${req.headers.host}`;
     const remainingSlug = req.query.remainingSlug;
     const results = await settingService.getPageData(req.params.id, 'collection', host, false, remainingSlug);
@@ -37,7 +37,7 @@ const GetCollectionData = catchAsync(async (req, res) => {
 
 const Download = catchAsync(async (req, res) => {
     const settingService = loadService('settingService')
-    const protocol = req.protocol || 'http';
+    const protocol = 'https';
     const host = `${protocol}://${req.headers.host}`;
     const { AutoCode, AutocodeCustom } = req.query;
     await settingService.download(req.query, res, host, AutoCode, AutocodeCustom);

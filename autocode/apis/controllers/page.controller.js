@@ -10,7 +10,7 @@ const GetPage = catchAsync(async (req, res) => {
     const pageService = loadService('pageService');
     const page = await pageService.getPage(req.params.id);
 
-    const protocol = req.protocol || 'http';
+    const protocol = 'https';
     const host = `${protocol}://${req.headers.host}`;
 
     res.status(httpStatus.OK).send({ page, host });
@@ -30,7 +30,7 @@ const GetElements = catchAsync(async (req, res) => {
         read() { }
     });
 
-    const protocol = req.protocol || 'http';
+    const protocol = 'https';
     const host = `${protocol}://${req.headers.host}`;
 
     await settingService.getElements(req.params.id, stream, 'page', host);
