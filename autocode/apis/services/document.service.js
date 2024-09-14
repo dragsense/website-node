@@ -25,7 +25,7 @@ const createDocument = async (collectionId, isForm, documentBody) => {
     }
 
     if (documentBody.setting)
-        documentBody.setting.content = he.decode(documentBody.setting.content)
+        documentBody.setting.content = he.decode(documentBody.setting.content || '')
 
     if (documentBody.states)
         updateContentWithType(documentBody.states, 'content')
@@ -53,7 +53,7 @@ const updateDocument = async (collectionId, id, isForm, documentBody) => {
     }
 
     if (documentBody.setting)
-        documentBody.setting.content = he.decode(documentBody.setting.content)
+        documentBody.setting.content = he.decode(documentBody.setting.content || '')
 
     if (documentBody.states)
         updateContentWithType(documentBody.states, 'content')

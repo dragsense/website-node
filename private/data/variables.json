@@ -1,1 +1,79 @@
-{}
+{
+    "4N0ixei2r": {
+        "name": "Font Base",
+        "value": "16px",
+        "type": "font",
+        "variable": "--var-font-base-variable",
+        "_uid": "4N0ixei2r"
+    },
+    "0dMK6ELHD": {
+        "name": "Font Weight Normal",
+        "value": "400",
+        "type": "font",
+        "variable": "--var-font-weight-normal-variable",
+        "_uid": "0dMK6ELHD"
+    },
+    "ZhStPFyNe": {
+        "name": "Font Weight Bold",
+        "value": "700",
+        "type": "font",
+        "variable": "--var-font-weight-bold-variable",
+        "_uid": "ZhStPFyNe"
+    },
+    "9PhRlO7_1": {
+        "name": "Line Height Base",
+        "value": "1.5",
+        "type": "font",
+        "variable": "--var-line-height-base-variable",
+        "_uid": "9PhRlO7_1"
+    },
+    "Kz-n73jSX": {
+        "name": "Spacing Xs",
+        "value": "4px",
+        "type": "space",
+        "variable": "--var-spacing-xs-variable",
+        "_uid": "Kz-n73jSX"
+    },
+    "1ZaWuAsb8": {
+        "name": "Spacing Sm",
+        "value": "8px",
+        "type": "space",
+        "variable": "--var-spacing-sm-variable",
+        "_uid": "1ZaWuAsb8"
+    },
+    "lgsbIsS4z": {
+        "name": "Spacing Md",
+        "value": "16px",
+        "type": "space",
+        "variable": "--var-spacing-md-variable",
+        "_uid": "lgsbIsS4z"
+    },
+    "kgwfPDul4": {
+        "name": "Spacing Lg",
+        "value": "24px",
+        "type": "space",
+        "variable": "--var-spacing-lg-variable",
+        "_uid": "kgwfPDul4"
+    },
+    "-ynOrR3nl": {
+        "name": "Spacing Xl",
+        "value": "32px",
+        "type": "space",
+        "variable": "--var-spacing-xl-variable",
+        "_uid": "-ynOrR3nl"
+    },
+    "_CVbtv-Ym": {
+        "name": "Border Radius",
+        "value": "8px",
+        "type": "size",
+        "variable": "--var-border-radius-variable",
+        "_uid": "_CVbtv-Ym"
+    },
+    "QsLa18GTI": {
+        "name": "Border Width",
+        "value": "1px",
+        "type": "size",
+        "variable": "--var-border-width-variable",
+        "_uid": "QsLa18GTI"
+    }
+}

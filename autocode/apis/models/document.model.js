@@ -96,7 +96,6 @@ const Document = (slug) => {
     // Pre-save middleware function
     DocumentSchema.pre('save', async function (next) {
         const document = this
-
         // Check if the slug field is modified
         if (!document.isModified('slug')) {
             return next()

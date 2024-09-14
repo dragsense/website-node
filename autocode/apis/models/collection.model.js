@@ -207,7 +207,7 @@ CollectionSchema.pre('save', async function (next) {
         return next(error)
     }
 
-    const oldSlug = collection.getOriginal('slug');
+    const oldSlug = collection._doc.slug;     
     const newSlug = collection.slug;
 
     if (oldSlug && oldSlug !== newSlug) {

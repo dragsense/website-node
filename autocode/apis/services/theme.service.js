@@ -580,7 +580,7 @@ const saveCss = async (cssBody) => {
  */
 const getCustomCss = async () => {
   const code = await fsUtils.read(path.join(dataDir, 'customStyle.css'));
-  console.log(code);
+ 
   return { code }
 
 }

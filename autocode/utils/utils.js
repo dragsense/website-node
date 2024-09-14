@@ -5,10 +5,11 @@ const executeCommand = (command) => {
   return new Promise((resolve, reject) => {
     exec(command, (error, stdout, stderr) => {
       if (error) {
-        reject(new Error(`Error executing command: ${error.message}`));
-        return;
-      }
-
+        console.error(`Command failed: ${error.message}`);
+        console.error(`stderr: ${stderr}`);
+        return reject(new Error(stderr || error.message));
+    }
+    console.log(`stdout: ${stdout}`);
       resolve({ stdout, stderr });
     });
   });

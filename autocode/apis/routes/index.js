@@ -87,6 +87,8 @@ const defaultRoutes = [
     },
 ]
 
+
+
 router.get("/v1", autocodeAPIAuth, (req, res) => {
     return res.status(200).json({ status: true });
 
@@ -111,10 +113,10 @@ router.put('/v1/collection/:collectionId/document',
 
 router.post("/v1/forms/submit/:id", uploadFile.array('files[]', 10), formSubmit);
 
+
 defaultRoutes.forEach((route) => {
     router.use(route.path, autocodeAPIAuth, route.route)
 })
-
 
 
 

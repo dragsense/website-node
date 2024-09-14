@@ -1,1 +1,62 @@
-{}
+{
+    "XxMn6zPV2": {
+        "name": "Primary",
+        "color": "rgba(248, 138, 36, 1)",
+        "variable": "--var-primary-color",
+        "_uid": "XxMn6zPV2"
+    },
+    "ZK8hMcTYf": {
+        "name": "Secondary",
+        "color": "rgba(47, 193, 255, 1)",
+        "variable": "--var-secondary-color",
+        "_uid": "ZK8hMcTYf"
+    },
+    "7rFLFwxsG": {
+        "name": "Text",
+        "color": "rgba(29, 29, 29, 1)",
+        "variable": "--var-text-color",
+        "_uid": "7rFLFwxsG"
+    },
+    "V-DpfAedg": {
+        "name": "Success",
+        "color": "rgba(40, 167, 69, 1)",
+        "variable": "--var-success-color",
+        "_uid": "V-DpfAedg"
+    },
+    "9nm_WQI8P": {
+        "name": "Danger",
+        "color": "rgba(220, 53, 69, 1)",
+        "variable": "--var-danger-color",
+        "_uid": "9nm_WQI8P"
+    },
+    "uLFV38aLv": {
+        "name": "Warning",
+        "color": "rgba(255, 193, 7, 1)",
+        "variable": "--var-warning-color",
+        "_uid": "uLFV38aLv"
+    },
+    "qpBm2bmAu": {
+        "name": "Info",
+        "color": "rgba(23, 162, 184, 1)",
+        "variable": "--var-info-color",
+        "_uid": "qpBm2bmAu"
+    },
+    "ftbsyHfad": {
+        "name": "Light",
+        "color": "rgba(248, 249, 250, 1)",
+        "variable": "--var-light-color",
+        "_uid": "ftbsyHfad"
+    },
+    "ZTsQRO6AN": {
+        "name": "Dark",
+        "color": "rgba(52, 58, 64, 1)",
+        "variable": "--var-dark-color",
+        "_uid": "ZTsQRO6AN"
+    },
+    "FB6l5zafQ": {
+        "name": "Background",
+        "color": "rgba(253, 253, 253, 1)",
+        "variable": "--var-background-color",
+        "_uid": "FB6l5zafQ"
+    }
+}
