@@ -157,7 +157,7 @@ const externals = Object.keys(dependencies).reduce((externalsObj, dep) => {
        
     },
     plugins: [
-        new BundleAnalyzerPlugin(),
+        //new BundleAnalyzerPlugin(),
     ],
     target: 'node',
     mode: 'production',

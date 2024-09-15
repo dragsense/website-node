@@ -6,8 +6,8 @@ const env = require('./configs/env')
 const bannerLogger = require('./libs/banner')
 
 const expressLoader = require('./loaders/expressLoader')
-//const { autocodeRoutes, autocodeClient } = require('../dist/autocode');
-const { autocodeRoutes, autocodeClient } = require('../autocode/app')
+const { autocodeRoutes, autocodeClient } = require('../dist/autocode');
+//const { autocodeRoutes, autocodeClient } = require('../autocode/app')
 
 import AppClient from './client/components'
 import AutocodeClient from '../dist/autocode-client';

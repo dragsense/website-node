@@ -699,8 +699,8 @@ const generateHTML = (page, setting, htmlString, host) => {
             <meta name="keywords" content="${setting.keywords}" />
             <link rel="icon" href="${host}${setting.images?.favicon?.src || `/images/default/favicon.ico`}" />
             <meta httpEquiv="Content-Language" content="${setting.lang}" />
-            <link rel="stylesheet" href="../public/style.css">
-            <link rel="stylesheet" href="./styles/${page.slug}.css">
+            <link rel="stylesheet" href="../public/autocode-custom-index.css">
+            <link rel="stylesheet" href="./styles/${page.name}.css">
             ${setting.scripts?.head}
             ${page.scripts ? page.scripts?.head || '' : ''}
 
@@ -709,7 +709,7 @@ const generateHTML = (page, setting, htmlString, host) => {
             <div id="root">${htmlString}</div>
             ${setting.scripts ? setting.scripts.foot || '' : ''}
            ${page.scripts ? page.scripts?.footer || '' : ''}
-            <script src="../public/index.js"></script>
+            <script src="../public/autocode-custom-style.js"></script>
           </body>
         </html>
     `
@@ -718,7 +718,7 @@ const generateHTML = (page, setting, htmlString, host) => {
 // Function to write CSS and HTML to files
 const writeFilesToFolder = (pagesFolder, pagesResults, page, html) => {
     const assetsFolder = pagesFolder.folder('styles')
-    assetsFolder.file(`${page.slug}.css`, pagesResults.css.join(' '))
+    assetsFolder.file(`${page.name}.css`, pagesResults.css.join(' '))
     pagesFolder.file(page.name + '.html', html)
 }
 
@@ -750,9 +750,7 @@ const download = async (query, res, host, AutoCode, AutocodeCustom) => {
         const compsFolder = zip.folder('components')
         const formsFolder = zip.folder('forms')
         const collsFolder = zip.folder('collections')
-        const staticFolder = zip.folder('assets')
-        const rootFolder = zip.folder('')
-        const assetsFolder = rootFolder.folder('public')
+        const publicFolder = zip.folder('public')
 
         // Generate pages, components, forms and collections based on the query parameters
         if (Boolean(isPage == 'true')) {
@@ -791,14 +789,14 @@ const download = async (query, res, host, AutoCode, AutocodeCustom) => {
         const jsCode = await themeService.getJs()
 
         // Add CSS and JS files to the zip
-        staticFolder.file('style.css', rootCss + fontCssString + globalCss.css)
-        staticFolder.file('index.js', jsCode.code)
+        publicFolder.file('autocode-custom-style.css', rootCss + fontCssString + globalCss.css)
+        publicFolder.file('autocode-custom-index.js', jsCode.code)
 
         // Define the destination directory
         //var destinationDir = path.join(publicDir, 'static');
 
         // Add files to the zip
-        addFilesToZip(publicDir, '', assetsFolder)
+        //addFilesToZip(publicDir, '', assetsFolder)
 
         // Set headers and send the zip file
         res.setHeader('Content-Type', 'application/zip')
