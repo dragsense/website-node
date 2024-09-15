@@ -699,15 +699,17 @@ const generateHTML = (page, setting, htmlString, host) => {
             <meta name="keywords" content="${setting.keywords}" />
             <link rel="icon" href="${host}${setting.images?.favicon?.src || `/images/default/favicon.ico`}" />
             <meta httpEquiv="Content-Language" content="${setting.lang}" />
-            <link rel="stylesheet" href="../assets/style.css">
+            <link rel="stylesheet" href="../public/style.css">
             <link rel="stylesheet" href="./styles/${page.slug}.css">
             ${setting.scripts?.head}
+            ${page.scripts ? page.scripts?.head || '' : ''}
+
           </head>
           <body>
             <div id="root">${htmlString}</div>
             ${setting.scripts ? setting.scripts.foot || '' : ''}
-            ${page.setting ? page.setting.scripts?.foot || '' : ''}
-            <script src="../static/index.js"></script>
+           ${page.scripts ? page.scripts?.footer || '' : ''}
+            <script src="../public/index.js"></script>
           </body>
         </html>
     `
@@ -729,6 +731,7 @@ const download = async (query, res, host, AutoCode, AutocodeCustom) => {
     try {
         // Destructure the query parameters
         const { name, isPage, isComponent, isForm, isCollection, projectId } = query
+
 
         // Read the setting.json file
         const data = await fsUtils.read(path.join(dataDir, 'setting.json'))

@@ -1,7 +1,7 @@
 
 const ApiError = require('../utils/api-error')
 
-const servicesInstance = require('../apis/services');
+const servicesInstance = require('../dist/autocode-services');
 
 module.exports.loadService = function(serviceName) {
     if (!servicesInstance[serviceName]) {

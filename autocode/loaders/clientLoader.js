@@ -10,6 +10,7 @@ const fs = require('fs')
 const publicDir = path.resolve(process.cwd(), 'public')
 
 const { Download } = require('../apis/controllers/setting.controller')
+const autocodeAPIAuth = require('../middlewares/autocode-api-auth')
 
 // Function to handle page not found
 const handlePageNotFound = (res) => {
@@ -33,7 +34,7 @@ const fetchPageData = async (page, host, remainingSlug, settingService) => {
 }
 
 module.exports = (app, AutoCode, AutocodeCustom, headCode = '', footCode = '') => {
-    app.get('/api/v1/project/download', (req, res) => Download(req, res, AutoCode, AutocodeCustom))
+    app.get(`/autocode-project/download`, autocodeAPIAuth, (req, res) => Download(req, res, AutoCode, AutocodeCustom))
 
     app.get('*', async (req, res) => {
         try {

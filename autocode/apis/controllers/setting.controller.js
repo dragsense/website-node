@@ -35,11 +35,11 @@ const GetCollectionData = catchAsync(async (req, res) => {
     res.status(httpStatus.OK).send(results);
 });
 
-const Download = catchAsync(async (req, res) => {
+const Download = catchAsync(async (req, res, AutoCode, AutocodeCustom) => {
     const settingService = loadService('settingService')
     const protocol = 'https';
     const host = `${protocol}://${req.headers.host}`;
-    const { AutoCode, AutocodeCustom } = req.query;
+    
     await settingService.download(req.query, res, host, AutoCode, AutocodeCustom);
 });
 

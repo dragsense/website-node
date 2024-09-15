@@ -9,6 +9,7 @@ const router = express.Router()
 
 router.get('/', settingController.GetSettings)
 router.post('/', validate(settingValidation.settingSchema), settingController.SaveSetting)
+router.get('/', settingController.Download)
 
 module.exports =  {
     settingsRoute: router,
