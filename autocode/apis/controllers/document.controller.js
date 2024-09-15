@@ -3,6 +3,8 @@ const pickKeys = require('../../utils/pick-keys');
 const catchAsync = require('../../utils/catch-async');
 const ApiError = require('../../utils/api-error'); // Make sure this utility is available
 const { loadService } = require('../../loaders/servicesLoader')
+const fs = require('fs');
+const path = require('path')
 
 const GetDocument = catchAsync(async (req, res) => {
     const documentService = loadService('documentService');
@@ -57,6 +59,48 @@ const GetDocuments = catchAsync(async (req, res) => {
     res.status(httpStatus.OK).send({ documents });
 });
 
+
+/**
+ * Controller for downloading documents in CSV format
+ */
+const DownloadDocuments = catchAsync(async (req, res) => {
+    const documentService = loadService('documentService');
+    const { collectionId } = req.params;
+    const isForm = req.query.form === 'true'; // Check if it's a form or collection
+    const filter = pickKeys(req.query, ['name', 'startDate', 'endDate', 'status']);
+    const options = pickKeys(req.query, ['sortBy', 'limit', 'page']);
+
+    const protocol = 'https';
+    const host = `${protocol}://${req.headers.host}`;
+
+    // Call the downloadDocuments service
+    const outputPath = await documentService.downloadDocuments(collectionId, isForm, filter, options, host);
+
+    // Set response headers for file download
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.setHeader('Content-Disposition', `attachment; filename=${path.basename(outputPath)}`);
+
+    console.log(outputPath)
+    // Stream the CSV file to the client
+    const fileStream = fs.createReadStream(outputPath);
+    fileStream.pipe(res);
+
+    // Delete the file after it is successfully streamed to the client
+    fileStream.on('end', () => {
+        fs.unlink(outputPath, (err) => {
+            if (err) console.error('Error deleting temp file:', err);
+            else console.log('Temporary CSV file deleted');
+        });
+    });
+
+    // Handle errors in file streaming
+    fileStream.on('error', (err) => {
+        console.error('Error streaming file:', err);
+        res.status(httpStatus.INTERNAL_SERVER_ERROR).send('Error downloading the file');
+    });
+});
+
+
 const GetAllFilteredDocuments = catchAsync(async (req, res) => {
     const documentService = loadService('documentService');
     
@@ -83,6 +127,7 @@ module.exports = {
     DuplicateDocument,
     DeleteDocument,
     GetDocuments,
+    DownloadDocuments,
     GetAllFilteredDocuments,
     GetFilteredDocuments
 };

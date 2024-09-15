@@ -243,16 +243,33 @@ FormSchema.pre('save', async function (next) {
         return next();
     }
 
-    // Check if the slug already exists in the database
-    const isSlugTaken = await checkSlugExistence(form);
 
-    // If the slug is taken, return an error
+    const oldSlug = form._doc.slug
+    const newSlug = form.slug
+
+    const oldTableName = `ac_${pluralize(oldSlug.toLowerCase())}`
+    const newTableName = `ac_${pluralize(newSlug.toLowerCase())}`
+
+    // Check if the slug already exists in the database
+    const isSlugTaken = await checkSlugExistence(form, newTableName);
+
+
+    // Check if the slug is already taken
     if (isSlugTaken) {
-        const error = new Error('Slug already taken');
-        error.status = httpStatus.BAD_REQUEST;
-        return next(error);
+        const error = new Error('Slug already taken')
+        error.status = httpStatus.BAD_REQUEST
+        return next(error)
     }
 
+    if (oldSlug && oldSlug !== newSlug) {
+        try {
+            await mongoose.connection.db.renameCollection(oldTableName, newTableName)
+        } catch (err) {
+            const error = new Error(`Error renaming table from ${oldTableName} to ${newTableName}: ${err.message}`)
+            error.status = httpStatus.INTERNAL_SERVER_ERROR
+            return next(error)
+        }
+    }
     // Proceed to the next middleware
     next();
 });
@@ -278,9 +295,8 @@ async function generateUniqueIdentifiersAndStyles(form) {
 }
 
 // Function to check if the slug already exists in the database
-async function checkSlugExistence(form) {
-    const modelName = form.slug;
-
+async function checkSlugExistence(form, modelName) {
+  
     const existingForm = await form.constructor.findOne({ slug: modelName });
 
     const Collection = mongoose.model('AC_Collection');
@@ -288,7 +304,7 @@ async function checkSlugExistence(form) {
     const Page = mongoose.model('AC_Page');
     const existingPage = await Page.findOne({ slug: modelName });
 
-    const modelNames = mongoose.modelNames().map(name => name.toLowerCase());
+    const modelNames = mongoose.modelNames().map(name => pluralize(name.toLowerCase()));
     const isModelSingular = modelNames.includes(modelName.toLowerCase());
     const isModelPlural = modelNames.includes(pluralize(modelName.toLowerCase()));
 

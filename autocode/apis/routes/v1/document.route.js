@@ -16,6 +16,8 @@ router.delete('/:collectionId/:id', documentController.DeleteDocument);
 
 router.post('/:collectionId/get/filtered', validate(documentValidation.filterDocSchema), documentController.GetFilteredDocuments);
 router.put('/:collectionId/get/filtered',validate(documentValidation.filterSchema), documentController.GetAllFilteredDocuments);
+router.get('/:collectionId/get/download', documentController.DownloadDocuments);
+
 
 module.exports = router
 

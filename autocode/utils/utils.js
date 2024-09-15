@@ -15,6 +15,9 @@ const executeCommand = (command) => {
   });
 };
 
+function capitalizeFirstLetter(string) {
+  return string.charAt(0).toUpperCase() + string.slice(1);
+}
 
 
 
@@ -247,4 +250,5 @@ module.exports = {
   generateElementsCss,
   generateAnimationNames,
   generateAnimations,
+  capitalizeFirstLetter
 }

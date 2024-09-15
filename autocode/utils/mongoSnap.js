@@ -11,7 +11,7 @@ const { default: mongoose, pluralize } = require('mongoose')
 async function fetchSlugs(Model) {
     const docs = await Model.find({})
     return docs.map((doc) => {
-        const modelName = 'ac_' + pluralize(doc.slug.toLowerCase())
+        const modelName = pluralize(doc.slug.toLowerCase())
         return modelName
     })
 }

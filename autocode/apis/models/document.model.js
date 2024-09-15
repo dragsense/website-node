@@ -3,7 +3,8 @@ const shortid = require('shortid')
 const pluralize = require('pluralize');
 
 const Schema = mongoose.Schema
-const { toJSON, filter, document, paginate } = require('./plugins')
+const { toJSON, filter, document, paginate } = require('./plugins');
+const { capitalizeFirstLetter } = require('../../utils/utils');
 
 const Document = (slug) => {
     const DocumentSchema = new Schema(
@@ -126,13 +127,13 @@ const Document = (slug) => {
         document.url = `/${coll.slug}/${document.slug}`
     }
 
-    DocumentSchema.plugin(paginate)
-    DocumentSchema.plugin(document)
-    DocumentSchema.plugin(filter)
+    DocumentSchema.plugin(paginate);
+    DocumentSchema.plugin(document);
+    DocumentSchema.plugin(filter);
 
-    const modelName = 'ac_' + pluralize(slug.toLowerCase())
-
-    const Document = mongoose.models[modelName] || mongoose.model(modelName, DocumentSchema)
+    const modelName = pluralize.singular(slug.toLowerCase());
+ 
+    const Document = mongoose.models[modelName] || mongoose.model(modelName, DocumentSchema);
 
     return Document
 }

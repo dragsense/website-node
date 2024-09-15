@@ -283,8 +283,7 @@ const deleteCollection = async (id) => {
             throw new ApiError(httpStatus.NOT_FOUND, 'Collection not found');
         }
 
-
-        const modelName = 'ac_' + pluralize(collection.slug.toLowerCase())
+        const modelName = mongoose.pluralize(collection.slug.toLowerCase());
 
         const res = await mongoose.connection.db.dropCollection(modelName);
 

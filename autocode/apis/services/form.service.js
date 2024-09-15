@@ -21,11 +21,11 @@ const publicDir = path.resolve(process.cwd(), 'public/static/uploads')
  * @returns {Promise<Form>}
  */
 const createForm = async (formBody) => {
-    if (formBody.emailbody) formBody.emailbody.head = he.decode(formBody.emailbody.head)
+    if (formBody.emailbody) formBody.emailbody.head = he.decode(formBody.emailbody.head || '')
 
-    if (formBody.emailbody) formBody.emailbody.body = he.decode(formBody.emailbody.body)
+    if (formBody.emailbody) formBody.emailbody.body = he.decode(formBody.emailbody.body || '')
 
-    if (formBody.emailbody) formBody.emailbody.footer = he.decode(formBody.emailbody.footer)
+    if (formBody.emailbody) formBody.emailbody.footer = he.decode(formBody.emailbody.footer || '')
 
     return Form.create(formBody)
 }
@@ -42,11 +42,11 @@ const updateForm = async (id, formBody) => {
         throw new ApiError(httpStatus.NOT_FOUND, 'Form not found')
     }
 
-    if (formBody.emailbody) formBody.emailbody.head = he.decode(formBody.emailbody.head)
+    if (formBody.emailbody) formBody.emailbody.head = he.decode(formBody.emailbody.head || '')
 
-    if (formBody.emailbody) formBody.emailbody.body = he.decode(formBody.emailbody.body)
+    if (formBody.emailbody) formBody.emailbody.body = he.decode(formBody.emailbody.body || '')
 
-    if (formBody.emailbody) formBody.emailbody.footer = he.decode(formBody.emailbody.footer)
+    if (formBody.emailbody) formBody.emailbody.footer = he.decode(formBody.emailbody.footer || '')
 
     if (formBody.states) {
         form._states = formBody.states

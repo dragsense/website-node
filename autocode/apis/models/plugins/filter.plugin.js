@@ -31,8 +31,8 @@ const filter = function (schema) {
     }
 
     const isValidObjectId = (id) => {
-      return /^[a-fA-F0-9]{24}$/.test(id);
-  };
+        return /^[a-fA-F0-9]{24}$/.test(id)
+    }
 
     // Function to create filter criteria
     const createFilterCriteria = (filters) => {
@@ -45,14 +45,12 @@ const filter = function (schema) {
                     $options: 'i',
                 }
             } else if (filter.filterKey[0] === 'RELATIONSHIPS') {
-                const values = Array.isArray(filter.defaultValue) ? filter.defaultValue : filter.defaultValue.split(",")
+                const values = Array.isArray(filter.defaultValue) ? filter.defaultValue : filter.defaultValue.split(',')
                 criteria[`relationships.${filter.filterKey[1]}`] = {
-                    $in: values
-                    .filter(id => isValidObjectId(id))
-                    .map(id => new ObjectId(id)),
+                    $in: values.filter((id) => isValidObjectId(id)).map((id) => new ObjectId(id)),
                 }
             } else if (filter.filterKey[0] === '_id') {
-              criteria._id = isValidObjectId(filter.defaultValue) ? new ObjectId(filter.defaultValue) : filter.defaultValue;
+                criteria._id = isValidObjectId(filter.defaultValue) ? new ObjectId(filter.defaultValue) : filter.defaultValue
             } else {
                 criteria[filter.filterKey[0]] = { $regex: filter.defaultValue + '', $options: 'i' }
             }
@@ -178,12 +176,17 @@ const filter = function (schema) {
 
     schema.statics.filterAllDocuments = async function (filters, relationships, filter, options, collections = []) {
         try {
-            let search = ''
+            let search = null
             if (filter?.name) {
                 search = { $regex: new RegExp(filter.name, 'i') }
             }
 
-            let status = filter?.status
+            let status = filter?.status ? filter?.status : null;
+
+            let createdAt = null
+            if (filter?.startDate && filter?.endDate) {
+                createdAt = { $gte: new Date(filter.startDate), $lte: new Date( filter.endDate) }
+            }
 
             // Create sort object
             const sort = createSortObject(options)
@@ -193,7 +196,7 @@ const filter = function (schema) {
 
             // Create filter criteria
             const filterCriteria = createFilterCriteria(filters)
-            console.log(filterCriteria, filters)
+
 
             const res = await this.aggregate([
                 {
@@ -203,6 +206,7 @@ const filter = function (schema) {
                                 $match: {
                                     ...(status && { 'setting.status': status }),
                                     ...(search && { name: search }),
+                                    ...(createdAt && { createdAt }),
                                     ...filterCriteria,
                                 },
                             },
@@ -280,6 +284,7 @@ const filter = function (schema) {
                                 $match: {
                                     ...(status && { 'setting.status': status }),
                                     ...(search && { name: search }),
+                                    ...(createdAt && { createdAt }),
                                     ...filterCriteria,
                                 },
                             },
@@ -288,7 +293,6 @@ const filter = function (schema) {
                     },
                 },
             ])
-
 
             return { documents: res[0].documents, total: res[0].total[0]?.total || 0 }
         } catch (error) {

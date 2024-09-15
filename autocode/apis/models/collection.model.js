@@ -185,7 +185,7 @@ CollectionSchema.pre('save', async function (next) {
     }
 
     // Function to check if the slug is already taken
-    const isSlugTaken = async (modelName) => {
+    const isSlugTaken = async (collection, modelName) => {
         const existingCollection = await collection.constructor.findOne({ slug: modelName })
         const Form = mongoose.model('AC_Form')
         const existingForm = await Form.findOne({ slug: modelName })
@@ -193,27 +193,26 @@ CollectionSchema.pre('save', async function (next) {
         const Page = mongoose.model('AC_Page')
         const existingPage = await Page.findOne({ slug: modelName })
 
-        const modelNames = mongoose.modelNames().map((name) => name.toLowerCase())
+        const modelNames = mongoose.modelNames().map((name) => pluralize(name.toLowerCase()))
         const isModelSingular = modelNames.includes(modelName.toLowerCase())
         const isModelPlural = modelNames.includes(pluralize(modelName.toLowerCase()))
-
         return existingCollection || existingPage || existingForm || isModelSingular || isModelPlural
     }
 
+    const oldSlug = collection._doc.slug
+    const newSlug = collection.slug
+
+    const oldTableName = `ac_${pluralize(oldSlug.toLowerCase())}`
+    const newTableName = `ac_${pluralize(newSlug.toLowerCase())}`
+
     // Check if the slug is already taken
-    if (await isSlugTaken(collection.slug)) {
+    if (await isSlugTaken(collection, newTableName)) {
         const error = new Error('Slug already taken')
         error.status = httpStatus.BAD_REQUEST
         return next(error)
     }
 
-    const oldSlug = collection._doc.slug;     
-    const newSlug = collection.slug;
-
     if (oldSlug && oldSlug !== newSlug) {
-        const oldTableName = `ac_${pluralize(oldSlug.toLowerCase())}`
-        const newTableName = `ac_${pluralize(newSlug.toLowerCase())}`
-
         try {
             await mongoose.connection.db.renameCollection(oldTableName, newTableName)
         } catch (err) {
