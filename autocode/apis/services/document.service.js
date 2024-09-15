@@ -7,7 +7,7 @@ const he = require('he')
 const httpStatus = require('http-status')
 const { Collection, Form, Document } = require('../models')
 const { updateContentWithType, executeCommand } = require('../../utils/utils')
-const { parse } = require('json2csv')
+
 const ApiError = require('../../utils/api-error')
 const pluralize = require('pluralize')
 const ExcelJS = require('exceljs')
