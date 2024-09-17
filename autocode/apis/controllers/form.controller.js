@@ -2,6 +2,8 @@ const httpStatus = require('http-status');
 const pickKeys = require('../../utils/pick-keys');
 const { Readable } = require('stream');
 const catchAsync = require('../../utils/catch-async');
+const env = require('../../configs/env')
+
 
 // Load the necessary services dynamically
 const { loadService } = require('../../loaders/servicesLoader')
@@ -20,8 +22,7 @@ const GetElements = catchAsync(async (req, res) => {
         read() {}
     });
 
-    const protocol = 'https';
-    const host = `${protocol}://${req.headers.host}`;
+    const host = `${env.protocol}://${req.headers.host}`;
 
     await settingService.getElements(req.params.id, stream, 'form', host);
 
@@ -47,7 +48,9 @@ const GetStyle = catchAsync(async (req, res) => {
 
 const GetCss = catchAsync(async (req, res) => {
     const settingService = loadService('settingService');
-    const css = await settingService.getCss(req.params.id, 'form');
+    const host = `${env.protocol}://${req.headers.host}`;
+
+    const css = await settingService.getCss(req.params.id, 'form', host);
     res.status(httpStatus.OK).send(css);
 });
 

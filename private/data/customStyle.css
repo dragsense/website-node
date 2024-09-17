@@ -10,7 +10,7 @@ body {
 }
 
 header, nav, aside, main, section, footer {
-  padding: var(--var-spacing-lg-variable);
+  padding: var(--var-spacing-xs-variable);
   margin: 0;
 }
 
@@ -101,7 +101,6 @@ td {
 img, video, audio {
   max-width: 100%;
   border-radius: var(--var-border-radius-variable);
-  margin-bottom: var(--var-spacing-lg-variable);
 }
 
 /* Blockquote */
@@ -126,5 +125,5 @@ footer {
   background-color: var(--var-dark-color);
   color: var(--var-light-color);
   text-align: center;
-  padding: var(--var-spacing-md-variable);
+  padding: var(--var-spacing-xs-variable);
 }

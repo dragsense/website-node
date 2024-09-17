@@ -1,11 +1,11 @@
 const React = require('react')
 const ReactDOMServer = require('react-dom/server')
-const dotenv = require('dotenv')
-dotenv.config()
+
 const { loadService } = require('./servicesLoader')
 
 const path = require('path')
 const fs = require('fs')
+const env = require('../configs/env')
 
 const publicDir = path.resolve(process.cwd(), 'public')
 
@@ -159,8 +159,9 @@ module.exports = (app, AutoCode, AutocodeCustom, headCode = '', footCode = '') =
                 return cssString
             }, '')
 
-            const globalJs = await themeService.getJs()
 
+
+            const globalJs = await themeService.getJs()
             // Write CSS to temp file
             fs.writeFileSync(
                 path.join(publicDir, 'autocode-custom-style.css'),
@@ -170,6 +171,7 @@ module.exports = (app, AutoCode, AutocodeCustom, headCode = '', footCode = '') =
             // Write JS to temp file
             fs.writeFileSync(path.join(publicDir, 'autocode-custom-index.js'), `${globalJs.code}`)
 
+            const version = Date.now();
             res.send(`
         <!DOCTYPE html>
         <html>
@@ -184,10 +186,11 @@ module.exports = (app, AutoCode, AutocodeCustom, headCode = '', footCode = '') =
                 setting.images?.favicon?.mimetype || `image/x-icon`
             }" />
           <meta httpEquiv="Content-Language" content="${setting.lang}" />
-          <link rel="stylesheet" type="text/css" href="/autocode-custom-style.css">
+           <link rel="stylesheet" type="text/css" href="/autocode-custom-style.css?v=${version}">
           ${fontCssString}
           ${setting.scripts?.head}
           ${page.scripts ? page.scripts?.head || '' : ''}
+         
           ${headCode}
           </head>
           <body>
@@ -195,15 +198,16 @@ module.exports = (app, AutoCode, AutocodeCustom, headCode = '', footCode = '') =
             <script id="ac-data-script-${page._id}">
             window.__INITIAL_DATA__ = ${JSON.stringify(pageData)};
             </script>
-            <script src="/autocode-custom-index.js"></script>
+            <script src="/autocode-custom-index.js?v=${version}"></script>
             ${setting.scripts ? setting.scripts.footer || '' : ''}
             ${page.scripts ? page.scripts?.footer || '' : ''}
          <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
          <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
          <script>
             window.react = window.React;
-            window.AUTOCODE_API_PREFIX = '${process.env.AUTOCODE_API_PREFIX || 'autocode-api'}'
+            window.AUTOCODE_API_PREFIX = '${env.autocodeApiPrefix || 'autocode-api'}'
         </script>
+        
            ${footCode}
             <script src="/autocode-client.js"></script> 
           </body>

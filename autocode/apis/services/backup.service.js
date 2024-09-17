@@ -1,5 +1,5 @@
-const dotenv = require('dotenv');
-dotenv.config();
+const env = require('../../configs/env')
+
 
 const httpStatus = require('http-status');
 const ApiError = require('../../utils/api-error');
@@ -35,7 +35,7 @@ const createDirectoryAndCopyFiles = async (destinationDir, sourceDir, dirName) =
 // Function to take snapshot
 const takeSnapshotAndHandleError = async (destinationDir, isCollectionsEntries, isFormsEntries) => {
     try {
-        const MONGO_URI = process.env.DB_CONNECTION;
+        const MONGO_URI = env.database.mongouri;
         const dirPath = path.join(destinationDir, 'database');
         await takeSnapshot(dirPath, MONGO_URI, isCollectionsEntries, isFormsEntries);
     } catch (e) {
@@ -87,7 +87,7 @@ const extractZip = (destinationDir) => {
 // Function to restore snapshot
 const restoreSnapshotAndHandleError = async (destinationDir) => {
     try {
-        const MONGO_URI = process.env.DB_CONNECTION;
+        const MONGO_URI = env.database.mongouri;
         const dirPath = path.join(destinationDir, 'database');
         await restoreSnapshot(dirPath, MONGO_URI);
     } catch (e) {

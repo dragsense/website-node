@@ -1,5 +1,7 @@
 const httpStatus = require('http-status')
 const pickKeys = require('../../utils/pick-keys')
+const env = require('../../configs/env')
+
 
 const catchAsync = require('../../utils/catch-async')
 
@@ -13,8 +15,7 @@ const GetComponent = catchAsync(async (req, res) => {
     const componentService =loadService('componentService');
     const component = await componentService.getComponent(req.params.id);
 
-    const protocol = 'https';
-    const host = `${protocol}://${req.headers.host}`;
+    const host = `${env.protocol}://${req.headers.host}`;
 
     res.status(httpStatus.OK).send({ component, host });
 });
@@ -87,8 +88,7 @@ const GetElements = catchAsync(async (req, res) => {
         read() { }
     });
 
-    const protocol = 'https';
-    const host = `${protocol}://${req.headers.host}`;
+    const host = `${env.protocol}://${req.headers.host}`;
 
     await settingService.getElements(req.params.id, stream, 'component', host);
 
@@ -123,8 +123,9 @@ const UpdateStyle = catchAsync(async (req, res) => {
 
 const GetCss = catchAsync(async (req, res) => {
     const settingService = loadService('settingService');
+    const host = `${env.protocol}://${req.headers.host}`;
 
-    const css = await settingService.getCss(req.params.id, 'component');
+    const css = await settingService.getCss(req.params.id, 'component', host);
     res.status(httpStatus.OK).send(css);
 });
 

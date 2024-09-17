@@ -969,6 +969,7 @@ const getElements = async (id, stream, type, host) => {
 
     // Convert the document to a string and push it to the stream
     const chunkStr = JSON.stringify(doc) + '\n'
+
     stream.push(chunkStr)
 
     // Initialize an object to keep track of loaded collections
@@ -1123,7 +1124,7 @@ const loadCollection = async (collectionId, projection, loaded, stream) => {
  * @param {String} id
  * @returns {Promise<CSS>}
  */
-const getCss = async (id, type) => {
+const getCss = async (id, type, host) => {
     // Define the fields to be returned
     const projection = {
         styles: 1,
@@ -1157,7 +1158,7 @@ const getCss = async (id, type) => {
     } else doc.styles = page.styles
 
     // Generate CSS for the styles
-    style.css = generateCssForStyles(doc, style.css)
+    style.css = generateCssForStyles(doc, style.css, host)
 
     // Load CSS for forms
     await loadFormsCSS(doc.forms || [], projection, style)
@@ -1169,14 +1170,14 @@ const getCss = async (id, type) => {
 }
 
 // Function to generate CSS for the styles
-const generateCssForStyles = (doc, css) => {
+const generateCssForStyles = (doc, css, host) => {
     const styles = doc.styles || {}
 
-    return [...css, generateElementsCss(styles, doc._id)]
+    return [...css, generateElementsCss(styles, doc._id, host)]
 }
 
 // Function to load CSS for forms
-const loadFormsCSS = async (forms, projection, style) => {
+const loadFormsCSS = async (forms, projection, style, host) => {
     for (let i = 0; i < forms.length; i++) {
         const form = await Form.findById(forms[i]).select(projection)
         if (form) {
@@ -1186,14 +1187,14 @@ const loadFormsCSS = async (forms, projection, style) => {
                 doc.styles = form._styles
             } else doc.styles = form.styles
 
-            style.css = generateCssForStyles(doc, style.css)
-            await loadComponentsCSS(doc.components, projection, style)
+            style.css = generateCssForStyles(doc, style.css, host)
+            await loadComponentsCSS(doc.components, projection, style, host)
         }
     }
 }
 
 // Function to load CSS for components
-const loadComponentsCSS = async (components, projection, style) => {
+const loadComponentsCSS = async (components, projection, style, host) => {
     for (let i = 0; i < components.length; i++) {
         const component = await Component.findById(components[i]).select(projection)
         if (component) {
@@ -1203,10 +1204,10 @@ const loadComponentsCSS = async (components, projection, style) => {
                 doc.styles = component._styles
             } else doc.styles = component.styles
 
-            style.css = generateCssForStyles(doc, style.css)
+            style.css = generateCssForStyles(doc, style.css, host)
 
-            await loadComponentsCSS(doc.components, projection, style)
-            await loadFormsCSS(doc.forms, projection, style)
+            await loadComponentsCSS(doc.components, projection, style, host)
+            await loadFormsCSS(doc.forms, projection, style, host)
         }
     }
 }

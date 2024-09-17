@@ -25,7 +25,7 @@ const env = {
         description: pkg.description,
         host: getOsEnv('APP_HOST'),
         schema: getOsEnv('APP_SCHEMA'),
-        routePrefix: getOsEnv('APP_ROUTE_PREFIX'),
+        autocodeApiPrefix: getOsEnv('AUTOCODE_API_PREFIX'),
         port: normalizePort(process.env.PORT || getOsEnv('APP_PORT')),
         banner: toBool(getOsEnv('APP_BANNER')),
     },

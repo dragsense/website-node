@@ -79,7 +79,7 @@ function updateContentWithType(object, type) {
 }
 
 // Function to generate CSS for elements
-const generateElementsCss = (elements, _id) => {
+const generateElementsCss = (elements, _id, host = '') => {
   let css = '';
 
   // If no elements, return empty string
@@ -93,14 +93,14 @@ const generateElementsCss = (elements, _id) => {
 
     // If selectorText exists, generate CSS
     if (selectorText)
-      css += generateElementCss(style, selectorText);
+      css += generateElementCss(style, selectorText, host);
   });
 
   return css;
 }
 
 // Function to generate CSS for a single element
-const generateElementCss = (style, selectorText) => {
+const generateElementCss = (style, selectorText, host) => {
   let css = '';
 
   Object.keys(style).map((key) => {
@@ -108,7 +108,7 @@ const generateElementCss = (style, selectorText) => {
       if (key !== 'normal')
         css += '@media ' + key + ' {\n';
       const s = style[key];
-      css += generateStyleCss(s, selectorText);
+      css += generateStyleCss(s, selectorText, host);
 
       if (key !== 'normal')
         css += ' }\n';
@@ -119,15 +119,29 @@ const generateElementCss = (style, selectorText) => {
 }
 
 // Function to generate CSS for a single style
-const generateStyleCss = (s, selectorText) => {
+const generateStyleCss = (s, selectorText, host = '') => {
   let css = '';
 
   Object.keys(s).map((key) => {
-    let properties = Object.entries(s[key].properties || {}).map(([key, property]) => `${key}: ${property.value} ${property.priority ? "!important" : ""}`).join(';');
+    let properties = Object.entries(s[key].properties || {}).map(([propertyKey, property]) => {
 
-    let selector = key !== 'root' ? selectorText + key : selectorText
-    if(properties.trim())
-    css += `${selector} {\n  ${properties}\n}\n\n`;
+      // Check if the property is a URL and adjust it by adding the host if necessary
+      if (['background-image', 'list-style-image'].includes(propertyKey)) {
+        if (property.value && property.value.startsWith('url(/')) {
+          // Replace 'url(/...' with 'url(host/...'
+          property.value = property.value.replace('url(/', `url(${host}/`);
+        }
+      }
+
+      // Return the CSS property string
+      return `${propertyKey}: ${property.value} ${property.priority ? "!important" : ""}`;
+    }).join('; ');
+
+    let selector = key !== 'root' ? selectorText + key : selectorText;
+
+    if (properties.trim()) {
+      css += `${selector} {\n  ${properties}\n}\n\n`;
+    }
   });
 
   return css;

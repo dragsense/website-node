@@ -2,6 +2,8 @@ const httpStatus = require('http-status');
 const { Readable } = require('stream');
 const catchAsync = require('../../utils/catch-async');
 const pickKeys = require('../../utils/pick-keys');
+const env = require('../../configs/env')
+
 
 // Load the necessary services dynamically
 const { loadService } = require('../../loaders/servicesLoader')
@@ -10,8 +12,7 @@ const GetPage = catchAsync(async (req, res) => {
     const pageService = loadService('pageService');
     const page = await pageService.getPage(req.params.id);
 
-    const protocol = 'https';
-    const host = `${protocol}://${req.headers.host}`;
+    const host = `${env.protocol}://${req.headers.host}`;
 
     res.status(httpStatus.OK).send({ page, host });
 });
@@ -30,8 +31,7 @@ const GetElements = catchAsync(async (req, res) => {
         read() { }
     });
 
-    const protocol = 'https';
-    const host = `${protocol}://${req.headers.host}`;
+    const host = `${env.protocol}://${req.headers.host}`;
 
     await settingService.getElements(req.params.id, stream, 'page', host);
 
@@ -57,7 +57,8 @@ const GetStyle = catchAsync(async (req, res) => {
 
 const GetCss = catchAsync(async (req, res) => {
     const settingService = loadService('settingService');
-    const css = await settingService.getCss(req.params.id, 'page');
+    const host = `${env.protocol}://${req.headers.host}`;
+    const css = await settingService.getCss(req.params.id, 'page', host);
     res.status(httpStatus.OK).send(css);
 });
 

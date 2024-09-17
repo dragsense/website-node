@@ -5,13 +5,15 @@ const ApiError = require('../../utils/api-error'); // Make sure this utility is 
 const { loadService } = require('../../loaders/servicesLoader')
 const fs = require('fs');
 const path = require('path')
+const env = require('../../configs/env')
+
 
 const GetDocument = catchAsync(async (req, res) => {
     const documentService = loadService('documentService');
     
     const document = await documentService.getDocument(req.params.collectionId, req.params.id, req.query.form === 'true');
-    const protocol = 'https';
-    const host = `${protocol}://${req.headers.host}`;
+ 
+    const host = `${env.protocol}://${req.headers.host}`;
 
     res.status(httpStatus.OK).send({ document, host });
 });
@@ -70,8 +72,7 @@ const DownloadDocuments = catchAsync(async (req, res) => {
     const filter = pickKeys(req.query, ['name', 'startDate', 'endDate', 'status']);
     const options = pickKeys(req.query, ['sortBy', 'limit', 'page']);
 
-    const protocol = 'https';
-    const host = `${protocol}://${req.headers.host}`;
+    const host = `${env.protocol}://${req.headers.host}`;
 
     // Call the downloadDocuments service
     const outputPath = await documentService.downloadDocuments(collectionId, isForm, filter, options, host);

@@ -66,7 +66,7 @@ module.exports = (autocodeRoutes) => {
 
 
   // api routes
-  app.use(env.app.routePrefix, autocodeRoutes)
+  app.use(env.app.autocodeApiPrefix, autocodeRoutes)
 
 
 

@@ -25,10 +25,13 @@ const env = {
     isProduction: process.env.NODE_ENV === 'production',
     isTest: process.env.NODE_ENV === 'test',
     isDevelopment: process.env.NODE_ENV === 'development',
-    autocodeApiKey: process.env.AUTOCODE_API_KEY,
-
+    autocodeApiKey: getOsEnv('AUTOCODE_API_KEY'),
+    autocodeApiPrefix: getOsEnv('AUTOCODE_API_PREFIX'),
+    protocol:process.env.APP_SCHEMA || 'https',
     database: {
-        name: getOsEnv('DB_NAME')
+        
+        name: getOsEnv('DB_NAME'),
+        mongouri: getOsEnv('DB_CONNECTION')
     },
 }
 
