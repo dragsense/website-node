@@ -608,7 +608,7 @@ const getAnimationsCss = async () => {
  * @param
  * @returns {Promise<Style>}
  */
-const getCss = async () => {
+const getCss = async (host = '') => {
   const code = await fsUtils.read(path.join(dataDir, 'customStyle.css'));
 
   let css = code;
@@ -617,7 +617,7 @@ const getCss = async () => {
   const data = await fsUtils.read(path.join(dataDir, 'style.json'));
   const styles = JSON.parse(data || '{}');
 
-  css += generateElementsCss(styles)
+  css += generateElementsCss(styles, host)
 
   const animData = await fsUtils.read(path.join(dataDir, 'animation.json'));
   const aniamtion = JSON.parse(animData || '{}');

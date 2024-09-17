@@ -3,6 +3,7 @@ const catchAsync = require('../../utils/catch-async');
 const pickKeys = require('../../utils/pick-keys');
 const { Readable } = require('stream');
 const { loadService } = require('../../loaders/servicesLoader')
+const env = require('../../configs/env')
 
 
 const CreateColor = catchAsync(async (req, res) => {
@@ -165,7 +166,8 @@ const SaveCss = catchAsync(async (req, res) => {
 
 const GetCss = catchAsync(async (req, res) => {
     const themeService = loadService('themeService');
-    const result = await themeService.getCss();
+    const host = `${env.protocol}://${req.headers.host}`;
+    const result = await themeService.getCss(host);
     res.status(httpStatus.OK).json(result);
 });
 
