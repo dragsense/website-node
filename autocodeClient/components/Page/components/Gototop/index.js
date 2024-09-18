@@ -60,14 +60,13 @@ const GoToTopButton = (props) => {
     return <Transition nodeRef={nodeRef} in={isVisible} timeout={duration}>
         {state => {
             const baseStyle = {
-                display: 'inline-block',
                 ...buttonTransition.defaultStyles,
             };
             const transitionStyles = buttonTransition[state];
-            return <div ref={nodeRef} style={{ ...baseStyle, ...transitionStyles }}
+            return <span ref={nodeRef} style={{ ...baseStyle, ...transitionStyles }}
                 onClick={scrollToTopCallback}>
                 {element(node, children)}
-            </div>;
+            </span>;
 
         }}
     </Transition>

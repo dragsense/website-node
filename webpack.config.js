@@ -52,56 +52,56 @@ const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
  
 
 
-//   module.exports = {
-//     entry: {
-//         'autocode-client': './autocodeClient/index.js',
-//     },
-//     output: {
-//         filename: '[name].js',
-//         path: path.resolve(__dirname, 'dist'),
-//          library: 'AutocodeClient',
-//          libraryExport: 'default',
-//          libraryTarget: 'umd',
-//          globalObject: 'this',
-//          publicPath: '',
+  module.exports = {
+    entry: {
+        'autocode-client': './autocodeClient/index.js',
+    },
+    output: {
+        filename: '[name].js',
+        path: path.resolve(__dirname, 'dist'),
+         library: 'AutocodeClient',
+         libraryExport: 'default',
+         libraryTarget: 'umd',
+         globalObject: 'this',
+         publicPath: '',
 
-//     },
+    },
    
-//     module: {
-//         rules: [
+    module: {
+        rules: [
 
-//             {
-//                 test: /\.(js|jsx)$/,
-//                 exclude: /node_modules/,
-//                 use: {
-//                     loader: 'babel-loader',
-//                     options: {
-//                         presets: ['@babel/preset-env', '@babel/preset-react'],
-//                     },
-//                 },
-//             },
-//         ],
-//     },
-//   externals: {
-//     'react': 'react',
-//     'mathjs': 'mathjs',
-//     'react-dom': 'react-dom'
+            {
+                test: /\.(js|jsx)$/,
+                exclude: /node_modules/,
+                use: {
+                    loader: 'babel-loader',
+                    options: {
+                        presets: ['@babel/preset-env', '@babel/preset-react'],
+                    },
+                },
+            },
+        ],
+    },
+  externals: {
+    'react': 'react',
+    'mathjs': 'mathjs',
+    'react-dom': 'react-dom'
      
-//   },
-//     resolve: {
-//         extensions: ['.js', '.jsx'],
-//     },
+  },
+    resolve: {
+        extensions: ['.js', '.jsx'],
+    },
 
-//     optimization: {
-//         minimizer: [
-//             new TerserPlugin(),
-//         ],
-//     },
+    optimization: {
+        minimizer: [
+            new TerserPlugin(),
+        ],
+    },
 
-//     mode: 'production',
-//  };    
+    mode: 'production',
+ };    
     
-
+/* 
  
  const { dependencies } = require('./package.json');
 
@@ -161,4 +161,4 @@ const externals = Object.keys(dependencies).reduce((externalsObj, dep) => {
     ],
     target: 'node',
     mode: 'production',
- };     
+ };      */
