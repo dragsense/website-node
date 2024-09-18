@@ -19,6 +19,13 @@
             "alt": "dragsense-logo.png",
             "mimetype": "image/png",
             "name": "dragsense-logo.png"
+        },
+        "placeholder": {
+            "_id": "66eb15342024b133c7984311",
+            "src": "/static/uploads/images/866-536x354-180020.jpg",
+            "alt": "866-536x354.jpg",
+            "mimetype": "image/jpeg",
+            "name": "866-536x354.jpg"
         }
     },
     "email": {
