@@ -79,8 +79,8 @@ module.exports = (app, AutoCode, AutocodeCustom, headCode = '', footCode = '') =
                 return
             }
 
-            const protocol = 'https'
-            const host = `${protocol}://${req.headers.host}`
+            //const host = `${env.protocol}://${req.headers.host}`;
+            const host = '';
 
             const pagesResults = await fetchPageData(page, host, remainingSlug, settingService)
 

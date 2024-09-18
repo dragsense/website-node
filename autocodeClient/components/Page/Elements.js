@@ -75,7 +75,6 @@ export default function Elements({ setting, type, pages, states, _uid, _id, Auto
       window.removeEventListener('resize', updateSize);
     }
 
-
   }, [pageSetting]);
 
   return <MemoizedTreeNode

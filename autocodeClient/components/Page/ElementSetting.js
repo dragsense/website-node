@@ -208,6 +208,7 @@ const ElementSetting = (props) => {
         if (attribute.key === 'style') {
             attributeValue = calculateAttributes(attribute.attributes);
         } else {
+
             const stateValue = getValue(attribute.valueState, attribute.value);
             let value = stateValue?.value || stateValue;
 
@@ -224,6 +225,10 @@ const ElementSetting = (props) => {
                 attributeValue = value;
             }
         }
+
+        if(attribute.key === 'backgroundImage' || attribute.key === 'backgroundImage')
+            attributeValue = `url(${attributeValue})`;
+    
 
         const conditions = attribute.conditions;
         const cond = calculateConditions(conditions);

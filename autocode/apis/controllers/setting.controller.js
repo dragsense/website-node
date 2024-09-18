@@ -23,7 +23,7 @@ const GetSettings = catchAsync(async (req, res) => {
 const GetPageData = catchAsync(async (req, res) => {
     const settingService = loadService('settingService')
 
-    const host = `${env.protocol}://${req.headers.host}`;
+    const host = '';//`${env.protocol}://${req.headers.host}`;
     const results = await settingService.getPageData(req.params.id, 'page', host);
     res.status(httpStatus.OK).send(results);
 });
@@ -31,7 +31,7 @@ const GetPageData = catchAsync(async (req, res) => {
 const GetCollectionData = catchAsync(async (req, res) => {
     const settingService = loadService('settingService')
  
-    const host = `${env.protocol}://${req.headers.host}`;
+    const host = '';//`${env.protocol}://${req.headers.host}`;
     const remainingSlug = req.query.remainingSlug;
     const results = await settingService.getPageData(req.params.id, 'collection', host, false, remainingSlug);
     res.status(httpStatus.OK).send(results);

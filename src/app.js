@@ -10,7 +10,7 @@ const expressLoader = require('./loaders/expressLoader')
 const { autocodeRoutes, autocodeClient } = require('../autocode/app')
 
 import AppClient from './client/components'
-import AutocodeClient from '../dist/autocode-client';
+import AutocodeClient from '../autocodeClient/index';
 
 const mongooseLoader = require('./loaders/mongooseLoader')
 const monitorLoader = require('./loaders/monitorLoader')
