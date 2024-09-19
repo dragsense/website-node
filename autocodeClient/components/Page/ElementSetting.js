@@ -257,7 +257,7 @@ const ElementSetting = (props) => {
         } catch (e) {
             return true;
         }
-    }, [conditions, colStates, _cstates, _states, _props, mapValue, node._uid]);
+    }, [conditions, setting, colStates, _cstates, _states, _props, mapValue, node._uid]);
 
     let attr = useMemo(() => {
         try {
@@ -266,7 +266,7 @@ const ElementSetting = (props) => {
         } catch (e) {
             return {};
         }
-    }, [attributes, colStates, _cstates, _states, _props, mapValue, node._uid]);
+    }, [attributes, setting, colStates, _cstates, _states, _props, mapValue, node._uid]);
 
     // Function to calculate class names based on conditions
     const calculateClassNames = (cls) => {
@@ -296,7 +296,7 @@ const ElementSetting = (props) => {
         } catch (e) {
             return mainClass;
         }
-    }, [classes, colStates, _cstates, _states, _props, mapValue, node._uid, node.className]);
+    }, [classes, setting, colStates, _cstates, _states, _props, mapValue, node._uid, node.className]);
 
     // Regular expression pattern to match the placeholders in the node value
     const pattern = /\{\{[^}]*\}\}/g;
