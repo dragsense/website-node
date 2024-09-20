@@ -247,7 +247,7 @@ function setupTemplate(page, styleUid, withTemplate) {
                 },
             },
         },
-        '(min-width: 768px) and (orientation: landscape)': {
+        '(max-width: 768px)': {
             root: {
                 properties: {
                     'grid-template-areas': {
@@ -266,6 +266,7 @@ function setupTemplate(page, styleUid, withTemplate) {
     // Set the main content area to the appropriate element
     page.main = mainElementId.toString();
 }
+
 
 
 

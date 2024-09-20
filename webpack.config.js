@@ -52,7 +52,7 @@ const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
  
 
 
-  module.exports = {
+ /*  module.exports = {
     entry: {
         'autocode-client': './autocodeClient/index.js',
     },
@@ -99,9 +99,9 @@ const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
     },
 
     mode: 'production',
- };    
+ }; */    
     
-/* 
+
  
  const { dependencies } = require('./package.json');
 
@@ -112,13 +112,13 @@ const externals = Object.keys(dependencies).reduce((externalsObj, dep) => {
 }, {
     'mongodb': 'mongodb', // Additional external library
     'react-dom/server': 'react-dom/server',
-    '../dist/autocode-services': '../dist/autocode-services'
+    //'../dist/autocode-services': '../dist/autocode-services'
 });
 
   module.exports = {
     entry: {
-        //'autocode-services': './autocode/apis/services/index.js',
-        'autocode': './autocode/app.js',
+        'autocode-services': './autocode/apis/services/index.js',
+        //'autocode': './autocode/app.js',
     },
     output: {
         filename: '[name].js',
@@ -161,4 +161,4 @@ const externals = Object.keys(dependencies).reduce((externalsObj, dep) => {
     ],
     target: 'node',
     mode: 'production',
- };      */
+ };      

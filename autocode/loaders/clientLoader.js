@@ -176,6 +176,7 @@ module.exports = (app, AutoCode, AutocodeCustom, headCode = '', footCode = '') =
         <!DOCTYPE html>
         <html>
           <head>
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
           <title>${page.setting?.title ? page.setting.title : setting.webTitle ? setting.webTitle : 'Page'}${
                 setting.tagLine ? ' - ' + setting.tagLine : ''
             }</title>
