@@ -166,8 +166,6 @@ const ElementSetting = (props) => {
     const evaluateCondition = (expression, v, keyValue) => {
         let original = expression.replace(/\[state]/g, v);
         original = original.replace(/\[key]/g, keyValue);
-        console.log(original)
-
         try {
             const expr = parser.parse(original);
             const evaluatedResult = expr.evaluate();

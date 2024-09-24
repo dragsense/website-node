@@ -537,7 +537,7 @@ const Component = (props) => {
         }
     }, [loading, props, node.map, states, _states, colStates, renderChildren])
 
-    return <span data-name={'component'}>{renderComponent()}</span>
+    return renderComponent();
 }
 
 export default Component

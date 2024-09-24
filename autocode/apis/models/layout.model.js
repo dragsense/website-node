@@ -194,6 +194,7 @@ function setupTemplate(page, styleUid, withTemplate) {
             childNodes: [],
             styleUid: shortid.generate(),
             name: names[i], // e.g., 'Header', 'Main', 'Footer', 'Left Aside', 'Right Aside'
+            parent: '0'
         };
 
         // Add basic grid areas for each child element
