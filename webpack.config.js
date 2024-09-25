@@ -52,7 +52,7 @@ const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
  
 
 
-/*    module.exports = {
+  module.exports = {
     entry: {
         'autocode-client': './autocodeClient/index.js',
     },
@@ -99,11 +99,10 @@ const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
     },
 
     mode: 'production',
- };  */
- 
+ };   
  
     
-
+/* 
  
  const { dependencies } = require('./package.json');
 
@@ -163,4 +162,4 @@ const externals = Object.keys(dependencies).reduce((externalsObj, dep) => {
     ],
     target: 'node',
     mode: 'production',
- };       
+ };        */
